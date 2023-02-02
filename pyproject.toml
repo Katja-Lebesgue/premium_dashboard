@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "creative-analysis"
+version = "0.1.0"
+description = ""
+authors = ["sanjin-lebesgue <sanjin@lebesgue.io>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+pandas = "^1.4.3"
+pendulum = "^2.1.2"
+SQLAlchemy = "^1.4.40"
+numpy = "^1.23.1"
+python-dotenv = "^0.20.0"
+psycopg2-binary = "^2.9.3"
+facebook-business = "^14.0.0"
+boto3 = "^1.24.48"
+nltk = "^3.7"
+emojis = "^0.6.0"
+price-parser = "^0.3.4"
+plotly = "^5.9.0"
+matplotlib = "^3.5.2"
+scipy = "^1.9.0"
+seaborn = "^0.11.2"
+pyperclip = "^1.8.2"
+multiset = "^3.0.1"
+CurrencyConverter = "^0.17"
+streamlit = "^1.9.2"
+streamlit-option-menu = "^0.3.2"
+statsmodels = "^0.13.2"
+textblob = "^0.17.1"
+loguru = "^0.6.0"
+uuid = "^1.30"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
