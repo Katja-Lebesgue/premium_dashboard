@@ -1,6 +1,6 @@
 # creative-analysis
 
-Creating features for ad creatives, research phase.
+Dashboard for Lebesgue premium users.
 
 `.env` example
 

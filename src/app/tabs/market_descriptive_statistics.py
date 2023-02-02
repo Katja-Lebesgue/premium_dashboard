@@ -33,11 +33,7 @@ def market_descriptive_statistics(
 
     descriptive_df = read_csv_from_s3(descriptive_df_path, add_global_path=False)
 
-    st.write(descriptive_df.columns)
-
-    descriptive_df["year_month"] = descriptive_df.year_month.apply(
-        lambda x: datetime.strptime(x, "%Y-%m")
-    )
+    descriptive_df["year_month"] = descriptive_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
     pie_charts(descriptive_df.copy())
 
@@ -54,9 +50,7 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
         .sort_values(ascending=True)
     )
 
-    descriptive_df = descriptive_df.loc[
-        descriptive_df.year_month.isin(last_3_months), :
-    ]
+    descriptive_df = descriptive_df.loc[descriptive_df.year_month.isin(last_3_months), :]
 
     col1, col2 = st.columns([1, 4])
 
@@ -75,9 +69,7 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
 
         st.markdown(hide_table_row_index(), unsafe_allow_html=True)
 
-        time_df = pd.DataFrame(last_3_months_str).rename(
-            columns=dict(year_month="Time period")
-        )
+        time_df = pd.DataFrame(last_3_months_str).rename(columns=dict(year_month="Time period"))
         st.table(time_df)
 
     with col2:
@@ -91,9 +83,7 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
 
         colors = ["gold", "mediumturquoise", "darkorange", "lightgreen"]
 
-        fig.update_traces(
-            textposition="inside", textinfo="percent+label", marker=dict(colors=colors)
-        )
+        fig.update_traces(textposition="inside", textinfo="percent+label", marker=dict(colors=colors))
 
         add_pie_subplot(
             fig=fig,
@@ -122,9 +112,7 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
 
         # Creating title
         total_str = big_number_human_format(
-            descriptive_df.loc[
-                descriptive_df.feature == "target", descriptive_metric
-            ].sum()
+            descriptive_df.loc[descriptive_df.feature == "target", descriptive_metric].sum()
         )
 
         if descriptive_metric == "spend_USD":
@@ -137,9 +125,7 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
         else:
             unit = metric_dict_market[descriptive_metric]
 
-        fig.update_traces(
-            textinfo="percent+label", marker=dict(colors=colors), textfont_size=15
-        )
+        fig.update_traces(textinfo="percent+label", marker=dict(colors=colors), textfont_size=15)
         fig.update_layout(
             height=500,
             width=900,
@@ -165,9 +151,7 @@ def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: in
             values=pie_df[y],
             labels=pie_df["feature_value"],
             hoverinfo="label+value+percent",
-            title=dict(
-                text=pie_groups_dict[group], font=dict(size=25), position="top left"
-            ),
+            title=dict(text=pie_groups_dict[group], font=dict(size=25), position="top left"),
             rotation=225,
         ),
         row=row,
@@ -187,9 +171,7 @@ def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
 
     with col1:
 
-        selected_feature = st.selectbox(
-            "Select feature", tuple(features), format_func=lambda x: remove_any(x)
-        )
+        selected_feature = st.selectbox("Select feature", tuple(features), format_func=lambda x: remove_any(x))
 
         performance_metric = st.selectbox(
             "Select metric",
@@ -199,9 +181,7 @@ def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
         )
 
         descriptive_df = descriptive_df[descriptive_df.feature == selected_feature]
-        performance_series = descriptive_df.groupby(
-            ["year_month", "feature_value"]
-        ).sum()[performance_metric]
+        performance_series = descriptive_df.groupby(["year_month", "feature_value"]).sum()[performance_metric]
 
         bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"))
 
