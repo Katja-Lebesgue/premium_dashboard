@@ -5,6 +5,7 @@ sys.path.append("././.")
 import pandas as pd
 from datetime import date
 from sqlalchemy.orm import Session
+from loguru import logger
 
 from src.utils.decorators import print_execution_time
 
@@ -17,6 +18,8 @@ def ping_shops(
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
 ) -> pd.DataFrame:
+
+    logger.debug("Here I am!")
 
     query = db.query(FacebookAd.shop_id)
 

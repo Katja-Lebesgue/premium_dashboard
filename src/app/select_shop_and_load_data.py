@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from loguru import logger
 from sqlalchemy.orm import Session
 from src.pingers import *
 from src.models import *
@@ -18,6 +19,8 @@ import streamlit as st
 
 
 def select_shop_and_load_data() -> pd.DataFrame:
+
+    logger.debug("I am here")
 
     shops = st_get_shops()
 
@@ -44,9 +47,8 @@ def select_shop_and_load_data() -> pd.DataFrame:
     return data_shop_copy
 
 
-@st.cache
+@st.experimental_memo
 def st_get_shops() -> pd.Series:
-    # return ["2"]
     print("st_select_ids")
     shops = ping_shops(db=db)
     return shops
@@ -55,6 +57,6 @@ def st_get_shops() -> pd.Series:
 @st.experimental_memo
 def st_get_data_by_shop_id(shop_id) -> pd.DataFrame:
     print("st_select_shop")
-    df = ping_creative_and_performance(shop_id=shop_id)
+    df = ping_creative_and_performance(db=db, shop_id=shop_id)
     df["count"] = 1
     return df

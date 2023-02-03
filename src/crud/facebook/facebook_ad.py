@@ -18,6 +18,7 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         return db.query(self.model).get((shop_id, account_id, ad_id))
 
     def query_ad_id(
+        self,
         db: Session,
         shop_id: str | list[str] = None,
         start_date: str = None,
@@ -41,6 +42,7 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         return query
 
     def query_shop_id(
+        self,
         db: Session,
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),

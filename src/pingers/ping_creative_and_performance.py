@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import date, datetime
 from sqlalchemy import and_
+from sqlalchemy.orm import Session
 
 from src.utils.decorators import print_execution_time
 
@@ -15,7 +16,7 @@ from src.feature_extractors import *
 
 # @print_execution_time
 def ping_creative_and_performance(
-    session=SessionLocal(),
+    db: Session,
     ad_id: str | list[str] = None,
     shop_id: str | list[str] = None,
     start_date: str = None,
@@ -32,7 +33,7 @@ def ping_creative_and_performance(
         return None
 
     creative = ping_creative(
-        session=session,
+        db=db,
         shop_id=shop_id,
         ad_id=ad_id,
         start_date=start_date,
@@ -45,7 +46,7 @@ def ping_creative_and_performance(
         return creative
 
     performance_query = crud_fb_daily_performance.query_performance(
-        session=session,
+        db=db,
         shop_id=shop_id,
         ad_id=ad_id,
         start_date=start_date,
@@ -53,7 +54,7 @@ def ping_creative_and_performance(
         monthly=monthly,
     )
 
-    performance = pd.read_sql(performance_query.statement, session.bind)
+    performance = pd.read_sql(performance_query.statement, db.bind)
 
     if len(performance) == 0:
         return creative

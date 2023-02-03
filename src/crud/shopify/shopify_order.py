@@ -64,6 +64,7 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
         )
 
     def query_aov(
+        self,
         db: Session,
         shop_id: str | list[str] = None,
         start_date: str = None,

@@ -24,6 +24,7 @@ class CRUDFacebookDailyPerformance(
         return db.query(self.model).get((shop_id, account_id, ad_id, date_start))
 
     def query_performance(
+        self,
         db: Session,
         shop_id: str | list[str] = None,
         ad_id: str | list[str] = None,

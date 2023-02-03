@@ -46,5 +46,3 @@ class ShopifyOrder(Base):
     billing = Column(JSON)
 
     shop = relationship("Shop", viewonly=True)
-    discount_applications = relationship("ShopifyDiscountApplication", cascade="all, delete-orphan")
-    line_items = relationship("ShopifyLineItem", cascade="all, delete-orphan")

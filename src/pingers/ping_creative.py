@@ -15,17 +15,13 @@ from src.database.session import SessionLocal
 # @print_execution_time
 def ping_creative(
     db: Session,
+    shop_id: int | list[int],
     ad_id: str | list[str] = None,
-    shop_id: str | list[str] = None,
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
     get_aov: str = True,
     get_industry: bool = True,
 ) -> pd.DataFrame:
-
-    if all([x is None for x in [ad_id, shop_id, start_date]]):
-        print("No filters in ping creative!")
-        return None
 
     query = crud_ad_creative_features.query_creative(
         db=db,

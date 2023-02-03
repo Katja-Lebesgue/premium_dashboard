@@ -24,8 +24,6 @@ authenticator = authenticate()
 if st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
 
-    st.write("8")
-
     with st.sidebar:
 
         main_tab = option_menu(

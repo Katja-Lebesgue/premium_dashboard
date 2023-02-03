@@ -45,7 +45,7 @@ class Shop(Base):
     shop_name = Column(String)
     mailchimp_subscriber_hash = Column(String)
     owner_id = Column(BigInteger().with_variant(sqlite.INTEGER, "sqlite"), ForeignKey("user.id"), nullable=True)
-
+    facebook_ad_accounts = relationship("FacebookAdAccount", back_populates="shop", lazy="dynamic")
     facebook_ads_insights = relationship("FacebookAdsInsights", back_populates="shop", lazy="dynamic")
     facebook_ad_sets = relationship("FacebookAdset", back_populates="shop")
     facebook_daily_performance = relationship("FacebookDailyPerformance", back_populates="shop")

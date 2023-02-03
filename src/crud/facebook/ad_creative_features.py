@@ -33,16 +33,13 @@ class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCrea
         return features
 
     def query_creative(
+        self,
         db: Session,
-        shop_id: str | list[str] = None,
+        shop_id: int | list[int],
         ad_id: str | list[str] = None,
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
     ) -> Query:
-
-        if all([x is None for x in [ad_id, shop_id, start_date]]):
-            raise ValueError("No filters in query creative!")
-            return None
 
         query = db.query(AdCreativeFeatures)
 
