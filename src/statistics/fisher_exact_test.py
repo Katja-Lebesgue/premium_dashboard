@@ -3,7 +3,7 @@ from scipy.stats import fisher_exact
 import pandas as pd
 import numpy as np
 
-from src.utils.help_functions import nan_to_none
+from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
 
 
@@ -37,9 +37,7 @@ def fisher_exact_test(
     group2_mean = group2_positive / group2_size if group2_size else np.nan
 
     if convert_nan_to_none:
-        odsratio, p, group1_mean, group2_mean = (
-            nan_to_none(x) for x in (odsratio, p, group1_mean, group2_mean)
-        )
+        odsratio, p, group1_mean, group2_mean = (nan_to_none(x) for x in (odsratio, p, group1_mean, group2_mean))
 
     result = {
         "stat": odsratio,
@@ -51,9 +49,7 @@ def fisher_exact_test(
     return result
 
 
-def fisher_exact_test_ctr(
-    group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
-):
+def fisher_exact_test_ctr(group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False):
     result = fisher_exact_test(
         group1=group1,
         group2=group2,
@@ -64,9 +60,7 @@ def fisher_exact_test_ctr(
     return result
 
 
-def fisher_exact_test_cr(
-    group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
-):
+def fisher_exact_test_cr(group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False):
     result = fisher_exact_test(
         group1=group1,
         group2=group2,

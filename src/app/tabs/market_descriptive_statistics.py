@@ -11,7 +11,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
-from src.utils.help_functions import big_number_human_format
+from src.utils.common import big_number_human_format
 from src.app.utils.labels_and_values import feature_dict_market
 from src.s3 import *
 

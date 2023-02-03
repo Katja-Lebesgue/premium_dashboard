@@ -4,10 +4,10 @@ import numpy as np
 from scipy import stats
 from datetime import datetime, timedelta
 
-from src.utils.help_functions import big_number_human_format
+from src.utils.common import big_number_human_format
 from src.statistics.mean_test import mean_test
 from src.statistics import *
-from src.utils.help_functions import *
+from src.utils.common import *
 from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
 from src.statistics.bernoulli_tests.mean_test_bernoulli import *
@@ -131,20 +131,12 @@ def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
     pvalue = [np.nan, np.nan, np.nan]
 
     # divide groups
-    group_true = df.loc[df[group_col].isin([True]), :].dropna(
-        axis=0, subset=["ctr", "cr"]
-    )
+    group_true = df.loc[df[group_col].isin([True]), :].dropna(axis=0, subset=["ctr", "cr"])
 
-    group_false = df.loc[df[group_col].isin([False]), :].dropna(
-        axis=0, subset=["ctr", "cr"]
-    )
+    group_false = df.loc[df[group_col].isin([False]), :].dropna(axis=0, subset=["ctr", "cr"])
 
-    result_ctr = mean_test_bernoulli_ctr(
-        df=df, group_col=group_col, convert_nan_to_none=True
-    )
-    result_cr = mean_test_bernoulli_cr(
-        df=df, group_col=group_col, convert_nan_to_none=True
-    )
+    result_ctr = mean_test_bernoulli_ctr(df=df, group_col=group_col, convert_nan_to_none=True)
+    result_cr = mean_test_bernoulli_cr(df=df, group_col=group_col, convert_nan_to_none=True)
 
     pvalue.extend([result_ctr["p"], result_cr["p"]])
 
@@ -212,9 +204,7 @@ def style_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
     # style small p-values
     if "p-value" in df.index:
         slice = (["p-value"], df.columns)
-        df_style = df.style.applymap(
-            style_small_values, props="color: red", subset=slice
-        )
+        df_style = df.style.applymap(style_small_values, props="color: red", subset=slice)
 
     # add bars
     slice_x = list(df.index)

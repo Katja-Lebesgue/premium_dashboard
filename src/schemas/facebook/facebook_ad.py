@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
-from src.schemas.helpers import FieldAccessMetaclass
+
+# from src.schemas.helpers import FieldAccessMetaclass
 
 
 class FacebookAdBase(BaseModel):
@@ -27,5 +28,5 @@ class FacebookAdUpdate(FacebookAdBase):
     pass
 
 
-class FacebookAdField(FacebookAdBase, metaclass=FieldAccessMetaclass):
-    pass
+# class FacebookAdField(FacebookAdBase, metaclass=FieldAccessMetaclass):
+#     pass

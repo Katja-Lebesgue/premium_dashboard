@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
 
-from src.utils.help_functions import nan_to_none
+from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
 
 

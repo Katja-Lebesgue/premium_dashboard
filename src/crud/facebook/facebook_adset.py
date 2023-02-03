@@ -48,4 +48,4 @@ class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAds
         return query
 
 
-fb_adset = CRUDFacebookAdset(FacebookAdset)
+crud_fb_adset = CRUDFacebookAdset(FacebookAdset)

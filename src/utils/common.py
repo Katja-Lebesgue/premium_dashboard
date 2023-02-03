@@ -30,9 +30,7 @@ def read_csv_and_eval(path: str) -> pd.DataFrame:
 
     cols_to_eval = list(set(df.columns) - set(str_cols))
 
-    df.loc[:, cols_to_eval] = df.loc[:, cols_to_eval].applymap(
-        eval_but_leave_string_if_you_cant
-    )
+    df.loc[:, cols_to_eval] = df.loc[:, cols_to_eval].applymap(eval_but_leave_string_if_you_cant)
 
     df = df.infer_objects()
 
@@ -84,9 +82,7 @@ def big_number_human_format(num, big_decimals: int = 2, small_decimals: int = 0)
     return num_format
 
 
-def convert_to_USD(
-    price: float | int, currency: str, conversion_rates_json: str
-) -> float:
+def convert_to_USD(price: float | int, currency: str, conversion_rates_json: str) -> float:
 
     if type(currency) != str or currency not in conversion_rates_json.keys():
         return None

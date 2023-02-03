@@ -1,11 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.core.config import settings
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True, pool_size=32, max_overflow=64)
+print(f'base I am using: {os.getenv("POSTGRES_SERVER")}')
 
-print(str(engine))
+uri = f'postgresql://{os.getenv("POSTGRES_USER")}:{os.getenv("POSTGRES_PASSWORD")}@{os.getenv("POSTGRES_SERVER")}/{os.getenv("POSTGRES_DB")}'
 
+engine = create_engine(uri, pool_pre_ping=True, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+db = SessionLocal()

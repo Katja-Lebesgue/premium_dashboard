@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import chi2, chi2_contingency, f, kruskal
 
-from src.utils.help_functions import nan_to_none
+from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
 from src.statistics import *
 
@@ -48,9 +48,7 @@ def kruskal_bernoulli(positives: list, sizes: list) -> float:
         ]
     )
 
-    fraction = sum(
-        [size * (r - global_r) ** 2 / denominator for size, r in zip(sizes, rs)]
-    )
+    fraction = sum([size * (r - global_r) ** 2 / denominator for size, r in zip(sizes, rs)])
 
     H = (N - 1) * fraction
 
@@ -62,10 +60,7 @@ def kruskal_bernoulli(positives: list, sizes: list) -> float:
 def main():
     positives = [10000000, 120, 20]
     sizes = [100000000, 1270, 60]
-    samples = [
-        get_binomial_sample(positive=positive, size=size)
-        for positive, size in zip(positives, sizes)
-    ]
+    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
 
     f_moj, p_moj = kruskal_bernoulli(positives=positives, sizes=sizes)
     print(f"moji: {[f_moj, p_moj]}")

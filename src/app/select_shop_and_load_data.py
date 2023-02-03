@@ -10,19 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from sqlalchemy.orm import Session
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.query import Query
-from sqlalchemy.sql.compiler import StrSQLCompiler
-
-from src.database.pingers import *
-from src.database.queries import *
-from src.database.session import SessionLocal
-from src.database.models import *
-
-
-from src.app.utils.labels_and_values import shop_dict
-
-from src.database.session import SessionLocal
+from src.pingers import *
+from src.models import *
+from src.database.session import db
 
 import streamlit as st
 
@@ -54,11 +44,11 @@ def select_shop_and_load_data() -> pd.DataFrame:
     return data_shop_copy
 
 
-@st.experimental_memo
+@st.cache
 def st_get_shops() -> pd.Series:
     # return ["2"]
     print("st_select_ids")
-    shops = ping_shops()
+    shops = ping_shops(db=db)
     return shops
 
 

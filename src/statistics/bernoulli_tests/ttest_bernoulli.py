@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import ttest_ind_from_stats, ttest_ind
 
-from src.utils.help_functions import nan_to_none
+from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
 from src.statistics import *
 
@@ -51,10 +51,7 @@ def ttest_bernoulli(positives: list, sizes: list, equal_var: bool = True) -> flo
 def main():
     positives = [100, 230]
     sizes = [200, 500]
-    samples = [
-        get_binomial_sample(positive=positive, size=size)
-        for positive, size in zip(positives, sizes)
-    ]
+    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
     # print(samples)
     f_moj, p_moj = ttest_bernoulli(positives=positives, sizes=sizes)
     print(f"moji: {[f_moj, p_moj]}")

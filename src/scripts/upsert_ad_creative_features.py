@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("./.")
 
-from src.utils.help_functions import read_csv_and_eval
+from src.utils.common import read_csv_and_eval
 from src.utils.decorators import print_execution_time
 
 
@@ -36,9 +36,7 @@ def main():
     for shop_id in tqdm(shop_ids, total=len(shop_ids)):
         print(f"updating shop id {shop_id}...")
         try:
-            update_df, success = upsert_creative_by_shop_id(
-                shop_id=shop_id, update_df=update_df, end_date="2023-01-04"
-            )
+            update_df, success = upsert_creative_by_shop_id(shop_id=shop_id, update_df=update_df, end_date="2023-01-04")
 
             print(f"success: {success}")
 

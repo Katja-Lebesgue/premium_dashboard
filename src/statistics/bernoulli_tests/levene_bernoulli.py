@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency, f
 
-from src.utils.help_functions import nan_to_none
+from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
 from src.statistics import *
 
@@ -33,10 +33,7 @@ def levene_bernoulli(positives: list, sizes: list, use_medians: bool = True) -> 
     negatives = [size - positive for size, positive in zip(sizes, positives)]
 
     if use_medians:
-        means = [
-            get_median(positive, negative)
-            for positive, negative in zip(positives, negatives)
-        ]
+        means = [get_median(positive, negative) for positive, negative in zip(positives, negatives)]
     else:
         means = [positive / size for positive, size in zip(positives, sizes)]
 
@@ -57,9 +54,7 @@ def levene_bernoulli(positives: list, sizes: list, use_medians: bool = True) -> 
         ]
     )
 
-    fraction = np.sum(
-        [size * (z - global_z) ** 2 / denominator for size, z in zip(sizes, zs)]
-    )
+    fraction = np.sum([size * (z - global_z) ** 2 / denominator for size, z in zip(sizes, zs)])
 
     W = (N - k) * fraction / (k - 1)
 
@@ -71,10 +66,7 @@ def levene_bernoulli(positives: list, sizes: list, use_medians: bool = True) -> 
 def main():
     positives = [100, 120, 20]
     sizes = [1000, 1270, 60]
-    samples = [
-        get_binomial_sample(positive=positive, size=size)
-        for positive, size in zip(positives, sizes)
-    ]
+    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
 
     f_moj, p_moj = levene_bernoulli(positives=positives, sizes=sizes)
     print(f"moji: {[f_moj, p_moj]}")

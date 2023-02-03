@@ -8,7 +8,7 @@ from scipy.stats import f, f_oneway
 
 from src.utils import *
 from src.statistics.get_binomial_sample import get_binomial_sample
-from src.database.pingers import *
+from src.pingers import *
 
 
 def _f_oneway(*args, **kwargs):
@@ -61,10 +61,7 @@ def f_oneway_bernoulli(positives: pd.Series | list, sizes: pd.Series | list):
 
 def main():
     df = ping_creative_and_performance(shop_id="2")
-    samples = [
-        get_binomial_sample(positive=positive, size=size)
-        for positive, size in zip(positives, sizes)
-    ]
+    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
     f_moj, p_moj = f_oneway_bernoulli(positives=positives, sizes=sizes)
     print(f"moji: {[f_moj, p_moj]}")
     f, p = _f_oneway(*samples)

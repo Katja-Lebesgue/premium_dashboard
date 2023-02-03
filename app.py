@@ -14,6 +14,7 @@ from src.app.tabs.custom_performance_test import custom_performance_test
 from src.app.tabs.market_performance_tests import market_performance_tests
 from src.app.tabs.market_descriptive_statistics import market_descriptive_statistics
 from src.app.authenticate import authenticate
+from src.database.session import SessionLocal
 
 
 st.set_page_config(layout="wide")
@@ -22,6 +23,8 @@ authenticator = authenticate()
 
 if st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
+
+    st.write("8")
 
     with st.sidebar:
 

@@ -10,9 +10,9 @@ import sqlalchemy
 
 from currency_converter import CurrencyConverter
 
-from src.utils.help_functions import read_csv_and_eval
-from src.database.queries import *
+from src.utils.common import read_csv_and_eval
 from src.feature_extractors import *
+from src.crud import crud_fb_daily_performance
 
 from src.database.session import SessionLocal
 
@@ -21,9 +21,7 @@ def get_shop_ids() -> list:
 
     client = s3_connect()
 
-    response = client.list_objects_v2(
-        Bucket="creative-features", Prefix="data/creative_by_shop_id/"
-    )
+    response = client.list_objects_v2(Bucket="creative-features", Prefix="data/creative_by_shop_id/")
     list_of_paths = [content["Key"] for content in response["Contents"]]
     shop_ids = [re.findall("[\d]+(?=.csv)", path)[0] for path in list_of_paths]
 
@@ -37,9 +35,7 @@ def get_data_by_shop_id(
 ) -> pd.DataFrame:
 
     df = read_creative_data_by_shop_id(shop_id)
-    df = join_with_performance(
-        df=df, shop_id=shop_id, start_date=start_date, end_date=end_date
-    )
+    df = join_with_performance(df=df, shop_id=shop_id, start_date=start_date, end_date=end_date)
 
     return df
 
@@ -51,20 +47,14 @@ def read_creative_data_by_shop_id(
     client = s3_connect()
 
     if type(shop_id) == str:
-        object = client.get_object(
-            Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id}.csv"
-        )
+        object = client.get_object(Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id}.csv")
         creative = read_csv_and_eval(object["Body"])
 
     else:
-        object = client.get_object(
-            Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id[0]}.csv"
-        )
+        object = client.get_object(Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id[0]}.csv")
         creative = read_csv_and_eval(object["Body"])
         for id in shop_id[1:]:
-            object = client.get_object(
-                Bucket="creative-features", Key=f"data/creative_by_shop_id/{id}.csv"
-            )
+            object = client.get_object(Bucket="creative-features", Key=f"data/creative_by_shop_id/{id}.csv")
             creative_new = read_csv_and_eval(object["Body"])
             creative = pd.concat([creative, creative_new], axis=0)
 
@@ -82,7 +72,7 @@ def join_with_performance(
     if session is None:
         session = SessionLocal()
 
-    query = query_performance(
+    query = crud_fb_daily_performance.query_performance(
         session=session, shop_id=shop_id, start_date=start_date, end_date=end_date
     )
 

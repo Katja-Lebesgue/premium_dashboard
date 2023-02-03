@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from currency_converter import CurrencyConverter
 from ..s3.read_file_from_s3 import read_json_from_s3
-from src.utils.help_functions import convert_to_USD
+from src.utils.common import convert_to_USD
 import json
 
 
@@ -16,16 +16,10 @@ def add_performance_columns(
     performance.fillna(0, inplace=True)
     performance.replace(to_replace="None", value=0, inplace=True)
 
-    performance["ctr"] = performance.apply(
-        lambda df: df.link_clicks / df.impr if df.impr else np.nan, axis=1
-    )
-    performance["cr"] = performance.apply(
-        lambda df: df.purch / df.link_clicks if df.link_clicks else np.nan, axis=1
-    )
+    performance["ctr"] = performance.apply(lambda df: df.link_clicks / df.impr if df.impr else np.nan, axis=1)
+    performance["cr"] = performance.apply(lambda df: df.purch / df.link_clicks if df.link_clicks else np.nan, axis=1)
 
-    performance["roas"] = performance.apply(
-        lambda df: df.purch_value / df.spend if df.spend else np.nan, axis=1
-    )
+    performance["roas"] = performance.apply(lambda df: df.purch_value / df.spend if df.spend else np.nan, axis=1)
 
     int_cols = ["impr", "link_clicks", "purch"]
 

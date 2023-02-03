@@ -9,9 +9,8 @@ from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ad import FacebookAd
 from src.models.facebook.facebook_daily_performance import FacebookDailyPerformance
 from src.schemas.facebook.facebook_ad import FacebookAdCreate, FacebookAdUpdate
-from src.crud.facebook.facebook_daily_performance import fb_daily_performance
 
-from src.utils.help_functions import element_to_list
+from src.utils.common import element_to_list
 
 
 class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
@@ -39,6 +38,20 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
 
         query = query.distinct()
 
+        return query
+
+    def query_shop_id(
+        db: Session,
+        start_date: str = None,
+        end_date: str = date.today().strftime("%Y-%m-%d"),
+    ) -> pd.DataFrame:
+        query = db.query(FacebookAd.shop_id)
+        if start_date is not None:
+            query = query.join(FacebookDailyPerformance).filter(
+                FacebookDailyPerformance.date_start >= start_date,
+                FacebookDailyPerformance.date_start <= end_date,
+            )
+        query = query.distinct()
         return query
 
     def query_raw_creative_data(
@@ -167,4 +180,4 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         return query
 
 
-fb_ad = CRUDFacebookAd(FacebookAd)
+crud_fb_ad = CRUDFacebookAd(FacebookAd)

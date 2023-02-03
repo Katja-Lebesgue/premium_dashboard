@@ -6,19 +6,15 @@ import pandas as pd
 
 from sqlalchemy import and_
 
-from src.database.queries import *
-from src.database.models import *
+from src.models import *
+from src.crud import *
 from src.database.session import *
 
 
-def ping_raw_creative_and_target(
-    session=SessionLocal(), ad_id: str = None, shop_id: str = None
-):
+def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop_id: str = None):
 
-    creative_query = query_raw_creative_data(
-        session=session, ad_id=ad_id, shop_id=shop_id
-    )
-    target_query = query_target(session=session, shop_id=shop_id).subquery()
+    creative_query = crud_fb_ad.query_raw_creative_data(session=session, ad_id=ad_id, shop_id=shop_id)
+    target_query = crud_fb_adset.query_target(session=session, shop_id=shop_id).subquery()
 
     query = creative_query.join(
         target_query,

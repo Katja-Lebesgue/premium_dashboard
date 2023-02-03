@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from statistics import mean
 
-from src.utils.help_functions import nan_to_none, none_to_unknown
+from src.utils.common import nan_to_none, none_to_unknown
 from src.statistics.get_binomial_sample import *
 from src.utils.decorators import print_execution_time
 import itertools
@@ -76,9 +76,7 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
 
     # samples_dict = {group: sample for group, sample in samples_dict.items()}
 
-    samples_dict = {
-        group: sample for group, sample in samples_dict.items() if len(sample)
-    }
+    samples_dict = {group: sample for group, sample in samples_dict.items() if len(sample)}
 
     samples_list = list(samples_dict.values())
 
@@ -103,9 +101,7 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
                     # print(
                     #     f"duljine uzoraka: {[sum(sample) for sample in samples_list]}"
                     # )
-                    shapiro_pvalues = [
-                        _shapiro(sample).pvalue for sample in samples_list
-                    ]
+                    shapiro_pvalues = [_shapiro(sample).pvalue for sample in samples_list]
                     p_shapiro = min(shapiro_pvalues)
                 else:
                     p_shapiro = 0
@@ -129,9 +125,7 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
                     test_type = "kruskal"
 
     if convert_nan_to_none:
-        stat, p, stat_levene, p_levene = (
-            nan_to_none(x) for x in (stat, p, stat_levene, p_levene)
-        )
+        stat, p, stat_levene, p_levene = (nan_to_none(x) for x in (stat, p, stat_levene, p_levene))
 
     result = {
         "stat": stat,
@@ -186,11 +180,7 @@ def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) ->
     while p > 0.1 and upper_limit < means_len:
         upper_limit = upper_limit + 1
         mean_test_result = mean_test(
-            {
-                group: sample
-                for group, sample in samples_dict.items()
-                if group in means.index[0:upper_limit]
-            }
+            {group: sample for group, sample in samples_dict.items() if group in means.index[0:upper_limit]}
         )
         p = mean_test_result["p"]
 
@@ -203,11 +193,7 @@ def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) ->
     while p > 0.1 and lower_limit > 0:
         lower_limit = lower_limit - 1
         mean_test_result = mean_test(
-            {
-                group: sample
-                for group, sample in samples_dict.items()
-                if group in means.index[lower_limit:means_len]
-            }
+            {group: sample for group, sample in samples_dict.items() if group in means.index[lower_limit:means_len]}
         )
         p = mean_test_result["p"]
 
@@ -219,9 +205,7 @@ def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) ->
 @print_execution_time
 def mean_test_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
 
-    samples_dict = create_samples_dict(
-        df=df, group_col=group_col, size_col="impr", positive_col="link_clicks"
-    )
+    samples_dict = create_samples_dict(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
 
     result = mean_test(
         samples_dict=samples_dict,
@@ -234,21 +218,15 @@ def mean_test_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = 
 @print_execution_time
 def mean_test_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
 
-    samples_dict = create_samples_dict(
-        df=df, group_col=group_col, size_col="link_clicks", positive_col="purch"
-    )
+    samples_dict = create_samples_dict(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
 
-    result = mean_test(
-        samples_dict=samples_dict, convert_nan_to_none=convert_nan_to_none
-    )
+    result = mean_test(samples_dict=samples_dict, convert_nan_to_none=convert_nan_to_none)
 
     return result
 
 
 @print_execution_time
-def create_samples_dict(
-    df: pd.DataFrame, group_col: str, size_col: str, positive_col: str
-):
+def create_samples_dict(df: pd.DataFrame, group_col: str, size_col: str, positive_col: str):
 
     samples_dict = dict()
 

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.s3.s3_connect import s3_connect
-from src.utils.help_functions import read_csv_and_eval
+from src.utils.common import read_csv_and_eval
 
 from src.utils import *
 

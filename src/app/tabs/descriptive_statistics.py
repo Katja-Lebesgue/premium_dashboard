@@ -12,7 +12,7 @@ from src.app.utils.labels_and_values import feature_dict
 from src.app.utils.labels_and_values import *
 from src.app.utils.css import hide_table_row_index
 
-from src.utils.help_functions import big_number_human_format
+from src.utils.common import big_number_human_format
 
 from metadata.globals import *
 
@@ -67,9 +67,7 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
 
         st.markdown(hide_table_row_index(), unsafe_allow_html=True)
 
-        time_df = pd.DataFrame(last_3_months_str).rename(
-            columns=dict(year_month="Time period")
-        )
+        time_df = pd.DataFrame(last_3_months_str).rename(columns=dict(year_month="Time period"))
         st.table(time_df)
 
         if descriptive_metric == "count":
@@ -86,9 +84,7 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
 
         colors = ["gold", "mediumturquoise", "darkorange", "lightgreen"]
 
-        fig.update_traces(
-            textposition="inside", textinfo="percent+label", marker=dict(colors=colors)
-        )
+        fig.update_traces(textposition="inside", textinfo="percent+label", marker=dict(colors=colors))
 
         add_pie_subplot(
             fig=fig,
@@ -106,9 +102,7 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
             row=1,
             col=2,
         )
-        add_pie_subplot(
-            fig=fig, df=data_shop, group="target", y=descriptive_metric, row=1, col=3
-        )
+        add_pie_subplot(fig=fig, df=data_shop, group="target", y=descriptive_metric, row=1, col=3)
 
         # Creating title
         total_str = big_number_human_format(data_shop[descriptive_metric].sum())
@@ -123,9 +117,7 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
         else:
             unit = metric_dict_shop[descriptive_metric]
 
-        fig.update_traces(
-            textinfo="percent+label", marker=dict(colors=colors), textfont_size=15
-        )
+        fig.update_traces(textinfo="percent+label", marker=dict(colors=colors), textfont_size=15)
         fig.update_layout(
             height=500,
             width=900,
@@ -142,18 +134,14 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
 
 def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: int):
 
-    pie_df = pd.DataFrame(
-        df.replace({None: "unknown"}).groupby(group).sum()[y]
-    ).reset_index()
+    pie_df = pd.DataFrame(df.replace({None: "unknown"}).groupby(group).sum()[y]).reset_index()
 
     fig.add_trace(
         go.Pie(
             values=pie_df[y],
             labels=pie_df[group],
             hoverinfo="label+value+percent",
-            title=dict(
-                text=pie_groups_dict[group], font=dict(size=25), position="top left"
-            ),
+            title=dict(text=pie_groups_dict[group], font=dict(size=25), position="top left"),
             rotation=225,
         ),
         row=row,
@@ -196,9 +184,7 @@ def text_features_through_time(data_shop: pd.DataFrame) -> None:
         if performance_metric == "counts":
             data_shop = data_shop.drop_duplicates(subset="ad_id")
 
-        performance_series = data_shop.groupby(["year_month", text_feature]).sum()[
-            performance_metric
-        ]
+        performance_series = data_shop.groupby(["year_month", text_feature]).sum()[performance_metric]
 
         bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"))
 

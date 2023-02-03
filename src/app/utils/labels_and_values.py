@@ -2,7 +2,6 @@ import sys
 
 sys.path.append("./.")
 
-from src.database.myDB import DBConnect
 import pandas as pd
 
 metric_dict = {
@@ -38,6 +37,7 @@ custom_feature_dict = {
     "starts_with_question_any": "starts with question",
 }
 
+
 feature_dict = custom_feature_dict | {
     "creative_type": "creative type",
 }
@@ -58,38 +58,3 @@ feature_dict_market = {
     "facts": "mentions facts",
     "price": "price",
 }
-
-
-def get_shop_dict():
-
-    cursor = DBConnect()
-
-    query = f"""
-    select id, name
-    from shop
-        """
-
-    cursor.execute(query)
-
-    data = cursor.fetchall()
-    cols = []
-
-    for elt in cursor.description:
-        cols.append(elt[0])
-
-    df = pd.DataFrame(data=data, columns=cols).astype(str)
-
-    shop_dict = dict(zip(df.id, df.name))
-
-    return shop_dict
-
-
-shop_dict = get_shop_dict()
-
-
-def main():
-    print(get_shop_dict().keys())
-
-
-if __name__ == "__main__":
-    main()

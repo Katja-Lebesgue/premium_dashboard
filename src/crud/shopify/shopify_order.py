@@ -1,13 +1,15 @@
-from datetime import datetime
-from sqlalchemy import Float, and_, func, orm
+from datetime import datetime, date
+from sqlalchemy import Float, and_, func, orm, cast
+from sqlalchemy.orm import Query, Session
 from src import models, schemas
+from src.models import ShopifyOrder
 from src.crud.base import CRUDBase
+
+from src.utils.common import element_to_list
 
 
 class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate, schemas.ShopifyOrderUpdate]):
-    def get_sum_of_total_usd_in_period(
-        self, db: orm.Session, shop_id: int, start: datetime, end: datetime
-    ) -> int:
+    def get_sum_of_total_usd_in_period(self, db: orm.Session, shop_id: int, start: datetime, end: datetime) -> int:
         return (
             db.query(func.coalesce(func.sum(models.ShopifyOrder.total_price_usd.cast(Float)), 0))
             .filter(
@@ -37,9 +39,7 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
                 models.ShopifyOrder.created_at >= include_orders_after,
             )
         else:
-            query = query.filter(
-                models.ShopifyOrder.shop_id == shop_id, models.ShopifyOrder.customer_id.isnot(None)
-            )
+            query = query.filter(models.ShopifyOrder.shop_id == shop_id, models.ShopifyOrder.customer_id.isnot(None))
 
         return query.order_by(models.ShopifyOrder.processed_at.asc()).offset(offset).limit(limit).all()
 
@@ -63,5 +63,35 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
             {"shop_id": shop_id},
         )
 
+    def query_aov(
+        db: Session,
+        shop_id: str | list[str] = None,
+        start_date: str = None,
+        end_date: str = date.today().strftime("%Y-%m-%d"),
+    ) -> Query:
 
-shopify_order = CRUDShopifyOrder(models.ShopifyOrder)
+        columns = [
+            ShopifyOrder.shop_id,
+            func.avg(cast(ShopifyOrder.total_price_usd, Float())).label("aov"),
+        ]
+
+        query = db.query(*columns)
+
+        if shop_id is not None:
+            shop_id = element_to_list(shop_id)
+            query = query.filter(ShopifyOrder.shop_id.in_(shop_id))
+
+        if start_date is not None:
+            query = query.filter(
+                ShopifyOrder.created_at >= start_date,
+                ShopifyOrder.created_at <= end_date,
+            )
+
+        query = query.group_by(ShopifyOrder.shop_id)
+
+        query = query.distinct()
+
+        return query
+
+
+crud_shopify_order = CRUDShopifyOrder(models.ShopifyOrder)

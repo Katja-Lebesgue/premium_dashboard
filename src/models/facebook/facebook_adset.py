@@ -1,10 +1,16 @@
+import enum
+
 from sqlalchemy import BigInteger, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from src.database.base_class import Base
-from src.models.enums.facebook.adset import Target
+
+
+class Target(enum.Enum):
+    acquisition = "acquisition"
+    remarketing = "remarketing"
 
 
 class FacebookAdset(Base):

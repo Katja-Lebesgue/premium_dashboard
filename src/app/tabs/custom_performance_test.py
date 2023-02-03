@@ -13,7 +13,7 @@ from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
 from src.statistics.proportion_test import *
 
-from src.utils.help_functions import *
+from src.utils.common import *
 
 
 def custom_performance_test(data_shop: pd.DataFrame):

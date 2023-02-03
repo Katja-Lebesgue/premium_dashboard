@@ -5,7 +5,6 @@ sys.path.append("./.")
 from facebook_business.adobjects.adcreative import AdCreative
 from facebook_business.api import FacebookAdsApi
 import psycopg2
-from src.database.myDB import DBConnect, get_credentials, get_creative_unpacked
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adcreative import AdCreative
 from facebook_business.api import FacebookAdsApi
@@ -74,14 +73,10 @@ def has_cta(text: str) -> bool:
 
 def get_discounts(text: str) -> list:
     discounts = []
-    discounts.extend(
-        [x.group() for x in re.finditer("(?i)(discount)\s(of\s)?()[\d]+\s?%", text)]
-    )
+    discounts.extend([x.group() for x in re.finditer("(?i)(discount)\s(of\s)?()[\d]+\s?%", text)])
     discounts.extend([x.group() for x in re.finditer("(?i)(save)\s[\d]+\s?%", text)])
     discounts.extend([x.group() for x in re.finditer("(?i)[\d]+\s?%\s(off)", text)])
-    discounts.extend(
-        [x.group() for x in re.finditer("(?i)[\d]+\s?%\s(discount)", text)]
-    )
+    discounts.extend([x.group() for x in re.finditer("(?i)[\d]+\s?%\s(discount)", text)])
     discounts.extend([x.group() for x in re.finditer("(?i)-[\d]+\s?%", text)])
     return discounts
 
@@ -134,17 +129,12 @@ def get_prices(text: str) -> list:
             break
         beg = m.start("price")
         end = m.end("price") + previous_end
-        price_with_currency = text[
-            max(0, beg - 4, previous_end) : min(len(text), end + 4)
-        ]
+        price_with_currency = text[max(0, beg - 4, previous_end) : min(len(text), end + 4)]
         price = Price.fromstring(price_with_currency)
 
         if (
             price.currency is not None
-            and not (
-                price.currency == "FR"
-                and ("free" in text[end : min(end + 6, len(text))].lower())
-            )
+            and not (price.currency == "FR" and ("free" in text[end : min(end + 6, len(text))].lower()))
             and price.currency != "RD"
         ):
             price = price_to_dict(price)
@@ -157,17 +147,13 @@ def get_prices(text: str) -> list:
 def get_fact_words(text: str) -> list[str]:
     fact_words = []
     fact_words.extend([x.group() for x in re.finditer("(?i)scienti", text)])
-    fact_words.extend(
-        [x.group() for x in re.finditer(r"(?i)(?<!in )(?<=\b)fact(s)*(?=\b)", text)]
-    )
+    fact_words.extend([x.group() for x in re.finditer(r"(?i)(?<!in )(?<=\b)fact(s)*(?=\b)", text)])
     fact_words.extend([x.group() for x in re.finditer("(?i)proven", text)])
     fact_words.extend([x.group() for x in re.finditer("(?i)clinical", text)])
     return fact_words
 
 
-def starts_with_question(
-    text: str, tokenizer=nltk.data.load("tokenizers/punkt/english.pickle")
-) -> bool:
+def starts_with_question(text: str, tokenizer=nltk.data.load("tokenizers/punkt/english.pickle")) -> bool:
     sentences = tokenizer.tokenize(text)
     if len(sentences) == 0:
         return None

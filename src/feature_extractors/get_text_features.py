@@ -9,7 +9,6 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 from multiset import *
 from src.database.session import *
-from src.database.queries import *
 
 from src.utils.decorators import print_execution_time
 from src.feature_extractors.text_analysis_functions import *
@@ -42,18 +41,14 @@ feature_func_dict = {
 
 
 @print_execution_time
-def get_all_text_features(
-    df: pd.DataFrame, get_sentiment: bool = False
-) -> pd.DataFrame:
+def get_all_text_features(df: pd.DataFrame, get_sentiment: bool = False) -> pd.DataFrame:
 
     if len(df) == 0:
         return df
 
     for text_col in text_columns:
         for feature, func in feature_func_dict.items():
-            df = get_text_feature_for_all(
-                df=df, feature=feature, text_col=text_col, func=func
-            )
+            df = get_text_feature_for_all(df=df, feature=feature, text_col=text_col, func=func)
 
     df.prices_any = df.apply(lambda df: df.prices_any | df.has_dynamic_price, axis=1)
 
@@ -65,10 +60,7 @@ def get_all_text_features(
                 [
                     multiset_difference(a, b)
                     for b, a in zip(
-                        [
-                            [get_percentages(x)[0] for x in discounts]
-                            for discounts in df[f"{text_col}_discounts"]
-                        ],
+                        [[get_percentages(x)[0] for x in discounts] for discounts in df[f"{text_col}_discounts"]],
                         df[f"{text_col}_percentages"],
                     )
                 ]
@@ -78,9 +70,7 @@ def get_all_text_features(
 
     df = get_global_boolean_text_feature(df=df, feature=feature)
 
-    df.fact_words_any = df.apply(
-        lambda df: df[f"{feature}_any"] | df.fact_words_any, axis=1
-    )
+    df.fact_words_any = df.apply(lambda df: df[f"{feature}_any"] | df.fact_words_any, axis=1)
 
     if get_sentiment:
         df = get_sentiment_for_all(df)
@@ -112,18 +102,12 @@ def get_sentiment(df: pd.DataFrame, col: str):
 
     # print(df[col])
 
-    df[f"{col}_polarity_textblob"] = df[col].apply(
-        lambda texts: [TextBlob(text).polarity for text in texts]
-    )
+    df[f"{col}_polarity_textblob"] = df[col].apply(lambda texts: [TextBlob(text).polarity for text in texts])
 
-    df[f"{col}_polarity_nltk"] = df[col].apply(
-        lambda texts: [sia.polarity_scores(text) for text in texts]
-    )
+    df[f"{col}_polarity_nltk"] = df[col].apply(lambda texts: [sia.polarity_scores(text) for text in texts])
 
     for method in ["textblob", "nltk"]:
-        df[f"{col}_polarity_{method}_mean"] = df[f"{col}_polarity_{method}"].apply(
-            get_average_polarity_scores
-        )
+        df[f"{col}_polarity_{method}_mean"] = df[f"{col}_polarity_{method}"].apply(get_average_polarity_scores)
 
     return df
 
@@ -135,17 +119,13 @@ def get_text_feature_for_all(
     func,
 ):
     for text_col in text_columns:
-        df = get_text_feature(
-            df=df, feature=feature, text_col=text_col, func=func, add_any_col=True
-        )
+        df = get_text_feature(df=df, feature=feature, text_col=text_col, func=func, add_any_col=True)
     df = get_global_boolean_text_feature(df=df, feature=feature)
 
     if feature == "emojis":
 
         df[feature] = df.apply(
-            lambda df: list_of_lists_to_list(
-                [df[f"{text_col}_emojis"] for text_col in text_columns]
-            ),
+            lambda df: list_of_lists_to_list([df[f"{text_col}_emojis"] for text_col in text_columns]),
             axis=1,
         )
 
@@ -180,9 +160,7 @@ def get_text_feature(
     add_any_col: bool = False,
 ):
 
-    df[f"{text_col}_{feature}"] = df[text_col].apply(
-        lambda texts: [func(text) for text in texts]
-    )
+    df[f"{text_col}_{feature}"] = df[text_col].apply(lambda texts: [func(text) for text in texts])
 
     if add_any_col:
         df[f"{text_col}_{feature}_any"] = df[f"{text_col}_{feature}"].apply(has_any)
@@ -240,23 +218,6 @@ def has_any_keywords(l: list[dict]) -> bool:
 
 def multiset_difference(a, b):
 
-    result = (
-        list(Multiset(a).difference(Multiset(b)))
-        if Multiset(a).difference(Multiset(b))
-        else []
-    )
+    result = list(Multiset(a).difference(Multiset(b))) if Multiset(a).difference(Multiset(b)) else []
 
     return result
-
-
-def main():
-    session = SessionLocal()
-    query = query_raw_creative_data(shop_id=2)
-    df = pd.read_sql(query.statement, session.bind)
-    df = df.apply(extract_text_and_type, axis=1)
-    df = get_all_text_features_proba(df=df)
-    return
-
-
-if __name__ == "__main__":
-    main()

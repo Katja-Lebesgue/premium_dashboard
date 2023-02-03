@@ -10,11 +10,11 @@ class OrmBase(BaseModel):
     # NOTE: If high throughput/performance is a concern, you can/should probably apply
     #       this validator in a more targeted fashion instead of a wildcard in a base class.
     #       This approach is by no means slow, but adds a minor amount of overhead for every field
-    @validator("*", pre=True)
-    def evaluate_lazy_columns(cls, v):
-        if isinstance(v, Query):
-            return v.all()
-        return v
+    # @validator("*", pre=True)
+    # def evaluate_lazy_columns(cls, v):
+    #     if isinstance(v, Query):
+    #         return v.all()
+    #     return v
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True

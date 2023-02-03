@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from src.utils.decorators import print_execution_time
-from ..utils.help_functions import add_global_s3_folder
+from ..utils.common import add_global_s3_folder
 
 load_dotenv()
 
@@ -30,9 +30,7 @@ def s3_resource():
     return s3
 
 
-def list_objects_from_prefix(
-    prefix: str, client=s3_connect(), add_global_folder: bool = True
-):
+def list_objects_from_prefix(prefix: str, client=s3_connect(), add_global_folder: bool = True):
 
     if add_global_folder:
         prefix = add_global_s3_folder(prefix)

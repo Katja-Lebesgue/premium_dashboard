@@ -19,7 +19,7 @@ load_dotenv()
 
 from src.database.pingers import *
 from src.feature_extractors import *
-from src.utils.help_functions import nan_to_none, read_csv_and_eval
+from src.utils.common import nan_to_none, read_csv_and_eval
 from src.utils.decorators import print_execution_time
 from src.database.pingers import *
 
@@ -125,9 +125,7 @@ def upsert_creative_by_shop_id(
 
     if end_date_dt > last_updated_dt and len(df) > 0 and last_updated != "2015-01-01":
 
-        new_ad_ids_query = query_ad_id(
-            session=session, start_date=last_updated, shop_id=shop_id
-        )
+        new_ad_ids_query = query_ad_id(session=session, start_date=last_updated, shop_id=shop_id)
         new_ad_ids = pd.read_sql(new_ad_ids_query.statement, session.bind)["ad_id"]
 
         df = df.loc[df.ad_id.isin(new_ad_ids), :]
@@ -140,10 +138,7 @@ def upsert_creative_by_shop_id(
 
         print(f"novih adova ima {df.ad_id.nunique()}.")
 
-        if (
-            len(set(old_features).intersection(set(text_features)))
-            and "emojis" not in df.columns
-        ):
+        if len(set(old_features).intersection(set(text_features))) and "emojis" not in df.columns:
             # print("applying text features...")
             df = df = get_all_text_features(df)
             # print("finished.")
@@ -181,11 +176,7 @@ def upsert_columns(df: pd.DataFrame, features: list[str]):
 
     df.set_index(key_columns, inplace=True)
 
-    db_table = (
-        pd.DataFrame(df.stack(dropna=False))
-        .reset_index()
-        .rename(columns={"level_4": "feature", 0: "value"})
-    )
+    db_table = pd.DataFrame(df.stack(dropna=False)).reset_index().rename(columns={"level_4": "feature", 0: "value"})
 
     # db_table.to_csv(f"data/test/{shop_id}_{str(uuid.uuid4())}.csv", index=False)
 
@@ -230,9 +221,7 @@ def main():
     update_df = read_csv_and_eval(path="data/creative_update_metadata.csv")
     update_df.set_index("shop_id", inplace=True)
 
-    update_df, success = upsert_creative_by_shop_id(
-        shop_id=26660035, update_df=update_df
-    )
+    update_df, success = upsert_creative_by_shop_id(shop_id=26660035, update_df=update_df)
 
     logger.debug(f"success: {success}")
     # print(update_df.loc["16038", :])

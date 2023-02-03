@@ -14,7 +14,7 @@ import pandas as pd
 from statistics import mean
 import inspect
 
-from src.utils.help_functions import nan_to_none, none_to_unknown
+from src.utils.common import nan_to_none, none_to_unknown
 from src.statistics.get_binomial_sample import *
 from src.utils.decorators import print_execution_time
 from src.statistics.bernoulli_tests import *
@@ -74,9 +74,7 @@ def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> d
             test_type = "chi2"
 
     if convert_nan_to_none:
-        stat, p, stat_levene, p_levene = (
-            nan_to_none(x) for x in (stat, p, stat_levene, p_levene)
-        )
+        stat, p, stat_levene, p_levene = (nan_to_none(x) for x in (stat, p, stat_levene, p_levene))
 
     result = {
         "stat": stat,
@@ -101,39 +99,25 @@ def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> d
     return result
 
 
-def mean_test_bernoulli_ctr(
-    df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False
-):
+def mean_test_bernoulli_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
 
-    groups_df = create_groups_df(
-        df=df, group_col=group_col, size_col="impr", positive_col="link_clicks"
-    )
+    groups_df = create_groups_df(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
 
-    result = mean_test_bernoulli(
-        groups_df=groups_df, convert_nan_to_none=convert_nan_to_none
-    )
+    result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
 
     return result
 
 
-def mean_test_bernoulli_cr(
-    df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False
-):
+def mean_test_bernoulli_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
 
-    groups_df = create_groups_df(
-        df=df, group_col=group_col, size_col="link_clicks", positive_col="purch"
-    )
+    groups_df = create_groups_df(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
 
-    result = mean_test_bernoulli(
-        groups_df=groups_df, convert_nan_to_none=convert_nan_to_none
-    )
+    result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
 
     return result
 
 
-def create_groups_df(
-    df: pd.DataFrame, group_col: str, size_col: str, positive_col: str
-) -> pd.DataFrame:
+def create_groups_df(df: pd.DataFrame, group_col: str, size_col: str, positive_col: str) -> pd.DataFrame:
 
     df[group_col] = df[group_col].fillna("unknown")
 
@@ -158,10 +142,7 @@ def to_series(x):
 def main():
     positives = [100, 1118]
     sizes = [1000, 1270]
-    samples = [
-        get_binomial_sample(positive=positive, size=size)
-        for positive, size in zip(positives, sizes)
-    ]
+    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
 
     groups_df = pd.DataFrame(
         np.transpose([positives, sizes]),

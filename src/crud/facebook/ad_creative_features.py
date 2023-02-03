@@ -15,7 +15,7 @@ from src.schemas.facebook.ad_creative_features import (
     AdCreativeFeaturesUpdate,
 )
 
-from src.utils.help_functions import element_to_list
+from src.utils.common import element_to_list
 
 
 class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate]):
@@ -71,4 +71,4 @@ class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCrea
         return query
 
 
-ad_creative_features = CRUDAdCreativeFeatures(AdCreativeFeatures)
+crud_ad_creative_features = CRUDAdCreativeFeatures(AdCreativeFeatures)
