@@ -34,16 +34,4 @@ def ping_shops(
     query = query.join(Shop, FacebookAd.shop_id == Shop.id).add_columns(Shop.name)
     df = pd.read_sql(query.statement, db.bind)
 
-    df["shop_id"] = df["shop_id"].astype(str)
-
     return df
-
-
-def main():
-    session = SessionLocal()
-    df = ping_shops()
-    print(df)
-
-
-if __name__ == "__main__":
-    main()

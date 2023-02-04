@@ -1,13 +1,18 @@
-credentials:
-  usernames:
-    lebeg:
-      email: sanjinjf7h@gmail.com
-      name: lebeg
-      password: "$2b$12$haQXb0e.QKw9H3VO/YaEQOHtD4ebSjhx/iZG9cypSik3u6/u6oB62"
 cookie:
   expiry_days: 30
   key: some_signature_key
   name: some_cookie_name
+credentials:
+  usernames:
+    lebeg:
+      email: sanjinjf7@gmail.com
+      name: lebeg
+      password: $2b$12$haQXb0e.QKw9H3VO/YaEQOHtD4ebSjhx/iZG9cypSik3u6/u6oB62
+    fewmoda:
+      email: sanjin@gmail.
+      name: shopfw.myshopify.com
+      password: $2b$12$PrdHC3DVE8wy7MONTA9Kc.s7O8QETkSO6itYel/Wv9L4tYkrCL7fe
+      shop_id: 16038
 preauthorized:
   emails:
-  - melsby@gmail.com
+  - sanjinjf7@gmail.com

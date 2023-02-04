@@ -4,4 +4,4 @@ from .f_oneway_bernoulli import f_oneway_bernoulli
 from .kruskal_bernoulli import kruskal_bernoulli
 from .levene_bernoulli import levene_bernoulli
 from .ttest_bernoulli import ttest_bernoulli
-from .mean_test_bernoulli import *
+from .mean_test_bernoulli import mean_test_bernoulli, mean_test_bernoulli_cr, mean_test_bernoulli_ctr

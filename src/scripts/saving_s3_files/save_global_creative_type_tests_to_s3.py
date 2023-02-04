@@ -11,7 +11,7 @@ from src.statistics.proportion_test import (
     proportion_test_cr,
 )
 from src.s3 import *
-from src.database.pingers import *
+from src.pingers import *
 from src.statistics import *
 from src.statistics.bernoulli_tests import *
 from src.utils import *
@@ -66,9 +66,7 @@ def save_global_creative_type_tests_to_s3(
         table = read_csv_from_s3(path=table_path)
         table.set_index(keys=idx_cols, inplace=True)
 
-        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)[
-            "shop_id"
-        ]
+        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"]
 
         print(f"we have {len(done_shop_ids)} done shop ids.")
 
@@ -84,9 +82,7 @@ def save_global_creative_type_tests_to_s3(
 
         print(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(
-            shop_id=shop_id, start_date=start_date, end_date=end_date
-        )
+        data_shop = ping_creative_and_performance(shop_id=shop_id, start_date=start_date, end_date=end_date)
 
         if shop_iter % 10 == 5:
             save_csv_to_s3(
@@ -100,31 +96,19 @@ def save_global_creative_type_tests_to_s3(
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 
-        if not len(data_shop) or any(
-            [
-                x not in data_shop.columns
-                for x in ["impr", "creative_type", "targets_US"]
-            ]
-        ):
+        if not len(data_shop) or any([x not in data_shop.columns for x in ["impr", "creative_type", "targets_US"]]):
             continue
 
         data_shop = data_shop.loc[data_shop.targets_US == True, :]
 
-        data_shop = data_shop[
-            (data_shop.link_clicks >= data_shop.purch)
-            & (data_shop.impr >= data_shop.link_clicks)
-        ]
+        data_shop = data_shop[(data_shop.link_clicks >= data_shop.purch) & (data_shop.impr >= data_shop.link_clicks)]
 
         for promotion in [True, False]:
-            data_shop_promotion = data_shop.loc[
-                data_shop.discounts_any.isin([promotion]), :
-            ]
+            data_shop_promotion = data_shop.loc[data_shop.discounts_any.isin([promotion]), :]
 
             for target in ["acquisition", "remarketing"]:
 
-                data_shop_target = data_shop_promotion.loc[
-                    data_shop_promotion.target.isin([target]), :
-                ]
+                data_shop_target = data_shop_promotion.loc[data_shop_promotion.target.isin([target]), :]
 
                 result_ctr = mean_test_bernoulli_ctr(
                     df=data_shop_target,
