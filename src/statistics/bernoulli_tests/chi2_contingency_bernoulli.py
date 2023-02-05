@@ -14,15 +14,10 @@ from src.utils.decorators import print_execution_time
 
 # @print_execution_time
 def chi2_contingency_bernoulli(positives: list, sizes: list) -> float:
-
     negatives = [size - positive for size, positive in zip(sizes, positives)]
-
     table = pd.DataFrame([positives, negatives])
-
     table = table.T
-
     chi2_stat, p, a, b = chi2_contingency(table)
-
     return chi2_stat, p
 
 

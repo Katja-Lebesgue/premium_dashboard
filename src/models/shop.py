@@ -51,3 +51,5 @@ class Shop(Base):
     facebook_daily_performance = relationship("FacebookDailyPerformance", back_populates="shop")
     orders = relationship("ShopifyOrder", back_populates="shop", lazy="dynamic")
     ad_creative_features = relationship("AdCreativeFeatures", back_populates="shop")
+    tiktok_ads_insights = relationship("TikTokAdsInsights", back_populates="shop", lazy="dynamic")
+    # google_ads_insights = relationship("GoogleAdsInsights", back_populates="shop", lazy="dynamic")

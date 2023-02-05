@@ -2,6 +2,7 @@
 
 #folders
 venv/
+venv_backend/
 images/
 reports/
 data/
