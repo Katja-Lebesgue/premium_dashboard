@@ -1,6 +1,7 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
 from src.database.base_class import Base
+from src.models.enums import EPlatform
 
 
 class TikTokAdsInsights(Base):
@@ -18,3 +19,5 @@ class TikTokAdsInsights(Base):
     spend = Column(Numeric)
 
     shop = relationship("Shop", back_populates="tiktok_ads_insights")
+
+    platform = EPlatform.tiktok

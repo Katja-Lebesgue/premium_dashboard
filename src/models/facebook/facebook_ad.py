@@ -3,6 +3,7 @@ from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
 
 from src.database.base_class import Base
+from src.models.enums import EPlatform
 
 
 class FacebookAd(Base):
@@ -18,3 +19,4 @@ class FacebookAd(Base):
     body_text = Column(String)
     ad_language = Column(String)
     creative = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
+    platform = EPlatform.facebook

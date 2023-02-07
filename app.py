@@ -15,6 +15,7 @@ from src.app.tabs.default_performance_tests import default_performance_tests
 from src.app.tabs.custom_performance_test import custom_performance_test
 from src.app.tabs.market_performance_tests import market_performance_tests
 from src.app.tabs.market_descriptive_statistics import market_descriptive_statistics
+from src.app.tabs.all_platforms import all_platforms
 from src.app.authenticate import authenticate, is_admin
 from src.database.session import SessionLocal
 
@@ -33,54 +34,67 @@ if st.session_state["authentication_status"]:
 
         main_tab = option_menu(
             menu_title="Main menu",
-            options=["Shop", "Market", "Settings"],
+            options=["All platforms", "Facebook", "Settings"],
             menu_icon="menu-app",
-            icons=["shop", "globe", "gear"],
+            icons=["arrows-fullscreen", "facebook", "gear"],
             default_index=1,
         )
 
-    if main_tab == "Shop":
+    if main_tab == "All platforms":
+        all_platforms()
+
+    if main_tab == "Facebook":
         with st.sidebar:
-            data_shop = select_shop_and_load_data()
-            subtab = option_menu(
-                menu_title="Shop",
-                options=[
-                    "Descriptive statistics",
-                    "Default performance tests",
-                    "Custom performance test",
-                ],
-                menu_icon="shop",
-                icons=["pie-chart-fill", "lightning-fill", "lightbulb"],
-                default_index=0,
+            subtab1 = option_menu(
+                menu_title="Main menu",
+                options=["Shop", "Market"],
+                menu_icon="menu-app",
+                icons=["shop", "globe"],
+                default_index=1,
             )
 
-        if subtab == "Descriptive statistics":
-            descriptive_statistics(data_shop)
+        if subtab1 == "Shop":
+            with st.sidebar:
+                data_shop = select_shop_and_load_data()
+                subtab2 = option_menu(
+                    menu_title="Shop",
+                    options=[
+                        "Descriptive statistics",
+                        "Default performance tests",
+                        "Custom performance test",
+                    ],
+                    menu_icon="shop",
+                    icons=["pie-chart-fill", "lightning-fill", "lightbulb"],
+                    default_index=0,
+                )
 
-        if subtab == "Default performance tests":
-            default_performance_tests(data_shop)
+            if subtab2 == "Descriptive statistics":
+                descriptive_statistics(data_shop)
 
-        if subtab == "Custom performance test":
-            custom_performance_test(data_shop)
+            if subtab2 == "Default performance tests":
+                default_performance_tests(data_shop)
 
-    if main_tab == "Market":
-        with st.sidebar:
-            subtab = option_menu(
-                menu_title="Market",
-                options=[
-                    "Descriptive statistics",
-                    "Default performance tests",
-                ],
-                menu_icon="globe",
-                icons=["pie-chart-fill", "lightning-fill"],
-                default_index=0,
-            )
+            if subtab2 == "Custom performance test":
+                custom_performance_test(data_shop)
 
-        if subtab == "Descriptive statistics":
-            market_descriptive_statistics()
+        if subtab1 == "Market":
+            with st.sidebar:
+                subtab2 = option_menu(
+                    menu_title="Market",
+                    options=[
+                        "Descriptive statistics",
+                        "Default performance tests",
+                    ],
+                    menu_icon="globe",
+                    icons=["pie-chart-fill", "lightning-fill"],
+                    default_index=0,
+                )
 
-        if subtab == "Default performance tests":
-            market_performance_tests()
+            if subtab2 == "Descriptive statistics":
+                market_descriptive_statistics()
+
+            if subtab2 == "Default performance tests":
+                market_performance_tests()
 
     if main_tab == "Settings":
 

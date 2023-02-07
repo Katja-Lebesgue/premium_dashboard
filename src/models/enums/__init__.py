@@ -5,3 +5,4 @@ from .ecommerce_platform import EcommercePlatform
 from .task_status import TaskStatus
 from .task_type import TaskType
 from .shopify_product import ProductStatus
+from .EPlatform import EPlatform

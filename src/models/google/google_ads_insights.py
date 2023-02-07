@@ -4,6 +4,8 @@ from src.models.google.google_base import GoogleBase
 
 from google.ads.googleads.v11.services.types.google_ads_service import GoogleAdsRow
 
+from src.models.enums import EPlatform
+
 
 class GoogleAdsInsights(GoogleBase):
 
@@ -20,6 +22,8 @@ class GoogleAdsInsights(GoogleBase):
     spend = Column(Numeric)
 
     shop = relationship("Shop", back_populates="google_ads_insights")
+
+    platform = EPlatform.google
 
     @classmethod
     def from_obj(cls, obj: GoogleAdsRow, account_id: int, shop_id: int) -> "GoogleAdsInsights":

@@ -16,6 +16,7 @@ from currency_converter import CurrencyConverter
 import math
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
+from itertools import combinations
 
 from metadata.globals import *
 
@@ -149,3 +150,12 @@ def remove_any(s: str, underscore_to_space: bool = True):
     s = s.removesuffix("_any")
     s = s.removesuffix(" any")
     return s
+
+
+def get_all_subsets(s: set | list):
+    n = len(s)
+    subsets = []
+    for i in range(n + 1):
+        i_subsets = combinations(s, i)
+        subsets.extend(i_subsets)
+    return subsets

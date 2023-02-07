@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from src.database.base_class import Base
+from src.models.enums import EPlatform
 
 
 class FacebookAdsInsights(Base):
@@ -27,3 +28,5 @@ class FacebookAdsInsights(Base):
     action_values = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
 
     shop = relationship("Shop", back_populates="facebook_ads_insights")
+
+    platform = EPlatform.facebook
