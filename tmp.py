@@ -7,22 +7,23 @@ from src.models import *
 
 
 if __name__ == "__main__":
-    df = ping_ads_insights_all_platforms(db=db, get_industry=True)
-    # df.to_csv("data/ads_insights.csv", index=False)
+    # df = ping_ads_insights_all_platforms(db=db, get_industry=True)
+    # # df.to_csv("data/ads_insights.csv", index=False)
 
-    # crm = read_csv_from_s3(bucket="lebesgue-crm", path="crm_dataset_dev.csv", add_global_path=False)
-    # crm = crm[["shop_id", "industry"]]
-    # crm.to_csv("industries.csv")
+    # # crm = read_csv_from_s3(bucket="lebesgue-crm", path="crm_dataset_dev.csv", add_global_path=False)
+    # # crm = crm[["shop_id", "industry"]]
+    # # crm.to_csv("industries.csv")
 
-    # query = db.query(FacebookAdsInsights.revenue).filter(FacebookAdsInsights.revenue.is_not(None)).limit(1)
+    # # query = db.query(FacebookAdsInsights.revenue).filter(FacebookAdsInsights.revenue.is_not(None)).limit(1)
 
-    # df = pd.read_sql(query.statement, db.bind)
+    # # df = pd.read_sql(query.statement, db.bind)
 
-    # df = ping_crm()
-    print(df.industry.value_counts(dropna=False))
-    # for i in df.industry:
-    #     if type(i) != str:
-    #         print(np.isnan(i))
+    # # df = ping_crm()
+    # print(df.industry.value_counts(dropna=False))
+    # # for i in df.industry:
+    # #     if type(i) != str:
+    # #         print(np.isnan(i))
 
-    df = df[(df.tiktok_spend.notna()) & (df.facebook_spend.isna()) & (df.google_spend.isna())]
-    print(df)
+    # df = df[(df.tiktok_spend.notna()) & (df.facebook_spend.isna()) & (df.google_spend.isna())]
+    # print(df)
+    pass

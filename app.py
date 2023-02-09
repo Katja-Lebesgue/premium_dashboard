@@ -1,8 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-import os
 from dotenv import load_dotenv
-import nltk
 import yaml
 from yaml import SafeLoader
 
@@ -10,6 +8,8 @@ load_dotenv()
 
 from src.app.tabs.descriptive_statistics import descriptive_statistics
 from src.app.select_shop_and_load_data import select_shop_and_load_data
+from src.app.tabs.admin_settings import admin_settings
+from src.app.tabs.user_settings import user_settings
 
 from src.app.tabs.default_performance_tests import default_performance_tests
 from src.app.tabs.custom_performance_test import custom_performance_test
@@ -99,35 +99,6 @@ if st.session_state["authentication_status"]:
     if main_tab == "Settings":
 
         if is_admin():
-            options = {"Add/remove user": "person"}
+            admin_settings(authenticator=authenticator, config=config)
         else:
-            options = {"Change password": "hash"}
-
-        with st.sidebar:
-            subtab = option_menu(
-                menu_title="Settings",
-                options=list(options.keys()),
-                menu_icon="gear",
-                icons=list(options.values()),
-                default_index=0,
-            )
-
-        if subtab == "Add/remove user":
-            try:
-                if authenticator.register_user("Register user", preauthorization=False):
-                    st.success("User registered successfully")
-                    config["credentials"] = authenticator.credentials
-                    with open("config.yaml", "w") as file:
-                        yaml.dump(config, file, default_flow_style=False)
-            except Exception as e:
-                st.error(e)
-
-        elif subtab == "Change password":
-            try:
-                if authenticator.reset_password(st.session_state["username"], "Reset password"):
-                    st.success("Password modified successfully")
-                    config["credentials"] = authenticator.credentials
-                    with open("config.yaml", "w") as file:
-                        yaml.dump(config, file, default_flow_style=False)
-            except Exception as e:
-                st.error(e)
+            user_settings(authenticator=authenticator, config=config)

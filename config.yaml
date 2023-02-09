@@ -4,6 +4,14 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
+    a:
+      email: a
+      name: a
+      password: $2b$12$JudKWJNGaCi0eyg.UWr5BOdIOJvXXwWoShofLGS1Aa6tkSOwUhAm.
+    aaa:
+      email: a
+      name: a
+      password: $2b$12$Iz3efAk71da9oAgxRf6tO.Re5yiODy2oxmhCNx9F9qrIDqS1VJ44y
     fewmoda:
       email: sanjin@gmail.
       name: shopfw.myshopify.com
@@ -21,6 +29,10 @@ credentials:
       email: sanjinjf7@gmail.com
       name: lebeg
       password: $2b$12$haQXb0e.QKw9H3VO/YaEQOHtD4ebSjhx/iZG9cypSik3u6/u6oB62
+    ni:
+      email: ni
+      name: ni
+      password: $2b$12$7bJkx83xjjjcotviqMYqw.eZxs77GLjExHDSgolwYPAsfDg4wt/xe
     nikola:
       email: nikola
       name: nikola

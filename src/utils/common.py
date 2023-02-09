@@ -12,7 +12,6 @@ import ast
 import pandas as pd
 from src.types import types
 import numpy as np
-from currency_converter import CurrencyConverter
 import math
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -22,7 +21,6 @@ from metadata.globals import *
 
 
 def read_csv_and_eval(path: str) -> pd.DataFrame:
-
     # reads csv using pd.read_csv and then uses ast.literal_eval() to evaluate all columns in df.
 
     df = pd.read_csv(path, dtype=column_dtypes)
@@ -39,7 +37,6 @@ def read_csv_and_eval(path: str) -> pd.DataFrame:
 
 
 def eval_but_leave_string_if_you_cant(text: str):
-
     try:
         out = ast.literal_eval(text)
     except:
@@ -56,7 +53,6 @@ def separate_thousands_and_round(num: float | int | str, r: int = 2) -> str:
 
 
 def nan_to_none(num):
-
     if np.isnan(num) or math.isinf(num):
         return None
     else:
@@ -84,7 +80,6 @@ def big_number_human_format(num, big_decimals: int = 2, small_decimals: int = 0)
 
 
 def convert_to_USD(price: float | int, currency: str, conversion_rates_json: str) -> float:
-
     if type(currency) != str or currency not in conversion_rates_json.keys():
         return None
     return price / conversion_rates_json[currency]
@@ -115,7 +110,6 @@ def get_range_of_months(
     end_date: str = date.today().strftime("%Y-%m-%d"),
     return_dates=False,
 ):
-
     start_date, end_date = (to_date(x) for x in (start_date, end_date))
 
     dates_list = []
@@ -143,7 +137,6 @@ def add_global_s3_folder(path):
 
 
 def remove_any(s: str, underscore_to_space: bool = True):
-
     if underscore_to_space:
         s = s.replace("_", " ")
 

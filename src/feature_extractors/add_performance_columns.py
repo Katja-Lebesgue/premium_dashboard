@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-from currency_converter import CurrencyConverter
-from ..s3.read_file_from_s3 import read_json_from_s3
+from src.s3.read_file_from_s3 import read_json_from_s3
 from src.utils.common import convert_to_USD
 import json
 
@@ -10,7 +9,6 @@ def add_performance_columns(
     performance: pd.DataFrame,
     conversion_rates_json_path: str = "data/conversion_rates.txt",
 ) -> pd.DataFrame:
-
     conversion_rates_json = read_json_from_s3(path=f"conversion_rates.txt")
 
     performance.fillna(0, inplace=True)

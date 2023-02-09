@@ -3,11 +3,8 @@ import pandas as pd
 import os
 import numpy as np
 from datetime import datetime
-from matplotlib import pyplot as plt
 
 import re
-import boto3
-from scipy import stats
 
 from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
@@ -17,7 +14,6 @@ from src.utils.common import *
 
 
 def custom_performance_test(data_shop: pd.DataFrame):
-
     test_group1 = data_shop
 
     test_group2 = data_shop.copy()
@@ -51,7 +47,6 @@ def custom_performance_test(data_shop: pd.DataFrame):
 
 
 def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
-
     st.subheader("Filter ad and target type")
 
     targeting = st.radio(
@@ -66,11 +61,9 @@ def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
         df = df.loc[df[targeting] == True, :]
 
     for group in custom_group_dict.keys():
-
         filter = []
 
         with st.expander(f"{custom_group_dict[group]}"):
-
             for target in df[group].unique():
                 check = st.checkbox(str(target), value=True, key=group + id)
                 if check:
@@ -82,17 +75,13 @@ def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
 
 
 def feature_filtering(df: pd.DataFrame, features: list[str], id: str) -> pd.DataFrame:
-
     st.subheader("Filter text features")
 
     for feature in features:
-
         filter = []
 
         with st.expander(f"{custom_feature_dict[feature]}"):
-
             if df[feature].unique() is not None:
-
                 for target in df[feature].unique():
                     check = st.checkbox(str(target), value=True, key=feature + id)
                     if check:
@@ -107,7 +96,6 @@ def feature_filtering(df: pd.DataFrame, features: list[str], id: str) -> pd.Data
 
 
 def create_test_table(group_true: pd.Series, group_false: pd.Series) -> pd.DataFrame:
-
     table = pd.DataFrame(
         columns=["spend", "impr", "clicks", "ctr", "cr"],
         index=["group 1", "group 2", "p-value"],
@@ -141,7 +129,6 @@ def create_test_table(group_true: pd.Series, group_false: pd.Series) -> pd.DataF
 
 
 def style_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
-
     # style small p-values
     slice = (["p-value"], df.columns)
     df_style = df.style.applymap(style_small_values, props="color: red", subset=slice)

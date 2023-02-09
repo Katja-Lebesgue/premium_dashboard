@@ -7,9 +7,6 @@ import numpy as np
 
 import sqlalchemy
 
-
-from currency_converter import CurrencyConverter
-
 from src.utils.common import read_csv_and_eval
 from src.feature_extractors import *
 from src.crud import crud_fb_daily_performance
@@ -18,7 +15,6 @@ from src.database.session import SessionLocal
 
 
 def get_shop_ids() -> list:
-
     client = s3_connect()
 
     response = client.list_objects_v2(Bucket="creative-features", Prefix="data/creative_by_shop_id/")
@@ -33,7 +29,6 @@ def get_data_by_shop_id(
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
 ) -> pd.DataFrame:
-
     df = read_creative_data_by_shop_id(shop_id)
     df = join_with_performance(df=df, shop_id=shop_id, start_date=start_date, end_date=end_date)
 
@@ -43,7 +38,6 @@ def get_data_by_shop_id(
 def read_creative_data_by_shop_id(
     shop_id: str | list[str],
 ) -> pd.DataFrame:
-
     client = s3_connect()
 
     if type(shop_id) == str:
@@ -68,7 +62,6 @@ def join_with_performance(
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
 ) -> pd.DataFrame:
-
     if session is None:
         session = SessionLocal()
 
@@ -83,48 +76,3 @@ def join_with_performance(
     full = df.merge(performance)
 
     return full
-
-
-# def add_creative_columns(df: pd.DataFrame) -> pd.DataFrame:
-
-#     if len(df) == 0:
-#         return df
-
-#     df.loc[:, "counts"] = 1
-
-#     return df
-
-
-# def add_performance_columns(df: pd.DataFrame) -> pd.DataFrame:
-
-#     if len(df) == 0:
-#         return df
-
-#     df.fillna(0, inplace=True)
-#     df.replace(to_replace="None", value=0, inplace=True)
-
-#     df.loc[:, "ctr"] = df.apply(
-#         lambda x: x.link_clicks / x.impr if x.impr else np.nan, axis=1
-#     )
-#     df.loc[:, "cr"] = df.apply(
-#         lambda x: x.purch / x.link_clicks if x.link_clicks else np.nan, axis=1
-#     )
-
-#     int_cols = ["impr", "link_clicks", "purch"]
-
-#     float_cols = ["spend"]
-
-#     df.loc[:, int_cols] = df.loc[:, int_cols].astype(int)
-#     df.loc[:, float_cols] = df.loc[:, float_cols].astype(float)
-
-#     df = df.infer_objects()
-
-#     c = CurrencyConverter()
-#     try:
-#         df["spend_USD"] = df.apply(
-#             lambda x: convert_to_USD(c, x.spend, x.currency), axis=1
-#         )
-#     except:
-#         df["spend_USD"] = None
-
-#     return df
