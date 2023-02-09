@@ -1,8 +1,6 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 from src.models.google.google_base import GoogleBase
-
-from google.ads.googleads.v11.services.types.google_ads_service import GoogleAdsRow
 
 from src.models.enums import EPlatform
 
@@ -20,21 +18,8 @@ class GoogleAdsInsights(GoogleBase):
     conversions_purchase = Column(Numeric)
     total_purchase_value = Column(Numeric)
     spend = Column(Numeric)
+    revenue = synonym("total_purchase_value")
 
     shop = relationship("Shop", back_populates="google_ads_insights")
 
     platform = EPlatform.google
-
-    @classmethod
-    def from_obj(cls, obj: GoogleAdsRow, account_id: int, shop_id: int) -> "GoogleAdsInsights":
-        return cls(
-            date=obj.segments.date,
-            clicks=obj.metrics.clicks,
-            impressions=obj.metrics.impressions,
-            cost_micros=obj.metrics.cost_micros,
-            conversions=obj.metrics.conversions,
-            total_conversion_value=obj.metrics.conversions_value,
-            spend=obj.metrics.cost_micros / 10**6,
-            google_account_id=account_id,
-            shop_id=shop_id,
-        )

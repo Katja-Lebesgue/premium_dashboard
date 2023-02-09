@@ -1,5 +1,5 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 from src.database.base_class import Base
 from src.models.enums import EPlatform
 
@@ -17,6 +17,7 @@ class TikTokAdsInsights(Base):
     complete_payment = Column(BigInteger)
     total_complete_payment_rate = Column(Numeric)
     spend = Column(Numeric)
+    revenue = synonym("complete_payment")
 
     shop = relationship("Shop", back_populates="tiktok_ads_insights")
 

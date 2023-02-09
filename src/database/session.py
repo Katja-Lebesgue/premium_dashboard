@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from loguru import logger
 
 import os
 from dotenv import load_dotenv
@@ -14,3 +15,5 @@ engine = create_engine(uri, pool_pre_ping=True, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 db = SessionLocal()
+
+logger.debug(f'base: {os.getenv("POSTGRES_SERVER")}')

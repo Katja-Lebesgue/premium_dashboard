@@ -73,13 +73,9 @@ def market_performance_tests(
         # target filtering
         target = st.radio("Select target", ("acquisition", "remarketing"))
 
-        global_feature_tests_df = global_feature_tests_df.loc[
-            global_feature_tests_df.target == target
-        ]
+        global_feature_tests_df = global_feature_tests_df.loc[global_feature_tests_df.target == target]
 
-        global_promotion_tests_df = global_promotion_tests_df.loc[
-            global_promotion_tests_df.target == target
-        ]
+        global_promotion_tests_df = global_promotion_tests_df.loc[global_promotion_tests_df.target == target]
 
         global_creative_type_tests_df = global_creative_type_tests_df.loc[
             global_creative_type_tests_df.target == target
@@ -102,9 +98,7 @@ def market_performance_tests(
 
         promotion_value = True
 
-        feature_tests_promotional = global_feature_tests_df.loc[
-            global_feature_tests_df.promotion == promotion_value, :
-        ]
+        feature_tests_promotional = global_feature_tests_df.loc[global_feature_tests_df.promotion == promotion_value, :]
 
         creative_type_tests_promotional = global_creative_type_tests_df.loc[
             global_creative_type_tests_df.promotion == promotion_value, :
@@ -125,9 +119,7 @@ def market_performance_tests(
 
         promotion_value = False
 
-        feature_tests_promotional = global_feature_tests_df.loc[
-            global_feature_tests_df.promotion == promotion_value, :
-        ]
+        feature_tests_promotional = global_feature_tests_df.loc[global_feature_tests_df.promotion == promotion_value, :]
 
         creative_type_tests_promotional = global_creative_type_tests_df.loc[
             global_creative_type_tests_df.promotion == promotion_value, :
@@ -170,39 +162,27 @@ def rename_test_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     find_substring_starting_with_test = lambda x: x[x.find("test") :]
 
-    rename_dict = {
-        col: find_substring_starting_with_test(col)
-        for col in df.columns
-        if "test" in col
-    }
+    rename_dict = {col: find_substring_starting_with_test(col) for col in df.columns if "test" in col}
 
     df.rename(columns=rename_dict, inplace=True)
 
     return df
 
 
-def display_test_tables(
-    global_feature_tests_df: pd.DataFrame, global_creative_type_tests_df: pd.DataFrame
-):
+def display_test_tables(global_feature_tests_df: pd.DataFrame, global_creative_type_tests_df: pd.DataFrame):
 
     features = list(global_feature_tests_df.feature.unique())
 
     for feature in features:
         st.write(feature.replace("_", " "))
-        filtered_df = global_feature_tests_df.loc[
-            global_feature_tests_df.feature == feature, :
-        ]
+        filtered_df = global_feature_tests_df.loc[global_feature_tests_df.feature == feature, :]
         test_table = create_test_table(filtered_df)
         test_table_style = style_feature_test_table(test_table)
         st.dataframe(test_table_style)
 
     st.write("Creative type")
-    creative_type_test_table = create_creative_type_test_table(
-        global_creative_type_tests_df
-    )
-    creative_type_test_table_style = style_creative_type_test_table(
-        creative_type_test_table
-    )
+    creative_type_test_table = create_creative_type_test_table(global_creative_type_tests_df)
+    creative_type_test_table_style = style_creative_type_test_table(creative_type_test_table)
     st.dataframe(creative_type_test_table_style)
 
 
@@ -215,9 +195,7 @@ def create_test_table(df: pd.DataFrame) -> pd.DataFrame:
 
     for metric in ["ctr", "cr"]:
         test_results = df["test_" + metric]
-        total_shops = test_results.apply(
-            lambda x: x["p"] is not None and x["p"] < 1
-        ).sum()
+        total_shops = test_results.apply(lambda x: x["p"] is not None and x["p"] < 1).sum()
         table.loc["total shops in analysis", metric] = total_shops
 
         conclusions = test_results.apply(get_conclusion)
@@ -238,10 +216,7 @@ def get_conclusion(test_result: dict) -> str:
     if p > 0.1:
         return "neutral"
 
-    if (
-        True in test_result.keys()
-        and test_result[True]["mean"] > test_result[False]["mean"]
-    ):
+    if True in test_result.keys() and test_result[True]["mean"] > test_result[False]["mean"]:
         return "positive"
 
     if (
@@ -287,11 +262,7 @@ def get_winners(result: dict) -> list[str]:
         return winners
 
     # sorting means into Series
-    means_dict = {
-        k: result[k]["mean"]
-        for k in result.keys()
-        if type(result[k]) == dict and "mean" in result[k].keys()
-    }
+    means_dict = {k: result[k]["mean"] for k in result.keys() if type(result[k]) == dict and "mean" in result[k].keys()}
     means = pd.Series(means_dict)
 
     maxi = max(means)
@@ -330,7 +301,6 @@ def style_feature_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
     # format percentages
     df_style.format(
         na_rep="-",
-        # precision=0,
         thousands=" ",
         formatter={
             "ctr": lambda x: "{:,.2f}%".format(x * 100),

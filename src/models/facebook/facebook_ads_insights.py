@@ -1,7 +1,7 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from src.database.base_class import Base
 from src.models.enums import EPlatform
@@ -26,7 +26,7 @@ class FacebookAdsInsights(Base):
     purchases_conversion_value = Column(Numeric)
     actions = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
     action_values = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
-
+    revenue = synonym("purchases_conversion_value")
     shop = relationship("Shop", back_populates="facebook_ads_insights")
 
     platform = EPlatform.facebook

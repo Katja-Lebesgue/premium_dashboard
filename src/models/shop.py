@@ -53,3 +53,5 @@ class Shop(Base):
     ad_creative_features = relationship("AdCreativeFeatures", back_populates="shop")
     tiktok_ads_insights = relationship("TikTokAdsInsights", back_populates="shop", lazy="dynamic")
     google_ads_insights = relationship("GoogleAdsInsights", back_populates="shop", lazy="dynamic")
+    google_ad_accounts = relationship("GoogleAdAccount", back_populates="shop", lazy="dynamic")
+    tiktok_ad_accounts = relationship("TikTokAdAccount", back_populates="shop", lazy="dynamic")

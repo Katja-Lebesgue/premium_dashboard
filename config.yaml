@@ -4,15 +4,27 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
-    lebeg:
-      email: sanjinjf7@gmail.com
-      name: lebeg
-      password: $2b$12$haQXb0e.QKw9H3VO/YaEQOHtD4ebSjhx/iZG9cypSik3u6/u6oB62
     fewmoda:
       email: sanjin@gmail.
       name: shopfw.myshopify.com
       password: $2b$12$PrdHC3DVE8wy7MONTA9Kc.s7O8QETkSO6itYel/Wv9L4tYkrCL7fe
       shop_id: 16038
+    ha:
+      email: ha
+      name: ha
+      password: $2b$12$rwFpmlg737t1nlOCN4K.reAJey3.iuyB42CC5n8ghUGBF22awsT.q
+    ho:
+      email: ho
+      name: shopfw.myshopify.com
+      password: $2b$12$u4U4D2G0IgC2ewK6SrSume9tDPBANddP0uBbXjC67c26ge969mh4y
+    lebeg:
+      email: sanjinjf7@gmail.com
+      name: lebeg
+      password: $2b$12$haQXb0e.QKw9H3VO/YaEQOHtD4ebSjhx/iZG9cypSik3u6/u6oB62
+    nikola:
+      email: nikola
+      name: nikola
+      password: $2b$12$85jA9zfbN7qXoRhteX1j9eQByogPHVMX1.RL.SnbLTtqvfZi8vQhi
 preauthorized:
   emails:
   - sanjinjf7@gmail.com

@@ -3,17 +3,22 @@ from datetime import date
 from sqlalchemy.orm import Session, InstrumentedAttribute, DeclarativeMeta
 from sqlalchemy import func
 from loguru import logger
+import numpy as np
 
 
 from src.utils.decorators import print_execution_time
 
 from src.models import *
-from src.utils.common import element_to_list
-from src.s3.read_file_from_s3 import read_csv_from_s3
+from src.models.enums.EPlatform import PLATFORMS
+from src.utils.common import element_to_list, convert_to_USD
+from src.s3.read_file_from_s3 import read_csv_from_s3, read_json_from_s3
+from src.pingers.ping_crm import ping_crm
+from itertools import product
 
 
 def ping_ads_insights_by_platform(
     model: DeclarativeMeta,
+    account_model: DeclarativeMeta,
     db: Session,
     columns: str | list[str] = ["spend"],
     add_platform_prefix: bool = False,
@@ -21,11 +26,19 @@ def ping_ads_insights_by_platform(
     shop_id: int | list[int] | None = None,
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
+    add_currency: bool = True,
+    conversion_json: dict | None = None,
 ) -> pd.DataFrame:
+
+    if conversion_json is not None:
+        add_currency = True
 
     group_columns = [
         model.shop_id,
     ]
+
+    if add_currency:
+        group_columns.append(account_model.currency)
 
     if add_platform_prefix:
         prefix = f"{model.platform}_"
@@ -59,11 +72,29 @@ def ping_ads_insights_by_platform(
             model.date <= end_date,
         )
 
+    if add_currency:
+        query = query.join(
+            account_model,
+            getattr(model, f"{model.platform}_account_id") == getattr(account_model, f"{model.platform}_id"),
+        )
+
     query = query.group_by(*group_columns)
 
     query = query.distinct()
 
     df = pd.read_sql(query.statement, db.bind)
+
+    if conversion_json is not None:
+        columns = [f"{prefix}{col}" for col in columns]
+        for col in columns:
+            df[col] = df.apply(
+                lambda df: convert_to_USD(
+                    price=df[col],
+                    currency=df.currency,
+                    conversion_rates_json=conversion_json,
+                ),
+                axis=1,
+            )
 
     return df
 
@@ -76,11 +107,21 @@ def ping_ads_insights_all_platforms(
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
     get_industry: bool = False,
+    convert_to_USD_bool: bool = True,
 ) -> pd.DataFrame:
 
-    for idx, model in enumerate([FacebookAdsInsights, TikTokAdsInsights, GoogleAdsInsights]):
+    if convert_to_USD_bool:
+        conversion_json = read_json_from_s3(path=f"conversion_rates.txt")
+
+    for idx, (model, account_model) in enumerate(
+        zip(
+            [FacebookAdsInsights, TikTokAdsInsights, GoogleAdsInsights],
+            [FacebookAdAccount, TikTokAdAccount, GoogleAdAccount],
+        ),
+    ):
         new_df = ping_ads_insights_by_platform(
             model=model,
+            account_model=account_model,
             db=db,
             columns=columns,
             monthly=monthly,
@@ -88,14 +129,21 @@ def ping_ads_insights_all_platforms(
             shop_id=shop_id,
             start_date=start_date,
             end_date=end_date,
+            conversion_json=conversion_json,
         )
+        logger.debug(new_df.columns)
         if idx == 0:
             df = new_df
         else:
             df = df.merge(new_df, how="outer")
-        if get_industry:
-            crm = read_csv_from_s3(bucket="lebesgue-crm", path="crm_dataset_dev.csv", add_global_path=False)
-            crm = crm[["shop_id", "industry"]]
-            df = df.merge(crm, on="shop_id", how="left")
+    if get_industry:
+        crm = ping_crm()
+        crm = crm[["shop_id", "industry"]]
+        df = df.merge(crm, on="shop_id", how="left")
+        df.industry = df.industry.apply(lambda x: x if type(x) == str else "unknown")
+        df.industry = df.industry.replace({"Unknown": "unknown"})
+
+    for col in columns:
+        df[f"total_{col}"] = df.apply(lambda df: np.nansum([df[f"{platform}_{col}"] for platform in PLATFORMS]), axis=1)
 
     return df
