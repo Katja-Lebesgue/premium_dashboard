@@ -3,40 +3,49 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml import SafeLoader
 
+from src.database.session import db
+from src.models.streamlit import StreamlitUser
+from src.utils.database import row_to_dict
+from loguru import logger
+
 
 def is_admin():
-    return st.session_state["username"] == "lebeg"
-
-
-def save_yaml(config: dict):
-    with open("config.yaml", "w") as file:
-        yaml.dump(config, file, default_flow_style=False)
-
-
-def load_yaml():
-    with open("config.yaml") as file:
-        config = yaml.load(file, Loader=SafeLoader)
-    return config
+    return st.session_state["is_superuser"]
 
 
 def authenticate():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        config = load_yaml()
+        config = get_username_config()
 
         authenticator = stauth.Authenticate(
-            config["credentials"],
-            config["cookie"]["name"],
-            config["cookie"]["key"],
-            config["cookie"]["expiry_days"],
-            config["preauthorized"],
+            config,
+            cookie_name="cookie_name",
+            key="cookie_key",
+            cookie_expiry_days=30,
         )
 
         name, authentication_status, username = authenticator.login("Login", "main")
 
-        if st.session_state["authentication_status"] == False:
+        if st.session_state["authentication_status"] == True:
+            st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
+            st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
+        elif st.session_state["authentication_status"] == False:
             st.error("Username/password is incorrect")
         elif st.session_state["authentication_status"] == None:
             st.warning("Please enter your username and password")
 
     return authenticator
+
+
+# @st.experimental_memo
+def get_username_config():
+    user_data = db.query(StreamlitUser).all()
+    list_of_dicts = [row.__dict__ for row in user_data]
+    result = {}
+    for dic in list_of_dicts:
+        username = dic["username"]
+        dic["name"] = username
+        dic["password"] = dic["hashed_password"]
+        result[username] = dic
+    return {"usernames": result}

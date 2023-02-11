@@ -13,14 +13,16 @@ from loguru import logger
 from sqlalchemy.orm import Session
 from src.pingers import *
 from src.models import *
-from src.database.session import db
+from src.database.session import SessionLocal
 from src.app.authenticate import is_admin
 
 import streamlit as st
 
 
-def select_shop_and_load_data() -> pd.DataFrame:
+db = SessionLocal()
 
+
+def select_shop_and_load_data() -> pd.DataFrame:
     shops = st_get_shops()
     shops = shops.sort_values("name").reset_index()
 

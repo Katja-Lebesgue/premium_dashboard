@@ -36,7 +36,7 @@ credentials:
     nikola:
       email: nikola
       name: nikola
-      password: $2b$12$85jA9zfbN7qXoRhteX1j9eQByogPHVMX1.RL.SnbLTtqvfZi8vQhi
+      password: $2b$12$TidzJVR9QgaY1Lfw4PI.AebTQEdogMp9P9WgRt6BZuBdXe/ewg0f2
 preauthorized:
   emails:
   - sanjinjf7@gmail.com

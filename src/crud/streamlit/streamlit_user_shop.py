@@ -1,19 +1,34 @@
 from typing import List
-
+import pandas as pd
 from sqlalchemy.orm import Session
 
 from src.crud.base import CRUDBase
 from src.models.streamlit import *
 from src.schemas.streamlit import *
+from src.models import Shop
 
 from src.utils.common import element_to_list
 
 
 class CRUDStreamlitUserShop(CRUDBase[StreamlitUserShop, StreamlitUserShopCreate, StreamlitUserShopUpdate]):
-    def get(self, db: Session, shop_id: int, account_id: str, ad_id: str) -> StreamlitUserShop | None:
-        return db.query(self.model).get((shop_id, account_id, ad_id))
+    def add_relationship(self, db: Session, streamlit_user_id: str, shop_id: int) -> None:
+        db.add(self.model(streamlit_user_id=streamlit_user_id, shop_id=shop_id))
+        db.commit()
 
-    def get_features_by_shop_id(self, db: Session, shop_id: int) -> List[str]:
-        ad_creative_features = StreamlitUserShop
-        result = db.query(ad_creative_features.feature).filter(ad_creative_features.shop_id == shop_id).distinct()
-        return result
+    def delete_relationship(self, db: Session, streamlit_user_id: str, shop_id: int) -> None:
+        db.query(self.model).filter(
+            self.model.streamlit_user_id == streamlit_user_id, self.model.shop_id == shop_id
+        ).delete()
+        db.commit()
+
+    def ping_shops_by_streamlit_user_id(self, db: Session, streamlit_user_id: int) -> pd.DataFrame:
+        query = (
+            db.query(Shop.id, Shop.name)
+            .join(self.model, self.model.shop_id == Shop.id)
+            .filter(self.model.streamlit_user_id == streamlit_user_id)
+        )
+        df = pd.read_sql(query.statement, db.bind)
+        return df
+
+
+crud_streamlit_user_shop = CRUDStreamlitUserShop(StreamlitUserShop)

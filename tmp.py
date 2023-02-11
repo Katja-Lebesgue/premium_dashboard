@@ -4,6 +4,7 @@ from src.pingers import ping_ads_insights_all_platforms, ping_crm
 from src.database.session import db
 from src.s3 import read_csv_from_s3
 from src.models import *
+from app.authenticate import get_username_config
 
 
 if __name__ == "__main__":

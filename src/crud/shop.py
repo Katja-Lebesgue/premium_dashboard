@@ -1,7 +1,10 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import false
 
 from src import models, schemas, crud
 from src.models.enums.credentials_provider import CredentialsProvider
+
+import pandas as pd
 
 from .base import CRUDBase
 
@@ -73,5 +76,10 @@ class CRUDShop(CRUDBase[models.Shop, schemas.ShopCreate, schemas.ShopUpdate]):
         tt_accounts = crud.tt_ad_account.get_all_by(db, shop_id=shop.id, connected=True)
         crud.tt_ad_account.disconnect_accounts(db, tt_accounts)
 
+    def ping_all(self, db: Session) -> pd.DataFrame:
+        query = db.query(self.model).filter(self.model.rapp_shop == false())
+        df = pd.read_sql(query.statement, db.bind)
+        return df
 
-shop = CRUDShop(models.Shop)
+
+crud_shop = CRUDShop(models.Shop)

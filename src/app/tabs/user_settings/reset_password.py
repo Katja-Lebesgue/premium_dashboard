@@ -1,9 +1,11 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 import yaml
+from src.crud.streamlit import crud_streamlit_user
+from src.database.session import db
 
 
-def user_settings(authenticator, config: dict):
+def reset_password(authenticator):
     with st.sidebar:
         subtab = option_menu(
             menu_title="Settings",
@@ -17,8 +19,11 @@ def user_settings(authenticator, config: dict):
         try:
             if authenticator.reset_password(st.session_state["username"], "Reset password"):
                 st.success("Password modified successfully")
-                config["credentials"] = authenticator.credentials
-                with open("config.yaml", "w") as file:
-                    yaml.dump(config, file, default_flow_style=False)
+                new_hashed_password = authenticator.credentials["usernames"][st.session_state["username"]][
+                    "password"
+                ].encode()
+                crud_streamlit_user.update_hashed_password(
+                    db=db, id=st.session_state["user_id"], hashed_password=new_hashed_password
+                )
         except Exception as e:
             st.error(e)

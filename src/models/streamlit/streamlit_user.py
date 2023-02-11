@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Boolean, Text
+from sqlalchemy import Column, Integer, Boolean, LargeBinary, Text
 
 from src.database.base_class import Base
 
@@ -6,5 +6,5 @@ from src.database.base_class import Base
 class StreamlitUser(Base):
     id = Column(Integer, primary_key=True)
     username = Column(Text)
-    hashed_password = Column(Text)
+    hashed_password = Column(LargeBinary)
     is_superuser = Column(Boolean)
