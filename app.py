@@ -7,15 +7,16 @@ from loguru import logger
 
 load_dotenv()
 
-from src.app.tabs.descriptive_statistics import descriptive_statistics
+from src.app.tabs.facebook.shop.descriptive_statistics import descriptive_statistics
 from src.app.select_shop_and_load_data import select_shop_and_load_data
 from src.app.tabs.admin_settings.admin_settings import admin_settings
 from src.app.tabs.user_settings.reset_password import reset_password
+from src.app.tabs.facebook.market.text_analysis import text_analysis
 
-from src.app.tabs.default_performance_tests import default_performance_tests
-from src.app.tabs.custom_performance_test import custom_performance_test
-from src.app.tabs.market_performance_tests import market_performance_tests
-from src.app.tabs.market_descriptive_statistics import market_descriptive_statistics
+from src.app.tabs.facebook.shop.default_performance_tests import default_performance_tests
+from src.app.tabs.facebook.shop.custom_performance_test import custom_performance_test
+from src.app.tabs.facebook.market.market_performance_tests import market_performance_tests
+from src.app.tabs.facebook.market.market_descriptive_statistics import market_descriptive_statistics
 from src.app.tabs.all_platforms import all_platforms
 from src.app.authenticate import authenticate, is_admin
 from src.database.session import SessionLocal
@@ -44,7 +45,7 @@ if st.session_state["authentication_status"]:
 
     if main_tab == "Facebook":
         with st.sidebar:
-            subtab1 = option_menu(
+            fb_subtab = option_menu(
                 menu_title="Main menu",
                 options=["Shop", "Market"],
                 menu_icon="menu-app",
@@ -52,10 +53,10 @@ if st.session_state["authentication_status"]:
                 default_index=1,
             )
 
-        if subtab1 == "Shop":
+        if fb_subtab == "Shop":
             with st.sidebar:
                 data_shop = select_shop_and_load_data()
-                subtab2 = option_menu(
+                shop_subtab = option_menu(
                     menu_title="Shop",
                     options=[
                         "Descriptive statistics",
@@ -67,33 +68,33 @@ if st.session_state["authentication_status"]:
                     default_index=0,
                 )
 
-            if subtab2 == "Descriptive statistics":
+            if shop_subtab == "Descriptive statistics":
                 descriptive_statistics(data_shop)
 
-            if subtab2 == "Default performance tests":
+            if shop_subtab == "Default performance tests":
                 default_performance_tests(data_shop)
 
-            if subtab2 == "Custom performance test":
+            if shop_subtab == "Custom performance test":
                 custom_performance_test(data_shop)
 
-        if subtab1 == "Market":
+        if fb_subtab == "Market":
             with st.sidebar:
-                subtab2 = option_menu(
+                market_subtab = option_menu(
                     menu_title="Market",
-                    options=[
-                        "Descriptive statistics",
-                        "Default performance tests",
-                    ],
+                    options=["Descriptive statistics", "Default performance tests", "Text analysis"],
                     menu_icon="globe",
-                    icons=["pie-chart-fill", "lightning-fill"],
+                    icons=["pie-chart-fill", "lightning-fill", "cursor-text"],
                     default_index=0,
                 )
 
-            if subtab2 == "Descriptive statistics":
+            if market_subtab == "Descriptive statistics":
                 market_descriptive_statistics()
 
-            if subtab2 == "Default performance tests":
+            if market_subtab == "Default performance tests":
                 market_performance_tests()
+
+            if market_subtab == "Text analysis":
+                text_analysis()
 
     if main_tab == "Settings":
         if is_admin():

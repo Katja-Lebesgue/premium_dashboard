@@ -8,6 +8,7 @@ from src.models import GoogleDailyPerformance
 from src.schemas.google import GoogleDailyPerformanceCreate, GoogleDailyPerformanceUpdate
 from src.utils.common import element_to_list
 from src.models import *
+from src.crud.currency_exchange_rate import crud_currency_exchange_rate
 
 
 class CRUDGoogleAdsInsights(
@@ -23,7 +24,6 @@ class CRUDGoogleAdsInsights(
         add_currency: bool = True,
         monthly: bool = True,
     ) -> Query:
-
         group_columns = [
             self.model.ad_id,
             self.model.shop_id,
@@ -78,6 +78,56 @@ class CRUDGoogleAdsInsights(
             )
 
         query = query.distinct()
+
+        return query
+
+    def query_budget_split_by_campaign_type(
+        self,
+        db: Session,
+        shop_id: int | list[int] = None,
+        start_date: str = None,
+        end_date: str = date.today().strftime("%Y-%m-%d"),
+    ) -> Query:
+        currency_subquery = crud_currency_exchange_rate.query_current_rates(db=db).subquery()
+
+        group_columns = [
+            self.model.shop_id,
+            GoogleAdgroup.type,
+        ]
+
+        performance_columns = [
+            func.sum(self.model.spend / currency_subquery.c.rate_from_usd).label("spend"),
+        ]
+
+        columns = group_columns + performance_columns
+
+        query = db.query(*columns)
+
+        if shop_id is not None:
+            shop_id = element_to_list(shop_id)
+            query = query.filter(self.model.shop_id.in_(shop_id))
+
+        if start_date is not None:
+            query = query.filter(
+                self.model.date_start >= start_date,
+                self.model.date_start <= end_date,
+            )
+
+        query = query.join(
+            GoogleAdgroup,
+            (self.model.shop_id == GoogleAdgroup.shop_id)
+            & (self.model.account_id == GoogleAdgroup.account_id)
+            & (self.model.adgroup_id == GoogleAdgroup.adgroup_id),
+        )
+
+        query = query.join(
+            GoogleAdAccount,
+            (self.model.account_id == GoogleAdAccount.facebook_id) & (self.model.shop_id == GoogleAdAccount.shop_id),
+        )
+
+        query = query.join(currency_subquery, GoogleAdAccount.currency == currency_subquery.c.code)
+
+        query = query.group_by(*group_columns)
 
         return query
 

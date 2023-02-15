@@ -11,7 +11,7 @@ import numpy as np
 from src.s3.s3_connect import s3_connect
 from src.s3 import *
 
-from src.app.tabs.default_performance_tests import style_test_table
+from src.app.tabs.facebook.shop.default_performance_tests import style_test_table
 
 from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
@@ -32,11 +32,9 @@ files_dict = {
 def market_performance_tests(
     global_data_s3_path: str = f"data/global/",
 ):
-
     col1, col2 = st.columns(2)
 
     with col1:
-
         global_dates = get_global_dates()
 
         selected_date = st.selectbox(
@@ -93,7 +91,6 @@ def market_performance_tests(
     col3, col4 = st.columns(2)
 
     with col3:
-
         st.header("Promotional ads")
 
         promotion_value = True
@@ -114,7 +111,6 @@ def market_performance_tests(
             st.markdown("No promotional ads.")
 
     with col4:
-
         st.header("Non-promotional ads")
 
         promotion_value = False
@@ -136,7 +132,6 @@ def market_performance_tests(
 
 
 def get_global_dates(prefix: str = "data/global/global_feature"):
-
     list_of_paths = list_objects_from_prefix(prefix=prefix)
 
     str_from_from = lambda x: x[x.find("from") : -4] if x.find("from") > -1 else None
@@ -150,7 +145,6 @@ def get_global_dates(prefix: str = "data/global/global_feature"):
 
 @st.experimental_memo
 def st_read_csv_from_s3(*args, **kwargs):
-
     df = read_csv_from_s3(*args, **kwargs)
 
     df = rename_test_columns(df=df)
@@ -159,7 +153,6 @@ def st_read_csv_from_s3(*args, **kwargs):
 
 
 def rename_test_columns(df: pd.DataFrame) -> pd.DataFrame:
-
     find_substring_starting_with_test = lambda x: x[x.find("test") :]
 
     rename_dict = {col: find_substring_starting_with_test(col) for col in df.columns if "test" in col}
@@ -170,7 +163,6 @@ def rename_test_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def display_test_tables(global_feature_tests_df: pd.DataFrame, global_creative_type_tests_df: pd.DataFrame):
-
     features = list(global_feature_tests_df.feature.unique())
 
     for feature in features:
@@ -187,7 +179,6 @@ def display_test_tables(global_feature_tests_df: pd.DataFrame, global_creative_t
 
 
 def create_test_table(df: pd.DataFrame) -> pd.DataFrame:
-
     table = pd.DataFrame(
         columns=["ctr", "cr"],
         index=["positive", "neutral", "negative", "total shops in analysis"],
@@ -232,7 +223,6 @@ def get_conclusion(test_result: dict) -> str:
 
 
 def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
-
     values = ["image", "video", "carousel", "dynamic", "unknown"]
 
     table = pd.DataFrame(
@@ -255,7 +245,6 @@ def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_winners(result: dict) -> list[str]:
-
     winners = []
 
     if result["p"] is None or result["p"] > 0.1:
@@ -274,7 +263,6 @@ def get_winners(result: dict) -> list[str]:
 
 
 def style_feature_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
-
     df_style = df.style
 
     # add bars
@@ -318,7 +306,6 @@ def style_feature_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
 
 
 def style_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
-
     df_style = df.style
 
     # add bars
