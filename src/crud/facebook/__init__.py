@@ -1,6 +1,7 @@
 from .facebook_ad import crud_fb_ad
 from .facebook_ad_account import fb_ad_account
 from .facebook_ads_insights import fb_ads_insights
+from .facebook_adset_insights import crud_fb_adset_insights
 from .facebook_adset import crud_fb_adset
 from .facebook_campaign import fb_campaign
 from .facebook_customaudience import fb_customaudience

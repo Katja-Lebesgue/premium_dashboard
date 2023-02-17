@@ -14,6 +14,9 @@ from src.statistics.bernoulli_tests.mean_test_bernoulli import *
 
 
 def default_performance_tests(data_shop: pd.DataFrame):
+    if not len(data_shop):
+        st.warning("No data")
+        return
 
     col1, col2, col3 = st.columns([1, 1, 2])
 
@@ -21,7 +24,6 @@ def default_performance_tests(data_shop: pd.DataFrame):
     max_date = datetime.today()
 
     with col1:
-
         timeperiod = st.slider(
             label="Choose time period:",
             value=(min_date, max_date),
@@ -31,7 +33,6 @@ def default_performance_tests(data_shop: pd.DataFrame):
         data_shop = data_shop[data_shop.year_month > timeperiod[0]]
 
     with col2:
-
         targeting = st.radio(
             "Select targets",
             tuple(targeting_dict.keys()),
@@ -71,7 +72,6 @@ def default_performance_tests(data_shop: pd.DataFrame):
     col3, col4 = st.columns(2)
 
     with col3:
-
         st.header("Promotional ads")
 
         data_promotional = data_shop.loc[data_shop.discounts_any == True, :]
@@ -82,7 +82,6 @@ def default_performance_tests(data_shop: pd.DataFrame):
             display_test_tables(df=data_promotional)
 
     with col4:
-
         st.header("Non-promotional ads")
 
         data_nonpromotional = data_shop.loc[data_shop.discounts_any == False, :]
@@ -94,7 +93,6 @@ def default_performance_tests(data_shop: pd.DataFrame):
 
 
 def display_test_tables(df: pd.DataFrame):
-
     column_title_dict = {
         "emojis_any": "has emojis",
         "urgency_any": "creates urgency",
@@ -120,7 +118,6 @@ def display_test_tables(df: pd.DataFrame):
 
 
 def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
-
     # initialize table
     table = pd.DataFrame(
         np.nan,
@@ -161,7 +158,6 @@ def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
 
 
 def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
-
     values = ["image", "video", "carousel", "dynamic", "unknown"]
 
     table = pd.DataFrame(
@@ -180,7 +176,6 @@ def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
     result["cr"] = mean_test_bernoulli_ctr(df=df, group_col="creative_type")
 
     for value in values:
-
         filtered_df = df[df.creative_type.isin([value])]
         table.loc[value, ["spend", "impr", "clicks"]] = [
             filtered_df.spend.sum(),
@@ -189,7 +184,6 @@ def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
         ]
 
     for metric in ["ctr", "cr"]:
-
         table.loc["p-value", metric] = result[metric]["p"]
         relevant_values = [value for value in values if value in result[metric].keys()]
 
@@ -200,7 +194,6 @@ def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def style_test_table(df: pd.DataFrame) -> pd.DataFrame.style:
-
     # style small p-values
     if "p-value" in df.index:
         slice = (["p-value"], df.columns)

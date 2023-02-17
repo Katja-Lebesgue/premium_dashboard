@@ -1,6 +1,7 @@
 from .facebook_ad import FacebookAd
 from .facebook_ad_account import FacebookAdAccount
 from .facebook_ads_insights import FacebookAdsInsights
+from .facebook_adset_insights import FacebookAdsetInsights
 from .facebook_adset import FacebookAdset
 from .facebook_campaign import FacebookCampaign
 from .facebook_customaudience import FacebookCustomaudience

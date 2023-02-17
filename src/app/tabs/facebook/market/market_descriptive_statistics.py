@@ -35,13 +35,20 @@ def market_descriptive_statistics(
 
     descriptive_df["year_month"] = descriptive_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
+    col, _ = st.columns([1, 2])
+    with col:
+        total_or_shop_average = st.selectbox(label="Choose wisely:", options=["Total", "Shop average"])
+
+    if total_or_shop_average == "Shop average":
+        descriptive_df.drop(list(metric_dict.keys()), axis=1, inplace=True)
+        descriptive_df.columns = [col.replace("_by_shop", "") for col in descriptive_df.columns]
+
     pie_charts(descriptive_df.copy())
 
     text_features_through_time(descriptive_df)
 
 
 def pie_charts(descriptive_df: pd.DataFrame) -> None:
-
     last_3_months = (
         descriptive_df.year_month.drop_duplicates()
         .sort_values(ascending=False)
@@ -55,7 +62,6 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
     col1, col2 = st.columns([1, 4])
 
     with col1:
-
         # metric selection
         descriptive_metric = st.radio(
             "Select metric",
@@ -141,7 +147,6 @@ def pie_charts(descriptive_df: pd.DataFrame) -> None:
 
 
 def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: int):
-
     pie_df = df[df.feature == group]
 
     pie_df = pd.DataFrame(pie_df.groupby("feature_value").sum()[y]).reset_index()
@@ -162,7 +167,6 @@ def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: in
 
 
 def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
-
     col1, col2 = st.columns([1, 3])
 
     features = descriptive_df.feature.unique()
@@ -170,7 +174,6 @@ def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
     metrics = set(descriptive_df.columns) - {"feature", "feature_value", "year_month"}
 
     with col1:
-
         selected_feature = st.selectbox("Select feature", tuple(features), format_func=lambda x: remove_any(x))
 
         performance_metric = st.selectbox(
@@ -192,7 +195,6 @@ def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
         performance_data = pd.DataFrame(performance_series).reset_index()
 
     with col2:
-
         fig = px.bar(
             performance_data,
             x="year_month",

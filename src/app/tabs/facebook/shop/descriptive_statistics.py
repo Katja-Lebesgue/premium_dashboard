@@ -18,6 +18,9 @@ from metadata.globals import *
 
 
 def descriptive_statistics(data_shop: pd.DataFrame):
+    if not len(data_shop):
+        st.warning("No data")
+        return
 
     # st.write(data_shop.columns)
 
@@ -27,7 +30,6 @@ def descriptive_statistics(data_shop: pd.DataFrame):
 
 
 def pie_charts(data_shop: pd.DataFrame) -> None:
-
     last_3_months = (
         data_shop.year_month.drop_duplicates()
         .sort_values(ascending=False)
@@ -41,7 +43,6 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
     col1, col2 = st.columns([1, 4])
 
     with col1:
-
         # metric selection
         descriptive_metric = st.radio(
             "Select metric",
@@ -133,7 +134,6 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
 
 
 def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: int):
-
     pie_df = pd.DataFrame(df.replace({None: "unknown"}).groupby(group).sum()[y]).reset_index()
 
     fig.add_trace(
@@ -152,11 +152,9 @@ def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: in
 
 
 def text_features_through_time(data_shop: pd.DataFrame) -> None:
-
     col1, col2 = st.columns([1, 3])
 
     with col1:
-
         text_feature = st.selectbox(
             "Select feature",
             tuple(feature_dict.keys()),
@@ -195,7 +193,6 @@ def text_features_through_time(data_shop: pd.DataFrame) -> None:
         performance_data = pd.DataFrame(performance_series).reset_index()
 
     with col2:
-
         fig = px.bar(
             performance_data,
             x="year_month",

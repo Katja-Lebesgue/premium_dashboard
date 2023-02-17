@@ -15,6 +15,7 @@ from src.pingers import *
 from src.models import *
 from src.database.session import SessionLocal
 from src.app.authenticate import is_admin
+from src.crud import crud_streamlit_user_shop
 
 import streamlit as st
 
@@ -23,19 +24,23 @@ db = SessionLocal()
 
 
 def select_shop_and_load_data() -> pd.DataFrame:
-    shops = st_get_shops()
+    if not is_admin():
+        shops = crud_streamlit_user_shop.ping_shops_by_streamlit_user_id(
+            db=db, streamlit_user_id=st.session_state["user_id"]
+        ).rename(columns={"id": "shop_id"})
+    else:
+        shops = st_get_shops()
+
     shops = shops.sort_values("name").reset_index()
 
-    if is_admin():
-        selected_shop_id = st.selectbox(
-            "Select shop",
-            options=shops["shop_id"],
-            format_func=lambda shop_id: shops.loc[shops.shop_id == shop_id, "name"].item(),
-            index=int(shops.loc[shops.shop_id == 16038].index[0]),
-        )
+    if not len(shops):
+        return pd.DataFrame()
 
-    else:
-        selected_shop_id = shops.loc[shops.name == st.session_state["name"], "shop_id"].item()
+    selected_shop_id = st.selectbox(
+        "Select shop",
+        options=shops["shop_id"],
+        format_func=lambda shop_id: shops.loc[shops.shop_id == shop_id, "name"].item(),
+    )
 
     data_shop = st_get_data_by_shop_id(selected_shop_id)
     data_shop_copy = data_shop.copy()

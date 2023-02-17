@@ -22,7 +22,6 @@ def ping_creative(
     get_aov: str = True,
     get_industry: bool = True,
 ) -> pd.DataFrame:
-
     query = crud_ad_creative_features.query_creative(
         db=db,
         shop_id=shop_id,
@@ -36,7 +35,9 @@ def ping_creative(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         ).subquery()
 
-        query = query.join(aov_query, AdCreativeFeatures.shop_id == aov_query.c.shop_id).add_columns(aov_query.c.aov)
+        query = query.join(aov_query, AdCreativeFeatures.shop_id == aov_query.c.shop_id, isouter=True).add_columns(
+            aov_query.c.aov
+        )
 
     df = pd.read_sql(query.statement, db.bind)
 

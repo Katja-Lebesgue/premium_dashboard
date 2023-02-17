@@ -14,6 +14,10 @@ from src.utils.common import *
 
 
 def custom_performance_test(data_shop: pd.DataFrame):
+    if not len(data_shop):
+        st.warning("No data")
+        return
+
     test_group1 = data_shop
 
     test_group2 = data_shop.copy()

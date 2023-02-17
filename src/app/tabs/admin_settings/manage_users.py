@@ -22,10 +22,8 @@ def manage_users():
         try:
             if new_password == new_password_repeat:
                 hashed_password = hash_password(new_password)
-                st.write(hashed_password)
                 crud_streamlit_user.add_user(db=db, username=new_username, hashed_password=hashed_password)
-                st.success("Successfully registered user.")
-                users = crud_streamlit_user.ping_all_subusernames(db=db)
+                st.experimental_rerun()
 
             else:
                 st.error("Passwords do not match.")
@@ -42,8 +40,7 @@ def manage_users():
 
     if delete_user_form.form_submit_button("Delete"):
         crud_streamlit_user.delete_user(db=db, id=user_id)
-        st.success("Successfully deleted user.")
-        users = crud_streamlit_user.ping_all_subusernames(db=db)
+        st.experimental_rerun()
 
     # reset password
     reset_password_form = st.form("Reset password")

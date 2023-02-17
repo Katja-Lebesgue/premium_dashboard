@@ -8,7 +8,7 @@ from loguru import logger
 load_dotenv()
 
 from src.app.tabs.facebook.shop.descriptive_statistics import descriptive_statistics
-from src.app.select_shop_and_load_data import select_shop_and_load_data
+from src.app.tabs.facebook.shop.select_shop_and_load_data import select_shop_and_load_data
 from src.app.tabs.admin_settings.admin_settings import admin_settings
 from src.app.tabs.user_settings.reset_password import reset_password
 from src.app.tabs.facebook.market.text_analysis import text_analysis
@@ -23,8 +23,6 @@ from src.database.session import SessionLocal
 
 
 st.set_page_config(layout="wide")
-
-logger.debug("poceli smo")
 
 authenticator = authenticate()
 

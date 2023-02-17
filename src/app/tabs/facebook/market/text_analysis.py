@@ -24,7 +24,9 @@ load_dotenv()
 def text_analysis():
     df = st_get_text_data()
     df = df.copy()
-    text_col = st.selectbox(label="Text position", options=get_enum_values(EText))
+    col, _ = st.columns([1, 2])
+    with col:
+        text_col = st.selectbox(label="Text position", options=get_enum_values(EText))
     sbs, sentiment_columns = get_samples_by_shop(df=df, text_col=text_col)
 
     st.subheader("Style")
@@ -60,7 +62,9 @@ def text_analysis():
         st.markdown(collocations_md, unsafe_allow_html=True)
 
     st.subheader("Sentiment")
-    sentiment_type = st.selectbox(label="Select sentiment type", options=sentiment_columns)
+    col1, _ = st.columns([1, 3])
+    with col1:
+        sentiment_type = st.selectbox(label="Select sentiment type", options=sentiment_columns)
     fig = plt.figure()
     sns.boxplot(data=sbs, y="industry", x=sentiment_type, showfliers=False)
     st.pyplot(fig)
@@ -127,7 +131,7 @@ def display_cloud(wc, title: str | None = None):
     plt.axis("off")
     plt.title(title)
     st.pyplot(fig)
-    st.markdown("#")
+    st.markdown("###")
 
 
 def get_sorted_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 2):
