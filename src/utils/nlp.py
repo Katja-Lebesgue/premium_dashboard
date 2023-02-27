@@ -12,6 +12,7 @@ from collections import Counter
 import emojis
 
 nltk.download("vader_lexicon")
+nltk.download("stopwords")
 
 
 def detect_language(text: str) -> None | str:

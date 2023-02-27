@@ -22,7 +22,6 @@ load_dotenv()
 
 
 def text_analysis():
-    nltk.download("stopwords")
     df = st_get_text_data()
     df = df.copy()
     col, _ = st.columns([1, 2])
