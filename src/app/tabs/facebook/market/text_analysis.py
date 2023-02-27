@@ -31,7 +31,7 @@ def text_analysis():
 
     st.subheader("Style")
     # wc & ec
-    emoji_cloud = EmojiCloud(font_path=f"{os.getenv('GLOBAL_PATH_TO_REPO')}/data/Symbola.otf")
+    emoji_cloud = EmojiCloud(font_path=f"{os.getenv('GLOBAL_PATH_TO_REPO')}/src/utils/Symbola.otf")
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("#")
