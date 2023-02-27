@@ -29,6 +29,8 @@ def authenticate():
 
         # st.write(config)
 
+        st.write(st.session_state["authentication_status"])
+
         if st.session_state["authentication_status"] == True:
             try:
                 st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
@@ -40,7 +42,7 @@ def authenticate():
                 st.session_state["name"] = None
                 st.session_state["username"] = None
                 st.session_state["authentication_status"] = None
-                st.experimental_rerun()
+                # st.experimental_rerun()
 
         elif st.session_state["authentication_status"] == False:
             st.error("Username/password is incorrect")
