@@ -34,6 +34,7 @@ def authenticate():
                 st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
                 st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
             except Exception:
+                st.error("Oh no!!!!")
                 authenticator.cookie_manager.delete(authenticator.cookie_name)
                 st.session_state["logout"] = True
                 st.session_state["name"] = None
