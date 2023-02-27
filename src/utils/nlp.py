@@ -1,11 +1,16 @@
 from langdetect import detect
 from loguru import logger
+
+import nltk
+
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 
 from wordcloud import WordCloud
 from collections import Counter
 import emojis
+
+nltk.download("vader_lexicon")
 
 
 def detect_language(text: str) -> None | str:
