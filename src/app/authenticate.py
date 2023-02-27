@@ -1,5 +1,7 @@
 import streamlit as st
-import streamlit_authenticator as stauth
+
+# import streamlit_authenticator as stauth
+from my_packages import streamlit_authenticator as stauth
 import yaml
 from yaml import SafeLoader
 
