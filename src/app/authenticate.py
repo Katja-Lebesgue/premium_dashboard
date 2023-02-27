@@ -1,6 +1,5 @@
 import streamlit as st
 
-# import streamlit_authenticator as stauth
 from my_packages import streamlit_authenticator as stauth
 import yaml
 from yaml import SafeLoader
@@ -26,25 +25,20 @@ def authenticate():
             key="cookie_key",
             cookie_expiry_days=30,
         )
-        st.write(config)
+
         name, authentication_status, username = authenticator.login("Login", "main")
-
-        # st.write(config)
-
-        st.write(st.session_state["authentication_status"])
 
         if st.session_state["authentication_status"] == True:
             try:
                 st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
                 st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
             except Exception:
-                st.error("Oh no!!!!")
                 authenticator.cookie_manager.delete(authenticator.cookie_name)
                 st.session_state["logout"] = True
                 st.session_state["name"] = None
                 st.session_state["username"] = None
                 st.session_state["authentication_status"] = None
-                # st.experimental_rerun()
+                st.experimental_rerun()
 
         elif st.session_state["authentication_status"] == False:
             st.error("Username/password is incorrect")
