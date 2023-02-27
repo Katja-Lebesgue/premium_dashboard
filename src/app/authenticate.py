@@ -24,7 +24,7 @@ def authenticate():
             key="cookie_key",
             cookie_expiry_days=30,
         )
-
+        st.write(config)
         name, authentication_status, username = authenticator.login("Login", "main")
 
         # st.write(config)
