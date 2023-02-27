@@ -27,9 +27,20 @@ def authenticate():
 
         name, authentication_status, username = authenticator.login("Login", "main")
 
+        # st.write(config)
+
         if st.session_state["authentication_status"] == True:
-            st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
-            st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
+            try:
+                st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
+                st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
+            except Exception:
+                authenticator.cookie_manager.delete(authenticator.cookie_name)
+                st.session_state["logout"] = True
+                st.session_state["name"] = None
+                st.session_state["username"] = None
+                st.session_state["authentication_status"] = None
+                st.experimental_rerun()
+
         elif st.session_state["authentication_status"] == False:
             st.error("Username/password is incorrect")
         elif st.session_state["authentication_status"] == None:

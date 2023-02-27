@@ -27,6 +27,8 @@ pie_groups_dict = {
     "target": "target",
 }
 
+google_pie_groups_dict = {"type": "type"}
+
 custom_feature_dict = {
     "urgency_any": "urgency",
     "discounts_any": "promotion",

@@ -25,8 +25,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def market_descriptive_statistics(
-    s3_path: str = f"data/global/global_descriptive",
+def google_market_descriptive_statistics(
+    s3_path: str = f"data/global/google_descriptive",
 ):
     list_of_objects = pd.Series(list_objects_from_prefix(prefix=s3_path)).sort_values()
 
@@ -88,8 +88,8 @@ def pie_charts(descriptive_df: pd.DataFrame, proper_metric_dict: dict, add_title
     with col2:
         fig = make_subplots(
             rows=1,
-            cols=3,
-            specs=[[{"type": "domain"}, {"type": "domain"}, {"type": "domain"}]],
+            cols=1,
+            specs=[[{"type": "domain"}]],
             horizontal_spacing=0.1,
             vertical_spacing=0.1,
         )
@@ -101,32 +101,16 @@ def pie_charts(descriptive_df: pd.DataFrame, proper_metric_dict: dict, add_title
         add_pie_subplot(
             fig=fig,
             df=descriptive_df,
-            group="creative_type",
+            group="type",
             y=descriptive_metric,
             row=1,
             col=1,
-        )
-        add_pie_subplot(
-            fig=fig,
-            df=descriptive_df,
-            group="discounts_any",
-            y=descriptive_metric,
-            row=1,
-            col=2,
-        )
-        add_pie_subplot(
-            fig=fig,
-            df=descriptive_df,
-            group="target",
-            y=descriptive_metric,
-            row=1,
-            col=3,
         )
 
         # Creating title
         if add_title:
             total_str = big_number_human_format(
-                descriptive_df.loc[descriptive_df.feature == "target", descriptive_metric].sum()
+                descriptive_df.loc[descriptive_df.feature == "type", descriptive_metric].sum()
             )
 
             if descriptive_metric == "spend_USD":
@@ -147,8 +131,8 @@ def pie_charts(descriptive_df: pd.DataFrame, proper_metric_dict: dict, add_title
         else:
             title = None
 
-        fig.update_traces(textinfo="percent+label", marker=dict(colors=colors), textfont_size=15)
-        fig.update_layout(height=500, width=900, showlegend=False, title=title)
+        fig.update_traces(textinfo="label+percent", textposition="inside", marker=dict(colors=colors), textfont_size=15)
+        fig.update_layout(height=500, width=500, showlegend=False, title=title)
 
         st.plotly_chart(fig)
 
@@ -163,7 +147,7 @@ def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: in
             values=pie_df[y],
             labels=pie_df["feature_value"],
             hoverinfo="label+value+percent",
-            title=dict(text=pie_groups_dict[group], font=dict(size=25), position="top left"),
+            title=dict(text=google_pie_groups_dict[group], font=dict(size=25), position="top left"),
             rotation=225,
         ),
         row=row,

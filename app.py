@@ -12,6 +12,7 @@ from src.app.tabs.facebook.shop.select_shop_and_load_data import select_shop_and
 from src.app.tabs.admin_settings.admin_settings import admin_settings
 from src.app.tabs.user_settings.reset_password import reset_password
 from src.app.tabs.facebook.market.text_analysis import text_analysis
+from src.app.tabs.google.google_market_descriptive_statistics import google_market_descriptive_statistics
 
 from src.app.tabs.facebook.shop.default_performance_tests import default_performance_tests
 from src.app.tabs.facebook.shop.custom_performance_test import custom_performance_test
@@ -32,9 +33,9 @@ if st.session_state["authentication_status"]:
     with st.sidebar:
         main_tab = option_menu(
             menu_title="Main menu",
-            options=["All platforms", "Facebook", "Settings"],
+            options=["All platforms", "Facebook", "Google", "Settings"],
             menu_icon="menu-app",
-            icons=["arrows-fullscreen", "facebook", "gear"],
+            icons=["arrows-fullscreen", "facebook", "google", "gear"],
             default_index=1,
         )
 
@@ -93,6 +94,19 @@ if st.session_state["authentication_status"]:
 
             if market_subtab == "Text analysis":
                 text_analysis()
+
+    if main_tab == "Google":
+        with st.sidebar:
+            google_subtab = option_menu(
+                menu_title="Google",
+                options=["Descriptive statistics"],
+                menu_icon="globe",
+                icons=["pie-chart-fill"],
+                default_index=0,
+            )
+
+        if google_subtab == "Descriptive statistics":
+            google_market_descriptive_statistics()
 
     if main_tab == "Settings":
         if is_admin():
