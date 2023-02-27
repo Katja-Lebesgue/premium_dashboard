@@ -17,7 +17,7 @@ seaborn
 sqlalchemy
 statsmodels
 streamlit==1.9.2
-streamlit-authenticator
+streamlit-authenticator==0.2.1
 streamlit-option-menu
 textblob
 wordcloud
