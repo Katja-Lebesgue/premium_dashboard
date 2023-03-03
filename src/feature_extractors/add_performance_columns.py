@@ -1,15 +1,17 @@
 import pandas as pd
 import numpy as np
+from sqlalchemy.orm import Session
 from src.s3.read_file_from_s3 import read_json_from_s3
 from src.utils.common import convert_to_USD
+from src.crud.currency_exchange_rate import crud_currency_exchange_rate
 import json
 
 
 def add_performance_columns(
     performance: pd.DataFrame,
-    conversion_rates_json_path: str = "data/conversion_rates.txt",
+    db: Session
 ) -> pd.DataFrame:
-    conversion_rates_json = read_json_from_s3(path=f"conversion_rates.txt")
+    conversion_rates_dict = crud_currency_exchange_rate.ping_current_rates_dict(db=db)
 
     performance.fillna(0, inplace=True)
     performance.replace(to_replace="None", value=0, inplace=True)
@@ -32,7 +34,7 @@ def add_performance_columns(
         lambda df: convert_to_USD(
             price=df.spend,
             currency=df.currency,
-            conversion_rates_json=conversion_rates_json,
+            conversion_rates_dict=conversion_rates_dict,
         ),
         axis=1,
     )

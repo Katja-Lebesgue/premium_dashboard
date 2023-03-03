@@ -82,7 +82,8 @@ class CRUDFacebookDailyPerformance(
         if add_currency:
             query = query.join(
                 FacebookAdAccount,
-                self.model.account_id == FacebookAdAccount.facebook_id,
+                (self.model.account_id == FacebookAdAccount.facebook_id)
+                & (self.model.shop_id == FacebookAdAccount.shop_id),
             )
 
         query = query.distinct()

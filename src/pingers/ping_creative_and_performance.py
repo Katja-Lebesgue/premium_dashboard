@@ -27,7 +27,6 @@ def ping_creative_and_performance(
     cast_to_date: bool = True,
     add_performance_columns_bool: bool = True,
 ) -> pd.DataFrame:
-
     if all([x is None for x in [ad_id, shop_id, start_date]]):
         print("No filters in ping_creative_and_performance!")
         return None
@@ -60,7 +59,7 @@ def ping_creative_and_performance(
         return creative
 
     if add_performance_columns_bool:
-        performance = add_performance_columns(performance)
+        performance = add_performance_columns(performance, db=db)
 
     performance.shop_id = performance.shop_id.astype(str)
 

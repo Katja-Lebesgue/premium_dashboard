@@ -4,4 +4,4 @@ from .shopify import *
 from .streamlit import *
 
 from .shop import crud_shop
-from .currency_exchange_rate import CRUDCurrencyExchangeRate
+from .currency_exchange_rate import crud_currency_exchange_rate

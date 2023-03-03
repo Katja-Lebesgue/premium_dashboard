@@ -9,6 +9,7 @@ import numpy as np
 from src.utils.decorators import print_execution_time
 
 from src.models import *
+from src.crud.currency_exchange_rate import crud_currency_exchange_rate
 from src.models.enums.EPlatform import PLATFORMS
 from src.utils.common import element_to_list, convert_to_USD
 from src.s3.read_file_from_s3 import read_csv_from_s3, read_json_from_s3
@@ -20,7 +21,7 @@ def ping_ads_insights_by_platform(
     model: DeclarativeMeta,
     account_model: DeclarativeMeta,
     db: Session,
-    columns: str | list[str] = ["spend"],
+    columns: str | list[str] = ["spend", "revenue"],
     add_platform_prefix: bool = False,
     monthly: bool = True,
     shop_id: int | list[int] | None = None,
@@ -29,7 +30,6 @@ def ping_ads_insights_by_platform(
     add_currency: bool = True,
     conversion_json: dict | None = None,
 ) -> pd.DataFrame:
-
     if conversion_json is not None:
         add_currency = True
 
@@ -91,7 +91,7 @@ def ping_ads_insights_by_platform(
                 lambda df: convert_to_USD(
                     price=df[col],
                     currency=df.currency,
-                    conversion_rates_json=conversion_json,
+                    conversion_rates_dict=conversion_json,
                 ),
                 axis=1,
             )
@@ -109,9 +109,8 @@ def ping_ads_insights_all_platforms(
     get_industry: bool = False,
     convert_to_USD_bool: bool = True,
 ) -> pd.DataFrame:
-
     if convert_to_USD_bool:
-        conversion_json = read_json_from_s3(path=f"conversion_rates.txt")
+        conversion_json = crud_currency_exchange_rate.ping_current_rates_dict(db=db)
 
     for idx, (model, account_model) in enumerate(
         zip(

@@ -59,5 +59,9 @@ class CRUDCurrencyExchangeRate(CRUDBase[CurrencyExchangeRate, CurrencyExchangeRa
         )
         return query
 
+    def ping_current_rates_dict(self, db: Session) -> dict:
+        data = self.query_current_rates(db=db).all()
+        return {a.code: a.rate_from_usd for a in data}
+
 
 crud_currency_exchange_rate = CRUDCurrencyExchangeRate(CurrencyExchangeRate)

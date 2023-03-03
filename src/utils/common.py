@@ -79,10 +79,10 @@ def big_number_human_format(num, big_decimals: int = 2, small_decimals: int = 0)
     return num_format
 
 
-def convert_to_USD(price: float | int, currency: str, conversion_rates_json: str) -> float:
-    if type(currency) != str or currency not in conversion_rates_json.keys():
+def convert_to_USD(price: float | int, currency: str, conversion_rates_dict: str) -> float:
+    if type(currency) != str or currency not in conversion_rates_dict.keys():
         return None
-    return price / conversion_rates_json[currency]
+    return price / conversion_rates_dict[currency]
 
 
 def element_to_list(a):

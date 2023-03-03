@@ -8,6 +8,8 @@ import numpy as np
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from src.database.session import db
+
 from src.s3 import *
 from src.pingers import *
 from src.utils import *
@@ -62,7 +64,7 @@ def save_global_descriptive_statistics_to_s3(
         table = read_csv_from_s3(path=table_path)
         table.set_index(keys=group_cols, inplace=True)
 
-        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"]
+        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
 
         print(f"we have {len(done_shop_ids)} done shop ids.")
 
@@ -73,16 +75,10 @@ def save_global_descriptive_statistics_to_s3(
         shop_ids = all_shop_ids
 
     descriptive_features = boolean_text_features + ["creative_type", "target"]
-    metric_columns = [
-        "count_ads",
-        "spend_USD",
-        "impr",
-        "link_clicks",
-        "purch",
-    ]
+    metric_columns = ["count_ads", "spend_USD", "impr", "link_clicks", "purch"]
 
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
-        print(f"shop_id: {shop_id}")
+        logger.debug(f"shop_id: {shop_id}")
 
         data_shop = ping_creative_and_performance(
             db=db,
@@ -136,8 +132,8 @@ def save_global_descriptive_statistics_to_s3(
             full = full.set_index(["feature"], append=True)
             full = full.reorder_levels(group_cols, axis=0).fillna(0)
 
-            logger.debug(f"full index: {full.index.names}")
-            logger.debug(f"table_index: {table.index.names}")
+            # logger.debug(f"full index: {full.index.names}")
+            # logger.debug(f"table_index: {table.index.names}")
 
             full["count_shops"] = (full.count_ads > 0).astype(int)
 
@@ -160,8 +156,7 @@ def save_global_descriptive_statistics_to_s3(
 
 
 def main():
-    table = save_global_descriptive_statistics_to_s3()
-    print(table)
+    table = save_global_descriptive_statistics_to_s3(db=db, force_from_scratch=True)
 
 
 if __name__ == "__main__":

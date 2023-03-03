@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, Query
 from sqlalchemy import and_, func
 from sqlalchemy.sql.expression import literal
 
-from src.feature_extractors.add_performance_columns import add_performance_columns
+from src.feature_extractors import add_performance_columns
 from src.crud.base import CRUDBase
 from src.models import GoogleDailyPerformance
 from src.schemas.google import GoogleDailyPerformanceCreate, GoogleDailyPerformanceUpdate

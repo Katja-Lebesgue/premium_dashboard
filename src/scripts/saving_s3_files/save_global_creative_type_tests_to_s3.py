@@ -4,6 +4,7 @@ sys.path.append("././.")
 
 import pandas as pd
 import numpy as np
+from sqlalchemy.orm import Session
 
 from src.statistics.proportion_test import (
     proportion_test,
@@ -34,13 +35,14 @@ warnings.filterwarnings(
 
 @print_execution_time
 def save_global_creative_type_tests_to_s3(
+    db: Session,
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
     folder="data/global/",
     bucket="creative-features",
     csv_file_name: str = None,
+    force_from_scratch: bool = False,
 ):
-
     if csv_file_name is None:
         csv_file_name = f"global_creative_type_tests_from_{start_date}_to_{end_date}"
 
@@ -50,8 +52,8 @@ def save_global_creative_type_tests_to_s3(
 
     done_shop_ids_path = folder + done_shop_ids_csv_name + ".csv"
 
-    shops = ping_shops()
-    all_shop_ids = shops["shop_id"]
+    shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
 
     idx_cols = ["shop_id", "target", "promotion"]
 
@@ -59,14 +61,13 @@ def save_global_creative_type_tests_to_s3(
 
     list_of_objects = list_objects_from_prefix(prefix=table_path)
 
-    # table was already created today
-    if len(list_of_objects):
-        # table was already created today
+    from_scratch = len(list_of_objects) == 0 or force_from_scratch
 
+    if not from_scratch:
         table = read_csv_from_s3(path=table_path)
         table.set_index(keys=idx_cols, inplace=True)
 
-        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"]
+        done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
 
         print(f"we have {len(done_shop_ids)} done shop ids.")
 
@@ -79,10 +80,9 @@ def save_global_creative_type_tests_to_s3(
         shop_ids = all_shop_ids
 
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
-
         print(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(shop_id=shop_id, start_date=start_date, end_date=end_date)
+        data_shop = ping_creative_and_performance(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
 
         if shop_iter % 10 == 5:
             save_csv_to_s3(
@@ -107,7 +107,6 @@ def save_global_creative_type_tests_to_s3(
             data_shop_promotion = data_shop.loc[data_shop.discounts_any.isin([promotion]), :]
 
             for target in ["acquisition", "remarketing"]:
-
                 data_shop_target = data_shop_promotion.loc[data_shop_promotion.target.isin([target]), :]
 
                 result_ctr = mean_test_bernoulli_ctr(
