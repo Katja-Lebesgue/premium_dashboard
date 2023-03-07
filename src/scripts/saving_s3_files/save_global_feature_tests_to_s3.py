@@ -58,28 +58,22 @@ def save_global_feature_tests_to_s3(
 
     if not from_scratch:
         table = read_csv_from_s3(path=table_path)
-        table.set_index(keys=idx_cols, inplace=True)
-
         done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
-
         print(f"we have {len(done_shop_ids)} done shop ids.")
-
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
 
     else:
-        idx = pd.MultiIndex.from_product(iterables=[[]] * len(idx_cols), names=idx_cols)
-        table = pd.DataFrame(index=idx, columns=table_columns)
+        table = pd.DataFrame(columns=idx_cols + table_columns)
 
         shop_ids = all_shop_ids
 
     test_features = boolean_text_features
-    print(test_features)
 
     if "discounts_any" in test_features:
         test_features.remove("discounts_any")
 
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
-        print(f"shop_id: {shop_id}")
+        logger.debug(f"shop_id: {shop_id}")
 
         data_shop = ping_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, monthly=False
@@ -122,9 +116,9 @@ def save_global_feature_tests_to_s3(
                     group_true = data_shop_target.loc[data_shop_target[feature].isin([True]), :]
                     group_false = data_shop_target.loc[data_shop_target[feature].isin([False]), :]
 
-                    # print(f"group lengths: {len(group_true)}, {len(group_false)}")
+                    new_idx = {"shop_id": shop_id, "promotion": promotion, "target": target, "feature": feature}
 
-                    new_row = {
+                    new_columns = {
                         "proportion_test_ctr": proportion_test_ctr(
                             group1=group_true,
                             group2=group_false,
@@ -137,7 +131,9 @@ def save_global_feature_tests_to_s3(
                         ),
                     }
 
-                    table.loc[(shop_id, promotion, target, feature), :] = new_row
+                    new_row = new_idx | new_columns
+
+                    table.loc[len(table), :] = new_row
 
     save_csv_to_s3(
         df=table,

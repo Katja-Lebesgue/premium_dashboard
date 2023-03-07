@@ -5,6 +5,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from src.utils.decorators import print_execution_time
+from src.pingers.ping_crm import ping_crm
 
 from src.s3 import *
 from src.models import *
@@ -41,13 +42,6 @@ def ping_creative(
 
     df = pd.read_sql(query.statement, db.bind)
 
-    df.shop_id = df.shop_id.astype(str)
-
-    if get_industry:
-        crm = read_csv_from_s3(bucket="lebesgue-crm", path="crm_dataset_dev.csv", add_global_path=False)
-        crm = crm[["shop_id", "industry"]]
-        df = df.merge(crm, how="left")
-
     # unstacking
     index = list(df.columns)
     index.remove("value")
@@ -59,6 +53,11 @@ def ping_creative(
     df = df.droplevel(level=0, axis=1)
     df = df.reset_index()
     df.columns.name = None
+
+    if get_industry:
+        crm = ping_crm()
+        crm = crm[["shop_id", "industry"]]
+        df = df.merge(crm, how="left")
 
     return df
 

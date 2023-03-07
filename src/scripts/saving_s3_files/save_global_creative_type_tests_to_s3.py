@@ -65,18 +65,12 @@ def save_global_creative_type_tests_to_s3(
 
     if not from_scratch:
         table = read_csv_from_s3(path=table_path)
-        table.set_index(keys=idx_cols, inplace=True)
-
         done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
-
         print(f"we have {len(done_shop_ids)} done shop ids.")
-
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
 
     else:
-        idx = pd.MultiIndex.from_product(iterables=[[]] * len(idx_cols), names=idx_cols)
-        table = pd.DataFrame(index=idx, columns=table_columns)
-
+        table = pd.DataFrame(columns=idx_cols + table_columns)
         shop_ids = all_shop_ids
 
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
@@ -120,10 +114,11 @@ def save_global_creative_type_tests_to_s3(
                     convert_nan_to_none=True,
                 )
 
-                table.loc[(shop_id, target, promotion), :] = [
-                    result_ctr,
-                    result_cr,
-                ]
+                new_index = {"shop_id": shop_id, "promotion": promotion, "target": target}
+                new_columns = {"mean_test_ctr": result_ctr, "mean_test_cr": result_ctr}
+                new_row = new_index | new_columns
+
+                table.loc[len(table), :] = new_row
 
     save_csv_to_s3(
         df=table,

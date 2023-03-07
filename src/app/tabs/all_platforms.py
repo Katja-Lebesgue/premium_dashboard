@@ -99,9 +99,8 @@ def display_spend_statistics(df: pd.DataFrame, bins=list[float]):
 
 
 def display_platform_table(df: pd.DataFrame):
-
     # backend
-    table = pd.DataFrame(columns=["platform", "shops", "shops (%)", "total spend", "median monthly spend"])
+    table = pd.DataFrame(columns=["platform", "shops (%)", "total spend", "median monthly spend"])
     num_shops = df.shop_id.nunique()
 
     for platform in PLATFORMS:
@@ -112,7 +111,7 @@ def display_platform_table(df: pd.DataFrame):
         monthly_spend = filtered.groupby(["shop_id", "industry"]).median()[f"{platform}_spend"].median()
         row = {
             "platform": platform,
-            "shops": shops,
+            # "shops": shops,
             "shops (%)": shops_prc,
             "total spend": spend,
             "median monthly spend": monthly_spend,
@@ -120,7 +119,7 @@ def display_platform_table(df: pd.DataFrame):
         table.loc[len(table), :] = row
 
     # frontend
-    table = table.sort_values(by="shops", ascending=False)
+    table = table.sort_values(by="shops (%)", ascending=False)
     table_style = table.style.bar(color=GREEN, subset=["shops (%)"], vmax=1)
     table_style = table_style.bar(color=GREEN, subset=["total spend", "median monthly spend"])
     table_style.format(
@@ -135,7 +134,6 @@ def display_platform_table(df: pd.DataFrame):
 
 
 def display_combinations_table(df: pd.DataFrame):
-
     df = df.groupby(["shop_id", "industry"]).sum().copy()
 
     table = pd.DataFrame(columns=["combination", "shops", "budget_split"])
@@ -169,7 +167,6 @@ def display_combinations_table(df: pd.DataFrame):
 
 
 def format_combination_column(combination: list[str]) -> str:
-
     if len(combination) == 1:
         return f"{str(combination[0]).capitalize()} only"
 
@@ -182,7 +179,6 @@ def get_spend_ratio(s: pd.Series, platforms: list):
 
 
 def get_data_by_platform_combination(df: pd.DataFrame, combination: list, platforms: list) -> dict | None:
-
     filter = [True in range(len(df))]
 
     for platform in platforms:

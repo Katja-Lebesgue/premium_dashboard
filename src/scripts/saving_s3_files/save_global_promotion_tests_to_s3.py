@@ -52,18 +52,15 @@ def save_global_promotion_tests_to_s3(
 
     if not from_scratch:
         table = read_csv_from_s3(path=table_path)
-        table.set_index(keys=idx_cols, inplace=True)
         done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
         logger.debug(f"total of {len(all_shop_ids)} shop ids.")
         logger.debug(f"we have {len(done_shop_ids)} done shop ids.")
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
         logger.debug(f"{len(shop_ids)} more to go")
-        logger.debug(table)
         return all_shop_ids, done_shop_ids
 
     else:
-        idx = pd.MultiIndex.from_product(iterables=[[]] * len(idx_cols), names=idx_cols)
-        table = pd.DataFrame(index=idx, columns=table_columns)
+        table = pd.DataFrame(columns=idx_cols + table_columns)
 
         shop_ids = all_shop_ids
 
@@ -103,9 +100,8 @@ def save_global_promotion_tests_to_s3(
             group_true = data_shop_target.loc[data_shop_target.discounts_any == True, :]
             group_false = data_shop_target.loc[data_shop_target.discounts_any == False, :]
 
-            # print(f"group lengths: {len(group_true)}, {len(group_false)}")
-
-            new_row = {
+            new_idx = {"shop_id": shop_id, "target": target}
+            new_columns = {
                 "proportion_test_ctr": proportion_test_ctr(
                     group1=group_true, group2=group_false, convert_nan_to_none=True
                 ),
@@ -114,9 +110,9 @@ def save_global_promotion_tests_to_s3(
                 ),
             }
 
-            logger.debug(f"new_row: {new_row}")
+            new_row = new_idx | new_columns
 
-            table.loc[(shop_id, target), :] = new_row
+            table.loc[len(table), :] = new_row
 
     save_csv_to_s3(
         df=table,

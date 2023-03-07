@@ -61,8 +61,6 @@ def ping_creative_and_performance(
     if add_performance_columns_bool:
         performance = add_performance_columns(performance, db=db)
 
-    performance.shop_id = performance.shop_id.astype(str)
-
     if monthly and cast_to_date:
         performance["year_month"] = performance.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
