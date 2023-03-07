@@ -4,6 +4,8 @@ from my_packages import streamlit_authenticator as stauth
 import yaml
 from yaml import SafeLoader
 
+from sqlalchemy.exc import PendingRollbackError
+
 from src.database.session import db
 from src.models.streamlit import StreamlitUser
 from src.utils.database import row_to_dict
@@ -50,7 +52,11 @@ def authenticate():
 
 # @st.experimental_memo
 def get_username_config():
-    user_data = db.query(StreamlitUser).all()
+    try:
+        user_data = db.query(StreamlitUser).all()
+    except PendingRollbackError:
+        db.rollback()
+        user_data = db.query(StreamlitUser).all()
     list_of_dicts = [row.__dict__ for row in user_data]
     result = {}
     for dic in list_of_dicts:
