@@ -36,6 +36,10 @@ def google_market_descriptive_statistics(
 
     descriptive_df["year_month"] = descriptive_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
+    descriptive_df["feature_value"] = descriptive_df.feature_value.apply(
+        lambda type: "VIDEO" if "video" in type.lower() else type
+    )
+
     col, _ = st.columns([1, 2])
     with col:
         total_or_shop_average = st.selectbox(label="Choose wisely:", options=["Total", "Shop average"])
