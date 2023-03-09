@@ -75,7 +75,8 @@ def ping_ads_insights_by_platform(
     if add_currency:
         query = query.join(
             account_model,
-            getattr(model, f"{model.platform}_account_id") == getattr(account_model, f"{model.platform}_id"),
+            (getattr(model, f"{model.platform}_account_id") == getattr(account_model, f"{model.platform}_id"))
+            & (model.shop_id == account_model.shop_id),
         )
 
     query = query.group_by(*group_columns)
