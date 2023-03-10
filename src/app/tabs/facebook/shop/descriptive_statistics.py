@@ -184,7 +184,7 @@ def text_features_through_time(data_shop: pd.DataFrame) -> None:
 
         performance_series = data_shop.groupby(["year_month", text_feature]).sum()[performance_metric]
 
-        bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"))
+        bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 
         if bar_height == "Relative":
             monthly = data_shop.groupby("year_month").sum()[performance_metric]
