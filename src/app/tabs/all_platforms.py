@@ -17,6 +17,8 @@ from src.utils.common import big_number_human_format
 def all_platforms():
     st.markdown(hide_dataframe_row_index, unsafe_allow_html=True)
     df = st_ping_ads_insights(get_industry=True, columns=["spend", "revenue"])
+    df = df[~df.shop_id.isin([50517862, 39831581])]
+
     df = df.groupby(["shop_id", "year_month", "industry"]).sum().reset_index()
     shop_size = (
         df.groupby(["shop_id"])
@@ -26,7 +28,7 @@ def all_platforms():
     )
     df = df.merge(shop_size, on="shop_id")
     df = df[(df.total_spend != 0) & (df.mean_monthly_revenue != 0) & (df.shop_id != 50517862)]
-    # st.dataframe(df)
+
     q = 4
     df["shop_size"], bins = pd.qcut(
         df.mean_monthly_revenue, q=q, labels=list(range(q)), retbins=True, duplicates="drop"
@@ -56,6 +58,8 @@ def all_platforms():
     with col_breakdown2:
         display_platform_table(df=df)
         display_combinations_table(df=df)
+
+    platform_spend_through_time(df=df)
 
 
 @st.experimental_memo
@@ -202,3 +206,46 @@ def get_data_by_platform_combination(df: pd.DataFrame, combination: list, platfo
         "budget_split": list(mean_ratio) + [1 - mean_ratio.sum()],
     }
     return result
+
+
+def platform_spend_through_time(df: pd.DataFrame):
+    col1, col2 = st.columns([1, 3])
+
+    with col1:
+        metric = st.selectbox(
+            "Select metric",
+            ("spend", "revenue"),
+            key="metric",
+        )
+
+        df = df.rename(columns={f"{platform}_{metric}": f"{platform}" for platform in get_enum_values(EPlatform)})
+        df = df[["year_month", "shop_id"] + get_enum_values(EPlatform)]
+
+        total_or_shop = st.select_slider("Choose wisely", ("Total", "Shop average"), value="Total")
+
+        if total_or_shop == "Shop average":
+            df = df.set_index(["year_month", "shop_id"]).div(df.groupby(["year_month", "shop_id"]).sum()).reset_index()
+
+        a = df.groupby(["year_month"]).sum()[get_enum_values(EPlatform)].unstack()
+        a = a.reset_index().rename(columns={"level_0": "platform", 0: "value"}).set_index(["year_month", "platform"])
+
+        bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
+
+        if bar_height == "Relative":
+            monthly = a.reset_index().groupby("year_month").sum()
+            a = a / monthly
+
+        a = pd.DataFrame(a).reset_index()
+
+    with col2:
+        fig = px.bar(
+            a,
+            x="year_month",
+            y="value",
+            color="platform",
+            title="value",
+        )
+
+        fig.update_layout(barmode="stack")
+
+        st.plotly_chart(fig)

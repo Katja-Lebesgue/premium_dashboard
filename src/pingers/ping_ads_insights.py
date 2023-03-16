@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 from datetime import date
 from sqlalchemy.orm import Session, InstrumentedAttribute, DeclarativeMeta
@@ -96,6 +98,9 @@ def ping_ads_insights_by_platform(
                 ),
                 axis=1,
             )
+
+    if monthly:
+        df.year_month = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
     return df
 

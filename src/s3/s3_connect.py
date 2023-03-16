@@ -9,7 +9,7 @@ load_dotenv()
 
 
 def s3_connect():
-    s3 = boto3.resource(
+    boto3.resource(
         service_name="s3",
         region_name=os.environ["AWS_DEFAULT_REGION"],
         aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
@@ -31,7 +31,6 @@ def s3_resource():
 
 
 def list_objects_from_prefix(prefix: str, client=s3_connect(), add_global_folder: bool = True):
-
     if add_global_folder:
         prefix = add_global_s3_folder(prefix)
     client = s3_connect()
