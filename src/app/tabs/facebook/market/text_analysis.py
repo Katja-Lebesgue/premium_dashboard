@@ -11,8 +11,11 @@ from nltk.tokenize.casual import TweetTokenizer
 import string
 from loguru import logger
 import seaborn as sns
+import plotly.express as px
+from src.s3 import *
 
 from src.s3.read_file_from_s3 import read_csv_from_s3
+from src.app.utils.cache_functions import st_read_csv_from_s3
 from src.utils.nlp import EmojiCloud
 from src.feature_extractors.EText import EText
 from src.utils.enum import get_enum_values
@@ -22,7 +25,7 @@ load_dotenv()
 
 
 def text_analysis():
-    df = st_get_text_data()
+    df = st_read_csv_from_s3("global/data/texts_2022.csv")
     df = df.copy()
     col, _ = st.columns([1, 2])
     with col:
@@ -75,6 +78,12 @@ def text_analysis():
     fig = plt.figure()
     sns.boxplot(data=sbs, y="industry", x="word_count", showfliers=False)
     st.pyplot(fig)
+
+    st.subheader("Text length through time")
+    list_of_objects = pd.Series(list_objects_from_prefix(prefix="data/global/text_length")).sort_values()
+    text_length_df_path = list_of_objects[len(list_of_objects) - 2]
+    text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_path=False)
+    text_length_through_time(df=text_length_df)
 
 
 @st.experimental_memo
@@ -158,3 +167,25 @@ def get_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 1):
     }
     collocations_dict = {k: v for k, v in collocations_dict.items() if v >= min_shops_using_phrase}
     return collocations_dict
+
+
+def text_length_through_time(df: pd.DataFrame):
+    text_types = ("primary", "title", "description")
+
+    for text_type in text_types:
+        df[text_type] = df[f"{text_type}_length"].div(df[f"{text_type}_num_shops"])
+
+    col, _ = st.columns([1, 2])
+
+    with col:
+        text_type = st.selectbox("Select text type:", text_types)
+
+    fig = px.bar(
+        df,
+        x="year_month",
+        y=text_type,
+    )
+
+    fig.update_layout(barmode="stack")
+
+    st.plotly_chart(fig)
