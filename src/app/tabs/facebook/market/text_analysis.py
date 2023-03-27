@@ -83,7 +83,7 @@ def text_analysis():
     list_of_objects = pd.Series(list_objects_from_prefix(prefix="data/global/text_length")).sort_values()
     text_length_df_path = list_of_objects[len(list_of_objects) - 2]
     text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_path=False)
-    text_length_through_time(df=text_length_df)
+    text_length_through_time(df=text_length_df, text_col=text_col)
 
 
 @st.experimental_memo
@@ -169,16 +169,11 @@ def get_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 1):
     return collocations_dict
 
 
-def text_length_through_time(df: pd.DataFrame):
+def text_length_through_time(df: pd.DataFrame, text_col: str):
     text_types = ("primary", "title", "description")
 
     for text_type in text_types:
         df[text_type] = df[f"{text_type}_length"].div(df[f"{text_type}_num_shops"])
-
-    col, _ = st.columns([1, 2])
-
-    with col:
-        text_type = st.selectbox("Select text type:", text_types)
 
     fig = px.bar(
         df,
