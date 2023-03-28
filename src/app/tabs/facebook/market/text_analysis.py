@@ -170,15 +170,12 @@ def get_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 1):
 
 
 def text_length_through_time(df: pd.DataFrame, text_col: str):
-    text_types = ("primary", "title", "description")
-
-    for text_type in text_types:
-        df[text_type] = df[f"{text_type}_length"].div(df[f"{text_type}_num_shops"])
+    df[text_col] = df[f"{text_col}_length"].div(df[f"{text_col}_num_shops"])
 
     fig = px.bar(
         df,
         x="year_month",
-        y=text_type,
+        y=text_col,
     )
 
     fig.update_layout(barmode="stack")
