@@ -1,18 +1,17 @@
 import sys
 
-
 sys.path.append("./.")
 
+import warnings
 from math import sqrt
-from scipy.stats import norm
+
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
+from statsmodels.stats.proportion import proportion_confint, proportions_ztest
 
-from src.utils.decorators import print_execution_time
 from src.utils.common import nan_to_none
-from statsmodels.stats.proportion import proportions_ztest, proportion_confint
-
-import warnings
+from src.utils.decorators import print_execution_time
 
 
 # @print_execution_time

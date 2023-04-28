@@ -1,24 +1,19 @@
 import sys
 
 sys.path.append("./.")
-from scipy.stats import (
-    levene,
-    ttest_ind,
-    kruskal,
-    f_oneway,
-    shapiro,
-    ttest_ind_from_stats,
-)
+import inspect
+import itertools
+from statistics import mean
+
 import numpy as np
 import pandas as pd
-from statistics import mean
-import inspect
+from scipy.stats import (f_oneway, kruskal, levene, shapiro, ttest_ind,
+                         ttest_ind_from_stats)
 
-from src.utils.common import nan_to_none, none_to_unknown
-from src.statistics.get_binomial_sample import *
-from src.utils.decorators import print_execution_time
 from src.statistics.bernoulli_tests import *
-import itertools
+from src.statistics.get_binomial_sample import *
+from src.utils.common import nan_to_none, none_to_unknown
+from src.utils.decorators import print_execution_time
 
 
 def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> dict:

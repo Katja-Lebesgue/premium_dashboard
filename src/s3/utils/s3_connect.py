@@ -1,9 +1,11 @@
-import boto3
 import os
+
+import boto3
 from dotenv import load_dotenv
 
 from src.utils.decorators import print_execution_time
-from ..utils.common import add_global_s3_folder
+
+from src.utils.common import add_global_s3_folder
 
 load_dotenv()
 

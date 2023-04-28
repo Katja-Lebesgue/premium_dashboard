@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_campaign import FacebookCampaign
-from src.schemas.facebook.facebook_campaign import FacebookCampaignCreate, FacebookCampaignUpdate
+from src.schemas.facebook.facebook_campaign import (FacebookCampaignCreate,
+                                                    FacebookCampaignUpdate)
 
 
 class CRUDFacebookCampaign(CRUDBase[FacebookCampaign, FacebookCampaignCreate, FacebookCampaignUpdate]):

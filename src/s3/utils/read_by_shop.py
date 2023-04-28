@@ -1,17 +1,16 @@
-from src.s3.s3_connect import s3_connect
 import re
-import boto3
-import pandas as pd
 from datetime import datetime
-import numpy as np
 
+import boto3
+import numpy as np
+import pandas as pd
 import sqlalchemy
 
-from src.utils.common import read_csv_and_eval
-from src.feature_extractors import *
 from src.crud import crud_fb_daily_performance
-
 from src.database.session import SessionLocal
+from src.feature_extractors import *
+from src.s3.utils.s3_connect import s3_connect
+from src.utils.common import read_csv_and_eval
 
 
 def get_shop_ids() -> list:
@@ -45,7 +44,9 @@ def read_creative_data_by_shop_id(
         creative = read_csv_and_eval(object["Body"])
 
     else:
-        object = client.get_object(Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id[0]}.csv")
+        object = client.get_object(
+            Bucket="creative-features", Key=f"data/creative_by_shop_id/{shop_id[0]}.csv"
+        )
         creative = read_csv_and_eval(object["Body"])
         for id in shop_id[1:]:
             object = client.get_object(Bucket="creative-features", Key=f"data/creative_by_shop_id/{id}.csv")

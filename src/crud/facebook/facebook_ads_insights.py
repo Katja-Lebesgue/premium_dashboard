@@ -1,11 +1,13 @@
 from datetime import date
 
-from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
+from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import literal
+
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ads_insights import FacebookAdsInsights
-from src.schemas.facebook.facebook_ads_insights import FacebookAdsInsightsCreate, FacebookAdsInsightsUpdate
+from src.schemas.facebook.facebook_ads_insights import (
+    FacebookAdsInsightsCreate, FacebookAdsInsightsUpdate)
 
 
 class CRUDFacebookAdsInsights(CRUDBase[FacebookAdsInsights, FacebookAdsInsightsCreate, FacebookAdsInsightsUpdate]):

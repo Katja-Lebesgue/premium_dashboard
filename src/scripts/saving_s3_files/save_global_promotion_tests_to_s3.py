@@ -2,16 +2,17 @@ import sys
 
 sys.path.append("././.")
 
-import pandas as pd
-import numpy as np
-from sqlalchemy.orm import Session
-
-from src.statistics import *
-from src.s3 import *
-from src.pingers import *
-from src.utils import *
-from tqdm import tqdm
 import warnings
+
+import numpy as np
+import pandas as pd
+from sqlalchemy.orm import Session
+from tqdm import tqdm
+
+from src.pingers import *
+from src.s3 import *
+from src.statistics import *
+from src.utils import *
 
 warnings.filterwarnings("ignore", message="Mean of empty slice")
 warnings.filterwarnings("ignore", message="invalid value encountered in double_scalars")

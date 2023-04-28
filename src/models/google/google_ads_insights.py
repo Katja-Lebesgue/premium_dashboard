@@ -1,8 +1,8 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric
 from sqlalchemy.orm import relationship, synonym
-from src.models.google.google_base import GoogleBase
 
 from src.models.enums import EPlatform
+from src.models.google.google_base import GoogleBase
 
 
 class GoogleAdsInsights(GoogleBase):

@@ -1,16 +1,15 @@
 from datetime import date, timedelta
 
+from loguru import logger
+from sqlalchemy import and_, case, func
 from sqlalchemy.orm import Session
-from sqlalchemy import func, case, and_
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import literal
-from loguru import logger
 
 from src.crud.base import CRUDBase
+from src.crud.currency_exchange_rate import crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
-
 from src.utils.common import element_to_list
 
 

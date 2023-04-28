@@ -1,5 +1,6 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship, synonym
+
 from src.database.base_class import Base
 from src.models.enums import EPlatform
 

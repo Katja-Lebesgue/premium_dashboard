@@ -4,7 +4,6 @@ sys.path.append(".")
 
 from metadata.globals import features
 
-
 bool_features = [feature + "_any" for feature in features if feature != "length"]
 
 categorical_features = ["creative_type", "industry", "target"]

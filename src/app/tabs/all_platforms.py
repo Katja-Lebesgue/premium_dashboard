@@ -1,17 +1,17 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 from loguru import logger
 from plotly.subplots import make_subplots
-import plotly.graph_objects as go
-import plotly.express as px
-from src.pingers import ping_ads_insights_all_platforms
+
+from src.app.utils.css import GREEN, hide_dataframe_row_index
 from src.database.session import db
-from src.utils.common import get_all_subsets
+from src.models.enums.EPlatform import PLATFORMS, EPlatform
+from src.pingers import ping_ads_insights_all_platforms
+from src.utils.common import big_number_human_format, get_all_subsets
 from src.utils.enum import get_enum_values
-from src.models.enums.EPlatform import EPlatform, PLATFORMS
-from src.app.utils.css import hide_dataframe_row_index, GREEN
-from src.utils.common import big_number_human_format
 
 
 def all_platforms():

@@ -1,10 +1,10 @@
-import yaml
 import streamlit as st
-from yaml.loader import SafeLoader
 import streamlit.components.v1 as components
+import yaml
+from yaml.loader import SafeLoader
 
-from .hasher import Hasher
 from .authenticate import Authenticate
+from .hasher import Hasher
 
 _RELEASE = True
 

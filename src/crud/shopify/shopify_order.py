@@ -1,10 +1,11 @@
-from datetime import datetime, date
-from sqlalchemy import Float, and_, func, orm, cast
-from sqlalchemy.orm import Query, Session
-from src import models, schemas
-from src.models import ShopifyOrder
-from src.crud.base import CRUDBase
+from datetime import date, datetime
 
+from sqlalchemy import Float, and_, cast, func, orm
+from sqlalchemy.orm import Query, Session
+
+from src import models, schemas
+from src.crud.base import CRUDBase
+from src.models import ShopifyOrder
 from src.utils.common import element_to_list
 
 

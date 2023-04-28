@@ -1,9 +1,11 @@
 from datetime import date
-from src.crud.base import CRUDBase
-from sqlalchemy.orm import Session
-from src.models import CurrencyExchangeRate
-from src.schemas import CurrencyExchangeRateUpdate, CurrencyExchangeRateCreate
 from typing import List
+
+from sqlalchemy.orm import Session
+
+from src.crud.base import CRUDBase
+from src.models import CurrencyExchangeRate
+from src.schemas import CurrencyExchangeRateCreate, CurrencyExchangeRateUpdate
 
 
 class CRUDCurrencyExchangeRate(CRUDBase[CurrencyExchangeRate, CurrencyExchangeRateCreate, CurrencyExchangeRateUpdate]):

@@ -2,25 +2,22 @@ import sys
 
 sys.path.append("./.")
 
-import streamlit as st
-import pandas as pd
+import os
 from datetime import datetime
 
-
+import pandas as pd
 import plotly.express as px
-from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import streamlit as st
+from dotenv import load_dotenv
 from loguru import logger
+from plotly.subplots import make_subplots
 
-from src.utils.common import big_number_human_format
+from src.app.utils.css import hide_table_row_index
+from src.app.utils.labels_and_values import *
 from src.app.utils.labels_and_values import feature_dict_market
 from src.s3 import *
-
-from src.app.utils.labels_and_values import *
-from src.app.utils.css import hide_table_row_index
-
-import os
-from dotenv import load_dotenv
+from src.utils.common import big_number_human_format
 
 load_dotenv()
 

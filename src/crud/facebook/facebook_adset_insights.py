@@ -1,17 +1,18 @@
 from datetime import date
-import pandas as pd
-import numpy as np
-from tqdm import tqdm
-from loguru import logger
 
-from sqlalchemy.orm import Session, Query
+import numpy as np
+import pandas as pd
+from loguru import logger
 from sqlalchemy import and_, func, insert
+from sqlalchemy.orm import Query, Session
 from sqlalchemy.sql.expression import literal
+from tqdm import tqdm
+
 from src.crud.base import CRUDBase
 from src.crud.currency_exchange_rate import crud_currency_exchange_rate
 from src.models import *
-from src.schemas.facebook.facebook_adset_insights import FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate
-
+from src.schemas.facebook.facebook_adset_insights import (
+    FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate)
 from src.utils.common import element_to_list
 
 

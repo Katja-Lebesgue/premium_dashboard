@@ -1,17 +1,16 @@
-from statistics import mean
 import sys
+from statistics import mean
 
 sys.path.append("././.")
 
-from numpy import size
-from scipy.stats import fisher_exact
-import pandas as pd
 import numpy as np
-from scipy.stats import ttest_ind_from_stats, ttest_ind
+import pandas as pd
+from numpy import size
+from scipy.stats import fisher_exact, ttest_ind, ttest_ind_from_stats
 
+from src.statistics import *
 from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time
-from src.statistics import *
 
 
 def get_std(positive: int, negative: int, mean: int):

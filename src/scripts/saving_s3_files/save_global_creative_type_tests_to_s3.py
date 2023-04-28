@@ -2,25 +2,22 @@ import sys
 
 sys.path.append("././.")
 
-import pandas as pd
-import numpy as np
-from sqlalchemy.orm import Session
-
-from src.statistics.proportion_test import (
-    proportion_test,
-    proportion_test_ctr,
-    proportion_test_cr,
-)
-from src.s3 import *
-from src.pingers import *
-from src.statistics import *
-from src.statistics.bernoulli_tests import *
-from src.utils import *
-
-from tqdm import tqdm
 import warnings
 
+import numpy as np
+import pandas as pd
 from pandas.core.common import SettingWithCopyWarning
+from sqlalchemy.orm import Session
+from tqdm import tqdm
+
+from src.pingers import *
+from src.s3 import *
+from src.statistics import *
+from src.statistics.bernoulli_tests import *
+from src.statistics.proportion_test import (proportion_test,
+                                            proportion_test_cr,
+                                            proportion_test_ctr)
+from src.utils import *
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 

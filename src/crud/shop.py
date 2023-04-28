@@ -1,10 +1,9 @@
+import pandas as pd
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import false
 
-from src import models, schemas, crud
+from src import crud, models, schemas
 from src.models.enums.credentials_provider import CredentialsProvider
-
-import pandas as pd
 
 from .base import CRUDBase
 

@@ -2,13 +2,14 @@ import sys
 
 sys.path.append("././.")
 import inspect
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from scipy.stats import f, f_oneway
 
-from src.utils import *
-from src.statistics.get_binomial_sample import get_binomial_sample
 from src.pingers import *
+from src.statistics.get_binomial_sample import get_binomial_sample
+from src.utils import *
 
 
 def _f_oneway(*args, **kwargs):

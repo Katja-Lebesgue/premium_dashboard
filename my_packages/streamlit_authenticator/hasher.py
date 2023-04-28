@@ -1,5 +1,6 @@
 import bcrypt
 
+
 class Hasher:
     """
     This class will hash plain text passwords.

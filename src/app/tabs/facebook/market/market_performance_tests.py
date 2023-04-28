@@ -2,22 +2,19 @@ import sys
 
 sys.path.append("./.")
 
+import os
 from cgi import test
-import streamlit as st
-import pandas as pd
+
 import numpy as np
-
-
-from src.s3.s3_connect import s3_connect
-from src.s3 import *
+import pandas as pd
+import streamlit as st
+from dotenv import load_dotenv
 
 from src.app.tabs.facebook.shop.default_performance_tests import style_test_table
-
-from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
-
-import os
-from dotenv import load_dotenv
+from src.app.utils.labels_and_values import *
+from src.s3 import *
+from src.s3.utils.s3_connect import s3_connect
 
 load_dotenv()
 
@@ -95,7 +92,9 @@ def market_performance_tests(
 
         promotion_value = True
 
-        feature_tests_promotional = global_feature_tests_df.loc[global_feature_tests_df.promotion == promotion_value, :]
+        feature_tests_promotional = global_feature_tests_df.loc[
+            global_feature_tests_df.promotion == promotion_value, :
+        ]
 
         creative_type_tests_promotional = global_creative_type_tests_df.loc[
             global_creative_type_tests_df.promotion == promotion_value, :
@@ -115,7 +114,9 @@ def market_performance_tests(
 
         promotion_value = False
 
-        feature_tests_promotional = global_feature_tests_df.loc[global_feature_tests_df.promotion == promotion_value, :]
+        feature_tests_promotional = global_feature_tests_df.loc[
+            global_feature_tests_df.promotion == promotion_value, :
+        ]
 
         creative_type_tests_promotional = global_creative_type_tests_df.loc[
             global_creative_type_tests_df.promotion == promotion_value, :
@@ -251,7 +252,9 @@ def get_winners(result: dict) -> list[str]:
         return winners
 
     # sorting means into Series
-    means_dict = {k: result[k]["mean"] for k in result.keys() if type(result[k]) == dict and "mean" in result[k].keys()}
+    means_dict = {
+        k: result[k]["mean"] for k in result.keys() if type(result[k]) == dict and "mean" in result[k].keys()
+    }
     means = pd.Series(means_dict)
 
     maxi = max(means)

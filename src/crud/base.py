@@ -2,6 +2,7 @@ from typing import Any, Generic, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
 from src.database.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)

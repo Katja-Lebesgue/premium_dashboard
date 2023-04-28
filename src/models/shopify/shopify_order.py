@@ -1,7 +1,9 @@
-from sqlalchemy import JSON, BigInteger, Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import (JSON, BigInteger, Boolean, Column, DateTime,
+                        ForeignKey, String)
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
+
 from src.database.base_class import Base
 
 UTM_SOURCE_KEY = "source"

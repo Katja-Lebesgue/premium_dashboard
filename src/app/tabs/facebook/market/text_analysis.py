@@ -1,25 +1,25 @@
-import streamlit as st
-from wordcloud import WordCloud
-from matplotlib import pyplot as plt
-from dotenv import load_dotenv
 import os
-import pandas as pd
-from io import StringIO
-import sys
-import nltk
-from nltk.tokenize.casual import TweetTokenizer
 import string
-from loguru import logger
-import seaborn as sns
-import plotly.express as px
-from src.s3 import *
+import sys
+from io import StringIO
 
-from src.s3.read_file_from_s3 import read_csv_from_s3
+import nltk
+import pandas as pd
+import plotly.express as px
+import seaborn as sns
+import streamlit as st
+from dotenv import load_dotenv
+from loguru import logger
+from matplotlib import pyplot as plt
+from nltk.tokenize.casual import TweetTokenizer
+from wordcloud import WordCloud
+
 from src.app.utils.cache_functions import st_read_csv_from_s3
-from src.utils.nlp import EmojiCloud
 from src.feature_extractors.EText import EText
+from src.s3 import *
+from src.s3.utils.read_file_from_s3 import read_csv_from_s3
 from src.utils.enum import get_enum_values
-from src.utils.nlp import get_sentiment
+from src.utils.nlp import EmojiCloud, get_sentiment
 
 load_dotenv()
 
@@ -106,7 +106,9 @@ def get_samples_by_shop(df: pd.DataFrame, text_col: str) -> pd.DataFrame:
     sbs["concatinated_tokens"] = sbs.word_tokens.apply(lambda x: " ".join(x))
 
     # remove lebesgue ads
-    lebesgue_shop_ids = sbs.loc[sbs.word_tokens.apply(lambda tokens: "lebesgue" in tokens), "shop_id"].unique()
+    lebesgue_shop_ids = sbs.loc[
+        sbs.word_tokens.apply(lambda tokens: "lebesgue" in tokens), "shop_id"
+    ].unique()
     sbs = sbs[~sbs.shop_id.isin(lebesgue_shop_ids)]
 
     # word count and sentiment

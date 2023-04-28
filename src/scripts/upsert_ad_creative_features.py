@@ -2,20 +2,15 @@ import sys
 
 sys.path.append("./.")
 
-from src.utils.common import read_csv_and_eval
-from src.utils.decorators import print_execution_time
+import pandas as pd
+from tqdm import tqdm
 
-
+from src.database.inserters_and_updaters.upsert_creative_by_shop_id import \
+    upsert_creative_by_shop_id
 from src.database.queries.query_shop_id import query_shop_id
 from src.database.session import SessionLocal
-
-from src.database.inserters_and_updaters.upsert_creative_by_shop_id import (
-    upsert_creative_by_shop_id,
-)
-
-
-from tqdm import tqdm
-import pandas as pd
+from src.utils.common import read_csv_and_eval
+from src.utils.decorators import print_execution_time
 
 
 @print_execution_time

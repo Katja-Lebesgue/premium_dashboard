@@ -1,14 +1,12 @@
 from typing import List
-import pandas as pd
 
+import pandas as pd
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import false
-
 
 from src.crud.base import CRUDBase
 from src.models.streamlit import *
 from src.schemas.streamlit import *
-
 from src.utils.common import element_to_list
 from src.utils.database import row_to_dict
 

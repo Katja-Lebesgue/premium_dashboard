@@ -2,21 +2,19 @@ import sys
 
 sys.path.append("././.")
 
-import pandas as pd
-import numpy as np
+import warnings
 
+import numpy as np
+import pandas as pd
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-
-from src.crud.google.google_daily_performance import ga_daily_performance
-from src.s3 import *
-from src.pingers import *
-from src.utils import *
-from metadata.globals import *
 from tqdm import tqdm
 
-
-import warnings
+from metadata.globals import *
+from src.crud.google.google_daily_performance import ga_daily_performance
+from src.pingers import *
+from src.s3 import *
+from src.utils import *
 
 warnings.filterwarnings("ignore", message="Mean of empty slice")
 warnings.filterwarnings("ignore", message="invalid value encountered in double_scalars")
@@ -153,7 +151,8 @@ def save_google_descriptive_statistics_to_s3(
 
 
 def main():
-    table = save_google_descriptive_statistics_to_s3()
+    db=SessionLocal()
+    table = save_google_descriptive_statistics_to_s3(db=db)
     print(table)
 
 

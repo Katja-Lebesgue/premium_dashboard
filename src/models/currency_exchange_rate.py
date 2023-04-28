@@ -1,5 +1,6 @@
+from sqlalchemy import (BigInteger, Column, Date, Float, Sequence, String,
+                        UniqueConstraint)
 from sqlalchemy.dialects import sqlite
-from sqlalchemy import Column, Date, String, Float, BigInteger, Sequence, UniqueConstraint
 
 from src.database.base_class import Base
 

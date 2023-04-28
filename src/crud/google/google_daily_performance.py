@@ -1,18 +1,18 @@
 from datetime import date
+
 import pandas as pd
-
-
-from sqlalchemy.orm import Session, Query
 from sqlalchemy import and_, func
+from sqlalchemy.orm import Query, Session
 from sqlalchemy.sql.expression import literal
 
-from src.feature_extractors import add_performance_columns
 from src.crud.base import CRUDBase
-from src.models import GoogleDailyPerformance
-from src.schemas.google import GoogleDailyPerformanceCreate, GoogleDailyPerformanceUpdate
-from src.utils.common import element_to_list
-from src.models import *
 from src.crud.currency_exchange_rate import crud_currency_exchange_rate
+from src.feature_extractors import add_performance_columns
+from src.models import *
+from src.models import GoogleDailyPerformance
+from src.schemas.google import (GoogleDailyPerformanceCreate,
+                                GoogleDailyPerformanceUpdate)
+from src.utils.common import element_to_list
 
 
 class CRUDGoogleDailyPerformance(
@@ -59,8 +59,8 @@ class CRUDGoogleDailyPerformance(
             group_columns.append(GoogleAdAccount.currency)
 
         if add_type:
-            columns.append(GoogleAdgroup.type)
-            group_columns.append(GoogleAdgroup.type)
+            columns.append(GoogleCampaign.type)
+            group_columns.append(GoogleCampaign.type)
 
         query = db.query(*columns)
 
@@ -88,10 +88,10 @@ class CRUDGoogleDailyPerformance(
 
         if add_type:
             query = query.join(
-                GoogleAdgroup,
-                (self.model.account_id == GoogleAdgroup.account_id)
-                & (self.model.adgroup_id == GoogleAdgroup.adgroup_id)
-                & (self.model.shop_id == GoogleAdgroup.shop_id),
+                GoogleCampaign,
+                (self.model.account_id == GoogleCampaign.account_id)
+                & (self.model.campaign_id == GoogleCampaign.campaign_id)
+                & (self.model.shop_id == GoogleCampaign.shop_id),
             )
 
         return query
@@ -121,7 +121,7 @@ class CRUDGoogleDailyPerformance(
         df = pd.read_sql(query.statement, db.bind)
         if len(df) == 0:
             return df
-        df = add_performance_columns(df)
+        df = add_performance_columns(df, db=db)
         return df
 
 

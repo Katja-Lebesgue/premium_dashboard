@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.query import Query
 
-from src.utils.common import element_to_list
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_adset import FacebookAdset
-from src.schemas.facebook.facebook_adset import FacebookAdsetCreate, FacebookAdsetUpdate
+from src.schemas.facebook.facebook_adset import (FacebookAdsetCreate,
+                                                 FacebookAdsetUpdate)
+from src.utils.common import element_to_list
 
 
 class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAdsetUpdate]):

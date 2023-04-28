@@ -1,16 +1,17 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-from scipy import stats
 from datetime import datetime, timedelta
 
-from src.utils.common import big_number_human_format
-from src.statistics.mean_test import mean_test
-from src.statistics import *
-from src.utils.common import *
-from src.app.utils.labels_and_values import *
+import numpy as np
+import pandas as pd
+import streamlit as st
+from scipy import stats
+
 from src.app.utils.css import *
+from src.app.utils.labels_and_values import *
+from src.statistics import *
 from src.statistics.bernoulli_tests.mean_test_bernoulli import *
+from src.statistics.mean_test import mean_test
+from src.utils.common import *
+from src.utils.common import big_number_human_format
 
 
 def default_performance_tests(data_shop: pd.DataFrame):

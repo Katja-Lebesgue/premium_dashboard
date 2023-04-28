@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ad_account import FacebookAdAccount
-from src.schemas.facebook.facebook_ad_account import FacebookAdAccountCreate, FacebookAdAccountUpdate
+from src.schemas.facebook.facebook_ad_account import (FacebookAdAccountCreate,
+                                                      FacebookAdAccountUpdate)
 
 
 class CRUDFacebookAdAccount(CRUDBase[FacebookAdAccount, FacebookAdAccountCreate, FacebookAdAccountUpdate]):

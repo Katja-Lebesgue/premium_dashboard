@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.s3.read_file_from_s3 import read_csv_from_s3
+from src.s3.utils.read_file_from_s3 import read_csv_from_s3
 
 
 @st.experimental_memo

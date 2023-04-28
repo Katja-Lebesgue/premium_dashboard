@@ -1,16 +1,16 @@
-from tracemalloc import start
-import pandas as pd
 from datetime import date
+from tracemalloc import start
+
+import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src.utils.decorators import print_execution_time
-from src.pingers.ping_crm import ping_crm
-
-from src.s3 import *
-from src.models import *
 from src.crud import *
 from src.database.session import SessionLocal
+from src.models import *
+from src.pingers.ping_crm import ping_crm
+from src.s3 import *
+from src.utils.decorators import print_execution_time
 
 
 # @print_execution_time

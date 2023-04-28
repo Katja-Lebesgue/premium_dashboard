@@ -1,7 +1,7 @@
+import numpy as np
+import pandas as pd
 from numpy import size
 from scipy.stats import fisher_exact
-import pandas as pd
-import numpy as np
 
 from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time

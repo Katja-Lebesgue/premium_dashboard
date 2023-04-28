@@ -1,20 +1,16 @@
-import streamlit as st
-import pandas as pd
 from datetime import datetime
 
-
+import pandas as pd
 import plotly.express as px
-from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-
-from src.app.utils.labels_and_values import feature_dict
-
-from src.app.utils.labels_and_values import *
-from src.app.utils.css import hide_table_row_index
-
-from src.utils.common import big_number_human_format
+import streamlit as st
+from plotly.subplots import make_subplots
 
 from metadata.globals import *
+from src.app.utils.css import hide_table_row_index
+from src.app.utils.labels_and_values import *
+from src.app.utils.labels_and_values import feature_dict
+from src.utils.common import big_number_human_format
 
 
 def descriptive_statistics(data_shop: pd.DataFrame):

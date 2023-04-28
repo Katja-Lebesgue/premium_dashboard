@@ -1,15 +1,13 @@
+import os
+from collections import Counter
+
+import emojis
+import nltk
 from langdetect import detect
 from loguru import logger
-import os
-
-import nltk
-
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
-
 from wordcloud import WordCloud
-from collections import Counter
-import emojis
 
 nltk.download("vader_lexicon")
 nltk.download("stopwords")

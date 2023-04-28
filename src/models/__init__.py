@@ -1,9 +1,8 @@
+from .currency_exchange_rate import CurrencyExchangeRate
 from .facebook import *
-from .shop import Shop
-from .tiktok import *
-
 from .google import *
+from .media import *
+from .shop import Shop
 from .shopify import *
 from .streamlit import *
-
-from .currency_exchange_rate import CurrencyExchangeRate
+from .tiktok import *

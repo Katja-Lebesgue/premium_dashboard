@@ -1,12 +1,13 @@
-from scipy.stats import levene, ttest_ind, kruskal, f_oneway, shapiro
-import numpy as np
-import pandas as pd
+import itertools
 from statistics import mean
 
-from src.utils.common import nan_to_none, none_to_unknown
+import numpy as np
+import pandas as pd
+from scipy.stats import f_oneway, kruskal, levene, shapiro, ttest_ind
+
 from src.statistics.get_binomial_sample import *
+from src.utils.common import nan_to_none, none_to_unknown
 from src.utils.decorators import print_execution_time
-import itertools
 
 
 @print_execution_time

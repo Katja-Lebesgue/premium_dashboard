@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("./.")
 
-from src.s3.s3_connect import s3_connect, list_objects_from_prefix
+from src.s3.utils.s3_connect import list_objects_from_prefix, s3_connect
 
 
 def copy_on_s3(
@@ -12,9 +12,7 @@ def copy_on_s3(
     client=s3_connect(),
     bucket: str = "creative-features",
 ):
-    list_of_objects = list_objects_from_prefix(
-        prefix=original_prefix, add_global_folder=add_global_path
-    )
+    list_of_objects = list_objects_from_prefix(prefix=original_prefix, add_global_folder=add_global_path)
 
     for key in list_of_objects:
         short_key = key[len(original_prefix) :]

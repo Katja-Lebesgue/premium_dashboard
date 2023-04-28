@@ -1,6 +1,6 @@
+import inspect
 import time
 from datetime import timedelta
-import inspect
 
 
 def print_start(func):

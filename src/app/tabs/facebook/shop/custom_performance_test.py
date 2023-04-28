@@ -1,15 +1,14 @@
-import streamlit as st
-import pandas as pd
 import os
-import numpy as np
+import re
 from datetime import datetime
 
-import re
+import numpy as np
+import pandas as pd
+import streamlit as st
 
-from src.app.utils.labels_and_values import *
 from src.app.utils.css import *
+from src.app.utils.labels_and_values import *
 from src.statistics.proportion_test import *
-
 from src.utils.common import *
 
 

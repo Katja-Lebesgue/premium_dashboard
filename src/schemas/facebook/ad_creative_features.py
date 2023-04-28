@@ -1,6 +1,6 @@
-from src.schemas.api_model import APIModel
-
 from typing import Any
+
+from src.schemas.api_model import APIModel
 
 
 class AdCreativeFeaturesBase(APIModel):

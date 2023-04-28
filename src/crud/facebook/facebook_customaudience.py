@@ -3,9 +3,7 @@ from sqlalchemy.orm import Session
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_customaudience import FacebookCustomaudience
 from src.schemas.facebook.facebook_customaudience import (
-    FacebookCustomaudienceCreate,
-    FacebookCustomaudienceUpdate,
-)
+    FacebookCustomaudienceCreate, FacebookCustomaudienceUpdate)
 
 
 class CRUDFacebookCustomaudience(

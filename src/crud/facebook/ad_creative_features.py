@@ -1,20 +1,14 @@
+from datetime import date
 from typing import List
 
-from sqlalchemy.orm import Session
-from datetime import date
-
-
-from sqlalchemy.orm import Query
 from sqlalchemy import and_
+from sqlalchemy.orm import Query, Session
 
-from src.models import FacebookDailyPerformance
 from src.crud.base import CRUDBase
+from src.models import FacebookDailyPerformance
 from src.models.facebook.ad_creative_features import AdCreativeFeatures
 from src.schemas.facebook.ad_creative_features import (
-    AdCreativeFeaturesCreate,
-    AdCreativeFeaturesUpdate,
-)
-
+    AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate)
 from src.utils.common import element_to_list
 
 

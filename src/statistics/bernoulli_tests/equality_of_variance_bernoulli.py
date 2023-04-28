@@ -2,11 +2,10 @@ import sys
 
 sys.path.append("././.")
 
-from numpy import size
-from scipy.stats import fisher_exact
-import pandas as pd
 import numpy as np
-from scipy.stats import chi2_contingency
+import pandas as pd
+from numpy import size
+from scipy.stats import chi2_contingency, fisher_exact
 
 from src.utils.common import nan_to_none
 from src.utils.decorators import print_execution_time

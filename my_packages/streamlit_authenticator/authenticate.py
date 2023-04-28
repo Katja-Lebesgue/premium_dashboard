@@ -1,13 +1,14 @@
-import jwt
-import bcrypt
-import streamlit as st
 from datetime import datetime, timedelta
-import extra_streamlit_components as stx
 
+import bcrypt
+import extra_streamlit_components as stx
+import jwt
+import streamlit as st
+
+from .exceptions import (CredentialsError, ForgotError, RegisterError,
+                         ResetError, UpdateError)
 from .hasher import Hasher
 from .utils import generate_random_pw
-
-from .exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
 
 
 class Authenticate:

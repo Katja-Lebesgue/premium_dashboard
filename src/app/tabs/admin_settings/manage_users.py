@@ -1,10 +1,11 @@
-import streamlit as st
-from sqlalchemy.exc import IntegrityError
-import pandas as pd
 from time import sleep
 
-from src.database.session import db
+import pandas as pd
+import streamlit as st
+from sqlalchemy.exc import IntegrityError
+
 from src.crud import crud_streamlit_user
+from src.database.session import db
 from src.utils.hash_password import hash_password
 
 

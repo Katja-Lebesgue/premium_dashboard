@@ -2,20 +2,20 @@ import sys
 
 sys.path.append("././.")
 
-import pandas as pd
-import numpy as np
-from sqlalchemy.orm import Session
-from loguru import logger
-
-from src.models import AdCreativeFeatures
-from src.statistics import *
-from src.s3 import *
-from src.utils import *
-from src.pingers import ping_creative_and_performance
-from tqdm import tqdm
 import warnings
 
+import numpy as np
+import pandas as pd
+from loguru import logger
+from sqlalchemy.orm import Session
+from tqdm import tqdm
+
 from metadata.globals import *
+from src.models import AdCreativeFeatures
+from src.pingers import ping_creative_and_performance
+from src.s3 import *
+from src.statistics import *
+from src.utils import *
 
 warnings.filterwarnings("ignore", message="Mean of empty slice")
 warnings.filterwarnings("ignore", message="invalid value encountered in double_scalars")

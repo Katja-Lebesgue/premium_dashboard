@@ -1,5 +1,6 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
+
 from src.models.google.google_base import GoogleBase
 
 

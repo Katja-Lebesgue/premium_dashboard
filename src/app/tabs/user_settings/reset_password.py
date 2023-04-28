@@ -1,6 +1,7 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import yaml
+from streamlit_option_menu import option_menu
+
 from src.crud.streamlit import crud_streamlit_user
 from src.database.session import db
 

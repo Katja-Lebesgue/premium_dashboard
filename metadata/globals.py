@@ -43,7 +43,7 @@ other_features = [
 ]
 
 
-column_dtypes = {"shop_id": str, "account_id": str, "ad_id": str, "creative_id": str}
+column_dtypes = {"account_id": str, "ad_id": str, "creative_id": str}
 
 
 text_columns = ["primary", "title", "description"]

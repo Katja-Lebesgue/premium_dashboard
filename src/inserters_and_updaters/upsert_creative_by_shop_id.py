@@ -2,31 +2,29 @@ import sys
 
 sys.path.append("././.")
 
-from sqlalchemy import create_engine
-import nltk
 import json
-import pangres
+import os
+import uuid
+from datetime import date, datetime
+from time import sleep
+
+import nltk
 import numpy
 import pandas as pd
-import os
+import pangres
 from dotenv import load_dotenv
-from datetime import datetime, date
-from time import sleep
 from loguru import logger
-import uuid
+from sqlalchemy import create_engine
 
 load_dotenv()
 
+from psycopg2.extensions import AsIs, register_adapter
+
 from src.database.pingers import *
+from src.database.session import engine
 from src.feature_extractors import *
 from src.utils.common import nan_to_none, read_csv_and_eval
 from src.utils.decorators import print_execution_time
-from src.database.pingers import *
-
-from src.database.session import engine
-
-
-from psycopg2.extensions import register_adapter, AsIs
 
 
 def addapt_numpy_float64(numpy_float64):

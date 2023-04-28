@@ -4,20 +4,22 @@ from time import strftime
 sys.path.append("./.")
 
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 import ast
-import pandas as pd
-from src.types import types
-import numpy as np
 import math
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
 from itertools import combinations
 
+import numpy as np
+import pandas as pd
+from dateutil.relativedelta import relativedelta
+
 from metadata.globals import *
+from src.types import types
 
 
 def read_csv_and_eval(path: str) -> pd.DataFrame:
@@ -152,3 +154,7 @@ def get_all_subsets(s: set | list):
         i_subsets = combinations(s, i)
         subsets.extend(i_subsets)
     return subsets
+
+
+def add_two_dicts(d1: dict, d2: dict) -> dict:
+    return {k: d1.get(k, 0) + d2.get(k, 0) for k in d1.keys() | d2.keys()}

@@ -2,14 +2,14 @@ import sys
 
 sys.path.append("././.")
 
-import pandas as pd
 from datetime import date
-from sqlalchemy.orm import Session
-from loguru import logger
 
-from src.utils.decorators import print_execution_time
+import pandas as pd
+from loguru import logger
+from sqlalchemy.orm import Session
 
 from src.models import *
+from src.utils.decorators import print_execution_time
 
 
 @print_execution_time

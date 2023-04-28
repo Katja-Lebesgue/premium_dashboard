@@ -3,12 +3,11 @@ import sys
 sys.path.append("././.")
 
 import pandas as pd
-
 from sqlalchemy import and_
 
-from src.models import *
 from src.crud import *
 from src.database.session import *
+from src.models import *
 
 
 def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop_id: str = None):

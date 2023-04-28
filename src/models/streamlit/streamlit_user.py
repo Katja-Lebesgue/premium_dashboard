@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, LargeBinary, Text
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, Text
 
 from src.database.base_class import Base
 

@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
-from src.crud import crud_streamlit_user, crud_streamlit_user_shop, crud_shop
+
+from src.crud import crud_shop, crud_streamlit_user, crud_streamlit_user_shop
 from src.database.session import db
 from src.pingers import ping_shops
 

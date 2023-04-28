@@ -1,11 +1,6 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    ForeignKey,
-    String,
-)
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import BigInteger, Column, ForeignKey, String
 from sqlalchemy.dialects import sqlite
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from src.database.base_class import Base

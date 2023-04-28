@@ -1,22 +1,19 @@
-from datetime import datetime
-
-import pandas as pd
-from datetime import date
-from sqlalchemy.orm import Session, InstrumentedAttribute, DeclarativeMeta
-from sqlalchemy import func
-from loguru import logger
-import numpy as np
-
-
-from src.utils.decorators import print_execution_time
-
-from src.models import *
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
-from src.models.enums.EPlatform import PLATFORMS
-from src.utils.common import element_to_list, convert_to_USD
-from src.s3.read_file_from_s3 import read_csv_from_s3, read_json_from_s3
-from src.pingers.ping_crm import ping_crm
+from datetime import date, datetime
 from itertools import product
+
+import numpy as np
+import pandas as pd
+from loguru import logger
+from sqlalchemy import func
+from sqlalchemy.orm import DeclarativeMeta, InstrumentedAttribute, Session
+
+from src.crud.currency_exchange_rate import crud_currency_exchange_rate
+from src.models import *
+from src.models.enums.EPlatform import PLATFORMS
+from src.pingers.ping_crm import ping_crm
+from src.s3.utils.read_file_from_s3 import read_csv_from_s3, read_json_from_s3
+from src.utils.common import convert_to_USD, element_to_list
+from src.utils.decorators import print_execution_time
 
 
 def ping_ads_insights_by_platform(
@@ -149,6 +146,8 @@ def ping_ads_insights_all_platforms(
         df.industry = df.industry.replace({"Unknown": "unknown"})
 
     for col in columns:
-        df[f"total_{col}"] = df.apply(lambda df: np.nansum([df[f"{platform}_{col}"] for platform in PLATFORMS]), axis=1)
+        df[f"total_{col}"] = df.apply(
+            lambda df: np.nansum([df[f"{platform}_{col}"] for platform in PLATFORMS]), axis=1
+        )
 
     return df

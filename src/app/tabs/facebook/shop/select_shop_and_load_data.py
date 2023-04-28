@@ -2,23 +2,21 @@ import sys
 
 sys.path.append("./.")
 
-import sqlalchemy.orm.relationships
-
 import pandas as pd
+import sqlalchemy.orm.relationships
 from dotenv import load_dotenv
 
 load_dotenv()
 
+import streamlit as st
 from loguru import logger
 from sqlalchemy.orm import Session
-from src.pingers import *
-from src.models import *
-from src.database.session import SessionLocal
+
 from src.app.authenticate import is_admin
 from src.crud import crud_streamlit_user_shop
-
-import streamlit as st
-
+from src.database.session import SessionLocal
+from src.models import *
+from src.pingers import *
 
 db = SessionLocal()
 

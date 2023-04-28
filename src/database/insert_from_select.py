@@ -1,5 +1,5 @@
-from sqlalchemy.sql.expression import Executable, ClauseElement
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import ClauseElement, Executable
 
 
 class InsertFromSelect(Executable, ClauseElement):

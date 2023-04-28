@@ -1,4 +1,5 @@
 from enum import Enum
+
 from src.utils.enum import get_enum_values
 
 

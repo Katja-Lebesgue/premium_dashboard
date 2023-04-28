@@ -1,17 +1,15 @@
-import pandas as pd
 from datetime import date, datetime
+
+import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src.utils.decorators import print_execution_time
-
-
-from src.models import *
 from src.crud import *
 from src.database.session import SessionLocal
-from src.pingers.ping_creative import ping_creative
-
 from src.feature_extractors import *
+from src.models import *
+from src.pingers.ping_creative import ping_creative
+from src.utils.decorators import print_execution_time
 
 
 # @print_execution_time

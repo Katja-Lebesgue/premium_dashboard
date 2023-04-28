@@ -2,8 +2,9 @@ import sys
 
 sys.path.append("./.")
 
-import requests
 import os
+
+import requests
 from dotenv import load_dotenv
 
 from src.s3 import *

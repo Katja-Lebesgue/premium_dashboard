@@ -1,9 +1,8 @@
 import sys
 
-
 sys.path.append("./.")
 
-from src.s3.s3_connect import s3_resource
+from src.s3.utils.s3_connect import s3_resource
 from src.utils.common import add_global_s3_folder
 
 
