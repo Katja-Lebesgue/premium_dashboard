@@ -1,1 +1,1 @@
-from .classes import *
+from .image import *

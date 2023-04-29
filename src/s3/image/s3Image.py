@@ -1,4 +1,4 @@
-from src.s3.classes.image.methods import *
+from src.s3.image.methods import *
 
 
 class s3Image:
@@ -8,7 +8,7 @@ class s3Image:
     image_df = global_folder + "image.csv"
     top_n_ads_per_shop_and_month_by_spend = global_folder + "top_n_ads_per_shop_and_month_by_spend.csv"
     final_df = global_folder + "final.csv"
-    performance_columns = ["spend", "impressions", "link_clicks", "purchases"]
+    performance_columns = ["spend", "impr", "link_clicks", "purch", "purch_value"]
 
     def __init__(
         self,

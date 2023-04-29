@@ -2,6 +2,7 @@ import json
 
 import cv2
 import pandas as pd
+import numpy as np
 
 from src.utils.s3.utils import s3_client, add_global_s3_folder
 from src.utils.pd import read_csv_and_eval

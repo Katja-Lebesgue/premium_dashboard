@@ -28,7 +28,7 @@ def add_global_centroids(
     basic_colors = calculate_basic_colors(full_df=full_df, n_clusters=self.n_global_centroids)
     logger.debug(f"len basic colors: {len(basic_colors)}")
     nn = train_nn_on_basic_colors(basic_colors=basic_colors)
-
+    i = 0
     for idx, row in tqdm(image_df.iterrows(), total=len(image_df)):
         if row["uploaded"] is False or type(row["global_color_centroids"]) == dict:
             continue
@@ -44,8 +44,8 @@ def add_global_centroids(
             logger.debug(basic_colors)
             logger.debug([col for col in color_centroids.keys() if col not in basic_colors])
         image_df.loc[idx, "global_color_centroids"] = [color_centroids]
-
-        if idx % n_iterations_between_save == 5:
+        i += 1
+        if i % n_iterations_between_save == 5:
             image_df.global_color_centroids = image_df.global_color_centroids.apply(
                 lambda x: x[0] if type(x) == list and len(x) else x
             )

@@ -1,5 +1,5 @@
 # from src.database.session import db
-# from src.s3 import s3_image
+from src.s3 import s3_image
 
 import sys
 import os
@@ -32,7 +32,10 @@ if __name__ == "__main__":
     # s3_image.save_urls_and_performance_to_s3(db=db, force_from_scratch=False)
     # s3_image.filter_and_save_top_n_ads_per_shop_and_month_by_spend()
     # s3_image.initialize_image_df()
-    s3_image.save_ad_images_to_s3()
+    # s3_image.save_ad_images_to_s3()
+    # s3_image.add_local_centroids()
+    # s3_image.add_global_centroids(force_from_scratch=True)
+    s3_image.save_final()
     # shop_id = 20347698
     # df = cr_image.ping_fb_urls_by_shop(
     #     db=db,
