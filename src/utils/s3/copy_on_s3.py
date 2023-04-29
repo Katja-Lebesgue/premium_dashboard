@@ -1,15 +1,11 @@
-import sys
-
-sys.path.append("./.")
-
-from src.s3.utils.s3_connect import list_objects_from_prefix, s3_connect
+from src.utils.s3.utils import s3_client, list_objects_from_prefix
 
 
 def copy_on_s3(
     original_prefix: str,
     copy_prefix: str,
     add_global_path: bool = False,
-    client=s3_connect(),
+    client=s3_client,
     bucket: str = "creative-features",
 ):
     list_of_objects = list_objects_from_prefix(prefix=original_prefix, add_global_folder=add_global_path)

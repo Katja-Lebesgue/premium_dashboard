@@ -8,8 +8,8 @@ import streamlit as st
 
 from src.app.utils.css import *
 from src.app.utils.labels_and_values import *
-from src.statistics.proportion_test import *
-from src.utils.common import *
+from src.statistical_tests.proportion_test import *
+from src.utils import *
 
 
 def custom_performance_test(data_shop: pd.DataFrame):

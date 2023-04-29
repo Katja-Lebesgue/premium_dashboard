@@ -5,9 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import f_oneway, kruskal, levene, shapiro, ttest_ind
 
-from src.statistics.get_binomial_sample import *
-from src.utils.common import nan_to_none, none_to_unknown
-from src.utils.decorators import print_execution_time
+from src.statistical_tests.get_binomial_sample import *
+from src.utils import *
 
 
 @print_execution_time
@@ -68,7 +67,6 @@ def _ttest_ind(*args, **kwargs):
 
 @print_execution_time
 def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
-
     # print(f"na_to_none: {convert_nan_to_none}")
 
     test_type = None
@@ -84,7 +82,6 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
     # print(f"len samples_list: {len(samples_list)}")
 
     if len(samples_list) > 0:
-
         all_observations = concat_lists(samples_list)
 
         if (
@@ -92,12 +89,10 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
             and any([len(sample) > 1 for sample in samples_list])
             and get_nunique(all_observations) > 1
         ):
-
             stat_levene, p_levene = _levene(*samples_list)
 
             # multisamples
             if len(samples_list) > 2:
-
                 if all([len(sample) > 3 for sample in samples_list]):
                     # print(
                     #     f"duljine uzoraka: {[sum(sample) for sample in samples_list]}"
@@ -116,7 +111,6 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
 
             # two samples
             else:
-
                 if p_levene > 0.1:
                     stat, p = _ttest_ind(*samples_list, nan_policy="omit")
                     test_type = "t"
@@ -146,7 +140,6 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
 
 
 def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
-
     mean_test_result = mean_test(samples_dict)
 
     result = {"winners": [], "losers": []}
@@ -194,7 +187,11 @@ def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) ->
     while p > 0.1 and lower_limit > 0:
         lower_limit = lower_limit - 1
         mean_test_result = mean_test(
-            {group: sample for group, sample in samples_dict.items() if group in means.index[lower_limit:means_len]}
+            {
+                group: sample
+                for group, sample in samples_dict.items()
+                if group in means.index[lower_limit:means_len]
+            }
         )
         p = mean_test_result["p"]
 
@@ -205,8 +202,9 @@ def winners_and_losers(samples_dict: dict, convert_nan_to_none: bool = False) ->
 
 @print_execution_time
 def mean_test_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-
-    samples_dict = create_samples_dict(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
+    samples_dict = create_samples_dict(
+        df=df, group_col=group_col, size_col="impr", positive_col="link_clicks"
+    )
 
     result = mean_test(
         samples_dict=samples_dict,
@@ -218,8 +216,9 @@ def mean_test_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = 
 
 @print_execution_time
 def mean_test_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-
-    samples_dict = create_samples_dict(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
+    samples_dict = create_samples_dict(
+        df=df, group_col=group_col, size_col="link_clicks", positive_col="purch"
+    )
 
     result = mean_test(samples_dict=samples_dict, convert_nan_to_none=convert_nan_to_none)
 
@@ -228,7 +227,6 @@ def mean_test_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = F
 
 @print_execution_time
 def create_samples_dict(df: pd.DataFrame, group_col: str, size_col: str, positive_col: str):
-
     samples_dict = dict()
 
     values = df[group_col].value_counts(dropna=False).index

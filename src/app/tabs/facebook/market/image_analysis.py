@@ -18,7 +18,7 @@ from src.app.utils.css import hide_table_row_index
 from src.app.utils.labels_and_values import *
 from src.app.utils.labels_and_values import feature_dict_market
 from src.s3 import *
-from src.utils.common import big_number_human_format
+from src.utils import big_number_human_format
 
 load_dotenv()
 

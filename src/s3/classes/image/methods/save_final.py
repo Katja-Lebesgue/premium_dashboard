@@ -5,7 +5,7 @@ import pandas as pd
 from src.database.session import SessionLocal
 from src.image_analysis.utils import *
 from src.models import *
-from src.s3.utils import read_csv_from_s3, save_csv_to_s3
+from src.utils import *
 
 db = SessionLocal()
 

@@ -7,10 +7,9 @@ from sqlalchemy.orm.query import Query
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ad import FacebookAd
-from src.models.facebook.facebook_daily_performance import \
-    FacebookDailyPerformance
+from src.models.facebook.facebook_daily_performance import FacebookDailyPerformance
 from src.schemas.facebook.facebook_ad import FacebookAdCreate, FacebookAdUpdate
-from src.utils.common import element_to_list
+from src.utils import element_to_list
 
 
 class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
@@ -24,7 +23,6 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
     ) -> Query:
-
         query = db.query(FacebookAd.ad_id)
 
         if start_date is not None:
@@ -120,13 +118,19 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
                 [
                     FacebookAd.creative["object_story_spec"]["video_data"]["message"].label("video_message"),
                     FacebookAd.creative["object_story_spec"]["video_data"]["video_id"].label("video_id"),
-                    FacebookAd.creative["object_story_spec"]["video_data"]["image_url"].label("video_image_url"),
-                    FacebookAd.creative["object_story_spec"]["video_data"]["image_hash"].label("video_image_hash"),
+                    FacebookAd.creative["object_story_spec"]["video_data"]["image_url"].label(
+                        "video_image_url"
+                    ),
+                    FacebookAd.creative["object_story_spec"]["video_data"]["image_hash"].label(
+                        "video_image_hash"
+                    ),
                     FacebookAd.creative["object_story_spec"]["video_data"]["link_description"].label(
                         "video_description"
                     ),
                     FacebookAd.creative["object_story_spec"]["video_data"]["title"].label("video_title"),
-                    FacebookAd.creative["object_story_spec"]["video_data"]["call_to_action"]["type"].label("video_cta"),
+                    FacebookAd.creative["object_story_spec"]["video_data"]["call_to_action"]["type"].label(
+                        "video_cta"
+                    ),
                     FacebookAd.creative["asset_feed_spec"]["videos"].label("videos"),
                 ]
             )
@@ -136,9 +140,15 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
                 [
                     FacebookAd.creative["object_story_spec"]["link_data"]["message"].label("link_message"),
                     FacebookAd.creative["object_story_spec"]["link_data"]["name"].label("link_name"),
-                    FacebookAd.creative["object_story_spec"]["link_data"]["description"].label("link_description"),
-                    FacebookAd.creative["object_story_spec"]["link_data"]["call_to_action"]["type"].label("link_cta"),
-                    FacebookAd.creative["object_story_spec"]["link_data"]["child_attachments"].label("children"),
+                    FacebookAd.creative["object_story_spec"]["link_data"]["description"].label(
+                        "link_description"
+                    ),
+                    FacebookAd.creative["object_story_spec"]["link_data"]["call_to_action"]["type"].label(
+                        "link_cta"
+                    ),
+                    FacebookAd.creative["object_story_spec"]["link_data"]["child_attachments"].label(
+                        "children"
+                    ),
                     FacebookAd.creative["object_story_spec"]["link_data"]["image_hash"].label("image_hash"),
                 ]
             )
@@ -146,7 +156,9 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         if add_template_data:
             columns.extend(
                 [
-                    FacebookAd.creative["object_story_spec"]["template_data"]["message"].label("template_message"),
+                    FacebookAd.creative["object_story_spec"]["template_data"]["message"].label(
+                        "template_message"
+                    ),
                     FacebookAd.creative["object_story_spec"]["template_data"]["name"].label("template_name"),
                     FacebookAd.creative["object_story_spec"]["template_data"]["description"].label(
                         "template_description"
@@ -182,4 +194,4 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         return query
 
 
-crud_fb_ad = CRUDFacebookAd(FacebookAd)
+fb_ad = CRUDFacebookAd(FacebookAd)

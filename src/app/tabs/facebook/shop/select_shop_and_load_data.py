@@ -13,7 +13,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.app.authenticate import is_admin
-from src.crud import crud_streamlit_user_shop
+from src import crud
 from src.database.session import SessionLocal
 from src.models import *
 from src.pingers import *
@@ -22,9 +22,8 @@ db = SessionLocal()
 
 
 def select_shop_and_load_data() -> pd.DataFrame:
-    
     if not is_admin():
-        shops = crud_streamlit_user_shop.ping_shops_by_streamlit_user_id(
+        shops = crud.streamlit_user_shop.ping_shops_by_streamlit_user_id(
             db=db, streamlit_user_id=st.session_state["user_id"]
         ).rename(columns={"id": "shop_id"})
     else:

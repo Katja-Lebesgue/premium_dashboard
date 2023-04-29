@@ -1,19 +1,21 @@
 import pandas as pd
 import streamlit as st
 
-from src.crud import crud_shop, crud_streamlit_user, crud_streamlit_user_shop
+from src import crud
 from src.database.session import db
 from src.pingers import ping_shops
 
 
 def manage_user_privileges():
-    users = crud_streamlit_user.ping_all_subusernames(db=db)
+    users = crud.streamlit_user.ping_all_subusernames(db=db)
     shops = st_ping_shops()
     user_id = st.selectbox(
-        label="Select user", options=users["id"], format_func=lambda x: users.loc[users.id == x, "username"].item()
+        label="Select user",
+        options=users["id"],
+        format_func=lambda x: users.loc[users.id == x, "username"].item(),
     )
 
-    user_shops = crud_streamlit_user_shop.ping_shops_by_streamlit_user_id(db=db, streamlit_user_id=user_id)
+    user_shops = crud.streamlit_user_shop.ping_shops_by_streamlit_user_id(db=db, streamlit_user_id=user_id)
     forbidden_shops = shops[~shops.id.isin(user_shops.id)]
 
     # add shop
@@ -27,7 +29,7 @@ def manage_user_privileges():
     )
 
     if add_shop_form.form_submit_button("Add"):
-        crud_streamlit_user_shop.add_relationship(db=db, streamlit_user_id=user_id, shop_id=shop_id)
+        crud.streamlit_user_shop.add_relationship(db=db, streamlit_user_id=user_id, shop_id=shop_id)
         st.experimental_rerun()
 
     # remove shop
@@ -42,10 +44,10 @@ def manage_user_privileges():
     remove_shop_button = remove_shop_form.form_submit_button("Remove")
 
     if remove_shop_button:
-        crud_streamlit_user_shop.delete_relationship(db=db, streamlit_user_id=user_id, shop_id=shop_id)
+        crud.streamlit_user_shop.delete_relationship(db=db, streamlit_user_id=user_id, shop_id=shop_id)
         st.experimental_rerun()
 
 
 @st.experimental_memo
 def st_ping_shops():
-    return crud_shop.ping_all(db=db)
+    return crud.shop.ping_all(db=db)

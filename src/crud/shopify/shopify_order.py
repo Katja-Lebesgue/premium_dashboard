@@ -6,11 +6,13 @@ from sqlalchemy.orm import Query, Session
 from src import models, schemas
 from src.crud.base import CRUDBase
 from src.models import ShopifyOrder
-from src.utils.common import element_to_list
+from src.utils import element_to_list
 
 
 class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate, schemas.ShopifyOrderUpdate]):
-    def get_sum_of_total_usd_in_period(self, db: orm.Session, shop_id: int, start: datetime, end: datetime) -> int:
+    def get_sum_of_total_usd_in_period(
+        self, db: orm.Session, shop_id: int, start: datetime, end: datetime
+    ) -> int:
         return (
             db.query(func.coalesce(func.sum(models.ShopifyOrder.total_price_usd.cast(Float)), 0))
             .filter(
@@ -40,7 +42,9 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
                 models.ShopifyOrder.created_at >= include_orders_after,
             )
         else:
-            query = query.filter(models.ShopifyOrder.shop_id == shop_id, models.ShopifyOrder.customer_id.isnot(None))
+            query = query.filter(
+                models.ShopifyOrder.shop_id == shop_id, models.ShopifyOrder.customer_id.isnot(None)
+            )
 
         return query.order_by(models.ShopifyOrder.processed_at.asc()).offset(offset).limit(limit).all()
 
@@ -71,7 +75,6 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
     ) -> Query:
-
         columns = [
             ShopifyOrder.shop_id,
             func.avg(cast(ShopifyOrder.total_price_usd, Float())).label("aov"),
@@ -96,4 +99,4 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
         return query
 
 
-crud_shopify_order = CRUDShopifyOrder(models.ShopifyOrder)
+shopify_order = CRUDShopifyOrder(models.ShopifyOrder)

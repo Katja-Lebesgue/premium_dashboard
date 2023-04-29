@@ -1,4 +1,4 @@
-from src.s3 import read_csv_from_s3
+from src.utils import *
 
 
 def ping_crm():

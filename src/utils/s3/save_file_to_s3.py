@@ -1,21 +1,17 @@
-import sys
-
-sys.path.append("./.")
-
 import json
 from io import StringIO
 
 import cv2
 import pandas as pd
+import numpy as np
 
-from src.s3.utils.s3_connect import s3_connect
-from src.utils import *
+from src.utils.s3.utils import s3_client, add_global_s3_folder
 
 
 def save_csv_to_s3(
     df: pd.DataFrame,
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket: str = "creative-features",
     add_global_path: bool = True,
     index: bool = True,
@@ -34,7 +30,7 @@ def save_csv_to_s3(
 def save_json_to_s3(
     d: dict,
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket: str = "creative-features",
     add_global_path: bool = True,
 ):
@@ -49,7 +45,7 @@ def save_json_to_s3(
 def save_image_to_s3(
     img: np.array,
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket: str = "creative-features",
     add_global_path: bool = True,
 ):

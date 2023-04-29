@@ -4,13 +4,14 @@ import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
-from src.s3.utils.read_file_from_s3 import read_json_from_s3
-from src.utils.common import convert_to_USD
+from src import crud, utils
 
 
 def add_performance_columns(performance: pd.DataFrame, db: Session) -> pd.DataFrame:
-    conversion_rates_dict = crud_currency_exchange_rate.ping_current_rates_dict(db=db)
+    if len(performance) == 0:
+        return performance
+
+    conversion_rates_dict = crud.currency_exchange_rate.ping_current_rates_dict(db=db)
 
     performance.fillna(0, inplace=True)
     performance.replace(to_replace="None", value=0, inplace=True)

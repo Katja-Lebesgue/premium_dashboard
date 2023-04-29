@@ -81,4 +81,4 @@ class CRUDShop(CRUDBase[models.Shop, schemas.ShopCreate, schemas.ShopUpdate]):
         return df
 
 
-crud_shop = CRUDShop(models.Shop)
+shop = CRUDShop(models.Shop)

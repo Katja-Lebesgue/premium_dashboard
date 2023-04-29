@@ -16,10 +16,7 @@ from wordcloud import WordCloud
 
 from src.app.utils.cache_functions import st_read_csv_from_s3
 from src.feature_extractors.EText import EText
-from src.s3 import *
-from src.s3.utils.read_file_from_s3 import read_csv_from_s3
-from src.utils.enum import get_enum_values
-from src.utils.nlp import EmojiCloud, get_sentiment
+from src.utils import *
 
 load_dotenv()
 

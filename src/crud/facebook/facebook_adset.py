@@ -3,9 +3,8 @@ from sqlalchemy.orm.query import Query
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_adset import FacebookAdset
-from src.schemas.facebook.facebook_adset import (FacebookAdsetCreate,
-                                                 FacebookAdsetUpdate)
-from src.utils.common import element_to_list
+from src.schemas.facebook.facebook_adset import FacebookAdsetCreate, FacebookAdsetUpdate
+from src.utils import element_to_list
 
 
 class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAdsetUpdate]):
@@ -19,7 +18,6 @@ class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAds
         account_id: str | list[str] | None = None,
         shop_id: int | list[int] | None = None,
     ) -> Query:
-
         query = db.query(
             FacebookAdset.adset_id,
             FacebookAdset.account_id,
@@ -49,4 +47,4 @@ class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAds
         return query
 
 
-crud_fb_adset = CRUDFacebookAdset(FacebookAdset)
+fb_adset = CRUDFacebookAdset(FacebookAdset)

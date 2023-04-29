@@ -14,7 +14,7 @@ from metadata.globals import *
 from src.models import AdCreativeFeatures
 from src.pingers import ping_creative_and_performance
 from src.s3 import *
-from src.statistics import *
+from src.statistical_tests import *
 from src.utils import *
 
 warnings.filterwarnings("ignore", message="Mean of empty slice")
@@ -104,7 +104,9 @@ def save_global_feature_tests_to_s3(
             continue
 
         data_shop = data_shop.loc[data_shop.targets_US == True, :]
-        data_shop = data_shop[(data_shop.link_clicks >= data_shop.purch) & (data_shop.impr >= data_shop.link_clicks)]
+        data_shop = data_shop[
+            (data_shop.link_clicks >= data_shop.purch) & (data_shop.impr >= data_shop.link_clicks)
+        ]
 
         for promotion in [True, False]:
             data_shop_promotion = data_shop.loc[data_shop.discounts_any == promotion, :]
@@ -116,7 +118,12 @@ def save_global_feature_tests_to_s3(
                     group_true = data_shop_target.loc[data_shop_target[feature].isin([True]), :]
                     group_false = data_shop_target.loc[data_shop_target[feature].isin([False]), :]
 
-                    new_idx = {"shop_id": shop_id, "promotion": promotion, "target": target, "feature": feature}
+                    new_idx = {
+                        "shop_id": shop_id,
+                        "promotion": promotion,
+                        "target": target,
+                        "feature": feature,
+                    }
 
                     new_columns = {
                         "proportion_test_ctr": proportion_test_ctr(

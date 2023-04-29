@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.stats import f, f_oneway
 
 from src.pingers import *
-from src.statistics.get_binomial_sample import get_binomial_sample
+from src.statistical_tests.get_binomial_sample import get_binomial_sample
 from src.utils import *
 
 
@@ -23,7 +23,6 @@ def get_sample_var_sum(positive: int, size: int, mean: float):
 
 
 def f_oneway_bernoulli(positives: pd.Series | list, sizes: pd.Series | list):
-
     if len(positives) != len(sizes):
         exit(
             f"{sys.argv[0]}/{inspect.stack()[0][3]} LengthError: Lengths of positives and sizes in ANOVA must be the same!"

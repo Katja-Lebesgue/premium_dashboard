@@ -3,8 +3,7 @@ import pandas as pd
 from numpy import size
 from scipy.stats import fisher_exact
 
-from src.utils.common import nan_to_none
-from src.utils.decorators import print_execution_time
+from src.utils import *
 
 
 @print_execution_time
@@ -15,7 +14,6 @@ def fisher_exact_test(
     size_col: str,
     convert_nan_to_none: bool = False,
 ) -> float:
-
     table = pd.DataFrame(columns=["positive", "negative"])
 
     group1_positive = group1[positive_col].sum()
@@ -37,7 +35,9 @@ def fisher_exact_test(
     group2_mean = group2_positive / group2_size if group2_size else np.nan
 
     if convert_nan_to_none:
-        odsratio, p, group1_mean, group2_mean = (nan_to_none(x) for x in (odsratio, p, group1_mean, group2_mean))
+        odsratio, p, group1_mean, group2_mean = (
+            nan_to_none(x) for x in (odsratio, p, group1_mean, group2_mean)
+        )
 
     result = {
         "stat": odsratio,

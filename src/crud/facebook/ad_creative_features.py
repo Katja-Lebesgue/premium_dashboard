@@ -7,18 +7,21 @@ from sqlalchemy.orm import Query, Session
 from src.crud.base import CRUDBase
 from src.models import FacebookDailyPerformance
 from src.models.facebook.ad_creative_features import AdCreativeFeatures
-from src.schemas.facebook.ad_creative_features import (
-    AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate)
-from src.utils.common import element_to_list
+from src.schemas.facebook.ad_creative_features import AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate
+from src.utils import element_to_list
 
 
-class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate]):
+class CRUDAdCreativeFeatures(
+    CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate]
+):
     def get(self, db: Session, shop_id: int, account_id: str, ad_id: str) -> AdCreativeFeatures | None:
         return db.query(self.model).get((shop_id, account_id, ad_id))
 
     def get_features_by_shop_id(self, db: Session, shop_id: int) -> List[str]:
         ad_creative_features = AdCreativeFeatures
-        result = db.query(ad_creative_features.feature).filter(ad_creative_features.shop_id == shop_id).distinct()
+        result = (
+            db.query(ad_creative_features.feature).filter(ad_creative_features.shop_id == shop_id).distinct()
+        )
         return result
 
     def get_distinct_features_by_shop_id(self, db: Session, shop_id: int) -> list[str]:
@@ -34,7 +37,6 @@ class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCrea
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
     ) -> Query:
-
         query = db.query(AdCreativeFeatures)
 
         if shop_id is not None:
@@ -46,7 +48,6 @@ class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCrea
             query = query.filter(AdCreativeFeatures.ad_id.in_(ad_id))
 
         if start_date is not None:
-
             query = query.join(
                 FacebookDailyPerformance,
                 and_(
@@ -62,4 +63,4 @@ class CRUDAdCreativeFeatures(CRUDBase[AdCreativeFeatures, AdCreativeFeaturesCrea
         return query
 
 
-crud_ad_creative_features = CRUDAdCreativeFeatures(AdCreativeFeatures)
+ad_creative_features = CRUDAdCreativeFeatures(AdCreativeFeatures)

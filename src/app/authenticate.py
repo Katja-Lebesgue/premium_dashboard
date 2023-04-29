@@ -1,13 +1,10 @@
 import streamlit as st
-import yaml
-from loguru import logger
 from sqlalchemy.exc import PendingRollbackError
-from yaml import SafeLoader
+
 
 from my_packages import streamlit_authenticator as stauth
 from src.database.session import db
 from src.models.streamlit import StreamlitUser
-from src.utils.database import row_to_dict
 
 
 def is_admin():
@@ -31,7 +28,9 @@ def authenticate():
         if st.session_state["authentication_status"] == True:
             try:
                 st.session_state["user_id"] = config["usernames"][st.session_state["username"]]["id"]
-                st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]]["is_superuser"]
+                st.session_state["is_superuser"] = config["usernames"][st.session_state["username"]][
+                    "is_superuser"
+                ]
             except Exception:
                 authenticator.cookie_manager.delete(authenticator.cookie_name)
                 st.session_state["logout"] = True

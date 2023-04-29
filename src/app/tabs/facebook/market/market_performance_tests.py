@@ -1,20 +1,11 @@
-import sys
-
-sys.path.append("./.")
-
-import os
-from cgi import test
-
 import numpy as np
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
-from src.app.tabs.facebook.shop.default_performance_tests import style_test_table
 from src.app.utils.css import *
 from src.app.utils.labels_and_values import *
-from src.s3 import *
-from src.s3.utils.s3_connect import s3_connect
+from src.utils import *
 
 load_dotenv()
 

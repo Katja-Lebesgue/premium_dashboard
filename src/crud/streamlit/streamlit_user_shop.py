@@ -7,7 +7,7 @@ from src.crud.base import CRUDBase
 from src.models import Shop
 from src.models.streamlit import *
 from src.schemas.streamlit import *
-from src.utils.common import element_to_list
+from src.utils import element_to_list
 
 
 class CRUDStreamlitUserShop(CRUDBase[StreamlitUserShop, StreamlitUserShopCreate, StreamlitUserShopUpdate]):
@@ -31,4 +31,4 @@ class CRUDStreamlitUserShop(CRUDBase[StreamlitUserShop, StreamlitUserShopCreate,
         return df
 
 
-crud_streamlit_user_shop = CRUDStreamlitUserShop(StreamlitUserShop)
+streamlit_user_shop = CRUDStreamlitUserShop(StreamlitUserShop)

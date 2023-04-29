@@ -1,19 +1,16 @@
 from datetime import date, datetime
-from itertools import product
 
 import numpy as np
 import pandas as pd
 from loguru import logger
 from sqlalchemy import func
-from sqlalchemy.orm import DeclarativeMeta, InstrumentedAttribute, Session
+from sqlalchemy.orm import DeclarativeMeta, Session
 
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
+from src import crud
 from src.models import *
 from src.models.enums.EPlatform import PLATFORMS
 from src.pingers.ping_crm import ping_crm
-from src.s3.utils.read_file_from_s3 import read_csv_from_s3, read_json_from_s3
-from src.utils.common import convert_to_USD, element_to_list
-from src.utils.decorators import print_execution_time
+from src.utils import convert_to_USD, element_to_list
 
 
 def ping_ads_insights_by_platform(
@@ -113,7 +110,7 @@ def ping_ads_insights_all_platforms(
     convert_to_USD_bool: bool = True,
 ) -> pd.DataFrame:
     if convert_to_USD_bool:
-        conversion_json = crud_currency_exchange_rate.ping_current_rates_dict(db=db)
+        conversion_json = crud.currency_exchange_rate.ping_current_rates_dict(db=db)
 
     for idx, (model, account_model) in enumerate(
         zip(

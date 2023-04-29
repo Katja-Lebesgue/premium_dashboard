@@ -9,17 +9,21 @@ from sqlalchemy.sql.expression import literal
 from tqdm import tqdm
 
 from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
+from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_adset_insights import (
-    FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate)
-from src.utils.common import element_to_list
+    FacebookAdsetInsightsCreate,
+    FacebookAdsetInsightsUpdate,
+)
+from src.utils import element_to_list
 
 
 class CRUDFacebookAdsetInsights(
     CRUDBase[FacebookAdsetInsights, FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate]
 ):
-    def get(self, db: Session, shop_id: int, facebook_account_id: str, date: date) -> FacebookAdsetInsights | None:
+    def get(
+        self, db: Session, shop_id: int, facebook_account_id: str, date: date
+    ) -> FacebookAdsetInsights | None:
         return db.query(self.model).get((shop_id, facebook_account_id, date))
 
     def rebuild_table(self, db: Session, chunk_size: int = 5):
@@ -68,7 +72,9 @@ class CRUDFacebookAdsetInsights(
                 db.query(*(group_cols + feat_cols))
                 .join(
                     fas,
-                    (fdp.shop_id == fas.shop_id) & (fdp.account_id == fas.account_id) & (fdp.adset_id == fas.adset_id),
+                    (fdp.shop_id == fas.shop_id)
+                    & (fdp.account_id == fas.account_id)
+                    & (fdp.adset_id == fas.adset_id),
                 )
                 .filter(fdp.shop_id.in_(chunk))
                 .group_by(*group_cols)
@@ -138,4 +144,4 @@ class CRUDFacebookAdsetInsights(
         return query
 
 
-crud_fb_adset_insights = CRUDFacebookAdsetInsights(FacebookAdsetInsights)
+fb_adset_insights = CRUDFacebookAdsetInsights(FacebookAdsetInsights)

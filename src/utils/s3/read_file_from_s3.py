@@ -1,25 +1,15 @@
-import sys
-
-sys.path.append("./.")
-
 import json
-import os
 
 import cv2
 import pandas as pd
-from dotenv import load_dotenv
-from loguru import logger
 
-load_dotenv()
-
-from src.s3.utils.s3_connect import s3_connect
-from src.utils import *
-from src.utils.common import read_csv_and_eval
+from src.utils.s3.utils import s3_client, add_global_s3_folder
+from src.utils.pd import read_csv_and_eval
 
 
 def read_csv_from_s3(
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket="creative-features",
     evaluate=True,
     add_global_path: bool = True,
@@ -39,7 +29,7 @@ def read_csv_from_s3(
 
 def read_json_from_s3(
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket="creative-features",
     add_global_path: bool = True,
 ):
@@ -55,7 +45,7 @@ def read_json_from_s3(
 
 def read_image_from_s3(
     path: str,
-    client=s3_connect(),
+    client=s3_client,
     bucket="creative-features",
     add_global_path: bool = True,
 ):

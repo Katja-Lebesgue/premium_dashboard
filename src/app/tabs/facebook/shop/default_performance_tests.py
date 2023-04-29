@@ -7,11 +7,11 @@ from scipy import stats
 
 from src.app.utils.css import *
 from src.app.utils.labels_and_values import *
-from src.statistics import *
-from src.statistics.bernoulli_tests.mean_test_bernoulli import *
-from src.statistics.mean_test import mean_test
-from src.utils.common import *
-from src.utils.common import big_number_human_format
+from src.statistical_tests import *
+from src.statistical_tests.bernoulli_tests.mean_test_bernoulli import *
+from src.statistical_tests.mean_test import mean_test
+from src.utils import *
+from src.utils import big_number_human_format
 
 
 def default_performance_tests(data_shop: pd.DataFrame):

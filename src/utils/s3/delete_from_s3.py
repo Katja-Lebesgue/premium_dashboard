@@ -1,14 +1,9 @@
-import sys
-
-sys.path.append("./.")
-
-from src.s3.utils.s3_connect import s3_resource
-from src.utils.common import add_global_s3_folder
+from src.utils.s3.utils import s3_resource, add_global_s3_folder
 
 
 def delete_from_s3(
     prefix: str,
-    s3=s3_resource(),
+    s3=s3_resource,
     bucket: str = "creative-features",
     add_global_path: bool = False,
 ):

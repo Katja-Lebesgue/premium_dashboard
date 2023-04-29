@@ -1,19 +1,14 @@
-import sys
-
-sys.path.append("././.")
-
 import pandas as pd
 from sqlalchemy import and_
 
-from src.crud import *
+from src import crud
 from src.database.session import *
 from src.models import *
 
 
 def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop_id: str = None):
-
-    creative_query = crud_fb_ad.query_raw_creative_data(session=session, ad_id=ad_id, shop_id=shop_id)
-    target_query = crud_fb_adset.query_target(session=session, shop_id=shop_id).subquery()
+    creative_query = crud.fb_ad.query_raw_creative_data(session=session, ad_id=ad_id, shop_id=shop_id)
+    target_query = crud.fb_adset.query_target(session=session, shop_id=shop_id).subquery()
 
     query = creative_query.join(
         target_query,
@@ -27,13 +22,3 @@ def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop
     df = pd.read_sql(query.statement, session.bind)
 
     return df
-
-
-def main():
-    session = SessionLocal()
-    df = ping_raw_creative_and_target(session=session, shop_id=16038)
-    print(df[["countries", "target", "targeting"]])
-
-
-if __name__ == "__main__":
-    main()

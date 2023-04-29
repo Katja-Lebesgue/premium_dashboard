@@ -10,8 +10,7 @@ from src.app.utils.css import GREEN, hide_dataframe_row_index
 from src.database.session import db
 from src.models.enums.EPlatform import PLATFORMS, EPlatform
 from src.pingers import ping_ads_insights_all_platforms
-from src.utils.common import big_number_human_format, get_all_subsets
-from src.utils.enum import get_enum_values
+from src.utils import *
 
 
 def all_platforms():
@@ -43,7 +42,8 @@ def all_platforms():
         shop_size_filter = []
         for shop_size in sorted(df.shop_size.unique()):
             check = st.checkbox(
-                f"${big_number_human_format(bins[shop_size])}-${big_number_human_format(bins[shop_size+1])}", value=True
+                f"${big_number_human_format(bins[shop_size])}-${big_number_human_format(bins[shop_size+1])}",
+                value=True,
             )
             if check:
                 shop_size_filter.append(shop_size)
@@ -83,7 +83,10 @@ def display_spend_statistics(df: pd.DataFrame, bins=list[float]):
         )
     )
     fig.update_layout(
-        showlegend=False, title="Monthly revenue by budget", xaxis_title="monthly budget", yaxis_title="monthly revenue"
+        showlegend=False,
+        title="Monthly revenue by budget",
+        xaxis_title="monthly budget",
+        yaxis_title="monthly revenue",
     )
 
     with col_budget1:
@@ -95,7 +98,9 @@ def display_spend_statistics(df: pd.DataFrame, bins=list[float]):
     industries = list(df.industry.unique())
     industries.remove("unknown")
     for industry in industries:
-        fig.add_trace(go.Box(x=df.loc[df.industry == industry, "total_spend"], boxpoints=False, name=industry))
+        fig.add_trace(
+            go.Box(x=df.loc[df.industry == industry, "total_spend"], boxpoints=False, name=industry)
+        )
 
     fig.update_layout(showlegend=False, title="Monthly budget by industry", xaxis_title="monthly budget")
     with col_budget2:
@@ -218,16 +223,26 @@ def platform_spend_through_time(df: pd.DataFrame):
             key="metric",
         )
 
-        df = df.rename(columns={f"{platform}_{metric}": f"{platform}" for platform in get_enum_values(EPlatform)})
+        df = df.rename(
+            columns={f"{platform}_{metric}": f"{platform}" for platform in get_enum_values(EPlatform)}
+        )
         df = df[["year_month", "shop_id"] + get_enum_values(EPlatform)]
 
         total_or_shop = st.select_slider("Choose wisely", ("Total", "Shop average"), value="Total")
 
         if total_or_shop == "Shop average":
-            df = df.set_index(["year_month", "shop_id"]).div(df.groupby(["year_month", "shop_id"]).sum()).reset_index()
+            df = (
+                df.set_index(["year_month", "shop_id"])
+                .div(df.groupby(["year_month", "shop_id"]).sum())
+                .reset_index()
+            )
 
         a = df.groupby(["year_month"]).sum()[get_enum_values(EPlatform)].unstack()
-        a = a.reset_index().rename(columns={"level_0": "platform", 0: "value"}).set_index(["year_month", "platform"])
+        a = (
+            a.reset_index()
+            .rename(columns={"level_0": "platform", 0: "value"})
+            .set_index(["year_month", "platform"])
+        )
 
         bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 

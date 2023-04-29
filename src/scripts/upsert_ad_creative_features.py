@@ -5,17 +5,15 @@ sys.path.append("./.")
 import pandas as pd
 from tqdm import tqdm
 
-from src.database.inserters_and_updaters.upsert_creative_by_shop_id import \
-    upsert_creative_by_shop_id
+from src.database.inserters_and_updaters.upsert_creative_by_shop_id import upsert_creative_by_shop_id
 from src.database.queries.query_shop_id import query_shop_id
 from src.database.session import SessionLocal
-from src.utils.common import read_csv_and_eval
-from src.utils.decorators import print_execution_time
+from src.utils import read_csv_and_eval
+from utils.timing import print_execution_time
 
 
 @print_execution_time
 def main():
-
     session = SessionLocal()
     print("pinging shop ids...")
     query = query_shop_id(session=session, start_date="2022-05-01")
@@ -31,7 +29,9 @@ def main():
     for shop_id in tqdm(shop_ids, total=len(shop_ids)):
         print(f"updating shop id {shop_id}...")
         try:
-            update_df, success = upsert_creative_by_shop_id(shop_id=shop_id, update_df=update_df, end_date="2023-01-04")
+            update_df, success = upsert_creative_by_shop_id(
+                shop_id=shop_id, update_df=update_df, end_date="2023-01-04"
+            )
 
             print(f"success: {success}")
 

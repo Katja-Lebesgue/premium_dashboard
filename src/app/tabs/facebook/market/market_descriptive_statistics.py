@@ -17,7 +17,7 @@ from src.app.utils.css import hide_table_row_index
 from src.app.utils.labels_and_values import *
 from src.app.utils.labels_and_values import feature_dict_market
 from src.s3 import *
-from src.utils.common import big_number_human_format
+from src.utils import *
 
 load_dotenv()
 
@@ -46,7 +46,9 @@ def market_descriptive_statistics(
         proper_metric_dict = metric_dict_market
 
     pie_charts(
-        descriptive_df.copy(), proper_metric_dict=proper_metric_dict, add_title=(total_or_shop_average == "Total")
+        descriptive_df.copy(),
+        proper_metric_dict=proper_metric_dict,
+        add_title=(total_or_shop_average == "Total"),
     )
 
     text_features_through_time(descriptive_df)
@@ -178,7 +180,9 @@ def text_features_through_time(descriptive_df: pd.DataFrame) -> None:
     metrics = set(descriptive_df.columns) - {"feature", "feature_value", "year_month"}
 
     with col1:
-        selected_feature = st.selectbox("Select feature", tuple(features), format_func=lambda x: remove_any(x))
+        selected_feature = st.selectbox(
+            "Select feature", tuple(features), format_func=lambda x: x.removesuffix("_any")
+        )
 
         performance_metric = st.selectbox(
             "Select metric",

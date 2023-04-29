@@ -9,7 +9,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 
 from src.models import *
-from src.utils.decorators import print_execution_time
+from src.utils import *
 
 
 @print_execution_time
@@ -19,9 +19,6 @@ def ping_shops(
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
 ) -> pd.DataFrame:
-
-    logger.debug("Here I am!")
-
     if start_date is not None:
         model = FacebookDailyPerformance
 

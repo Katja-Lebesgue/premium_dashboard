@@ -4,12 +4,11 @@ import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src.crud import *
+from src import crud, utils
 from src.database.session import SessionLocal
 from src.feature_extractors import *
 from src.models import *
 from src.pingers.ping_creative import ping_creative
-from src.utils.decorators import print_execution_time
 
 
 # @print_execution_time
@@ -42,7 +41,7 @@ def ping_creative_and_performance(
     if len(creative) == 0:
         return creative
 
-    performance_query = crud_fb_daily_performance.query_performance(
+    performance_query = crud.fb_daily_performance.query_performance(
         db=db,
         shop_id=shop_id,
         ad_id=ad_id,

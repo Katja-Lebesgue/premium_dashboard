@@ -10,13 +10,11 @@ import pandas as pd
 from scipy.stats import norm
 from statsmodels.stats.proportion import proportion_confint, proportions_ztest
 
-from src.utils.common import nan_to_none
-from src.utils.decorators import print_execution_time
+from src.utils import *
 
 
 # @print_execution_time
 def proportion_test(positive1, size1, positive2, size2, convert_nan_to_none: bool = False):
-
     p1 = positive1 / size1 if size1 else np.nan
     p2 = positive2 / size2 if size2 else np.nan
 
@@ -44,8 +42,9 @@ def proportion_test(positive1, size1, positive2, size2, convert_nan_to_none: boo
     return result
 
 
-def proportion_test_cr(group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False) -> float:
-
+def proportion_test_cr(
+    group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
+) -> float:
     positive1 = group1.purch.sum()
     size1 = group1.link_clicks.sum()
     positive2 = group2.purch.sum()
@@ -62,8 +61,9 @@ def proportion_test_cr(group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_t
     return result
 
 
-def proportion_test_ctr(group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False) -> float:
-
+def proportion_test_ctr(
+    group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
+) -> float:
     positive1 = group1.link_clicks.sum()
     size1 = group1.impr.sum()
     positive2 = group2.link_clicks.sum()

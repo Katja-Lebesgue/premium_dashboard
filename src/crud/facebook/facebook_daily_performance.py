@@ -7,10 +7,10 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import literal
 
 from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import crud_currency_exchange_rate
+from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.utils.common import element_to_list
+from src.utils import element_to_list
 
 
 class CRUDFacebookDailyPerformance(
@@ -29,6 +29,14 @@ class CRUDFacebookDailyPerformance(
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
         add_currency: bool = True,
+        column_label_dict: dict
+        | list = {
+            "spend": "spend",
+            "impressions": "impr",
+            "link_clicks": "link_clicks",
+            "purchases": "purch",
+            "purchases_conversion_value": "purch_value",
+        },
         monthly: bool = True,
     ) -> Query:
         group_columns = [
@@ -38,11 +46,7 @@ class CRUDFacebookDailyPerformance(
         ]
 
         performance_columns = [
-            func.sum(self.model.impressions).label("impr"),
-            func.sum(self.model.link_clicks).label("link_clicks"),
-            func.sum(self.model.purchases).label("purch"),
-            func.sum(self.model.spend).label("spend"),
-            func.sum(self.model.purchases_conversion_value).label("purch_value"),
+            func.sum(getattr(self.model, col)).label(label) for col, label in column_label_dict.items()
         ]
 
         columns = group_columns + performance_columns
@@ -73,7 +77,7 @@ class CRUDFacebookDailyPerformance(
         if start_date is not None:
             query = query.filter(
                 self.model.date_start >= start_date,
-                self.model.date_start <= end_date,
+                self.model.date_start < end_date,
             )
 
         query = query.group_by(*group_columns)
@@ -143,4 +147,4 @@ class CRUDFacebookDailyPerformance(
         return query
 
 
-crud_fb_daily_performance = CRUDFacebookDailyPerformance(FacebookDailyPerformance)
+fb_daily_performance = CRUDFacebookDailyPerformance(FacebookDailyPerformance)

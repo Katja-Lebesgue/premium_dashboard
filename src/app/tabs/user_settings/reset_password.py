@@ -2,7 +2,7 @@ import streamlit as st
 import yaml
 from streamlit_option_menu import option_menu
 
-from src.crud.streamlit import crud_streamlit_user
+from src import crud
 from src.database.session import db
 
 
@@ -23,7 +23,7 @@ def reset_password(authenticator):
                 new_hashed_password = authenticator.credentials["usernames"][st.session_state["username"]][
                     "password"
                 ].encode()
-                crud_streamlit_user.update_hashed_password(
+                crud.streamlit_user.update_hashed_password(
                     db=db, id=st.session_state["user_id"], hashed_password=new_hashed_password
                 )
         except Exception as e:

@@ -5,12 +5,12 @@ import pandas as pd
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src.crud import *
+from src import crud
 from src.database.session import SessionLocal
 from src.models import *
 from src.pingers.ping_crm import ping_crm
 from src.s3 import *
-from src.utils.decorators import print_execution_time
+from src.utils import *
 
 
 # @print_execution_time
@@ -23,7 +23,7 @@ def ping_creative(
     get_aov: str = True,
     get_industry: bool = True,
 ) -> pd.DataFrame:
-    query = crud_ad_creative_features.query_creative(
+    query = crud.ad_creative_features.query_creative(
         db=db,
         shop_id=shop_id,
         ad_id=ad_id,
@@ -32,13 +32,13 @@ def ping_creative(
     )
 
     if get_aov:
-        aov_query = crud_shopify_order.query_aov(
+        aov_query = crud.shopify_order.query_aov(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         ).subquery()
 
-        query = query.join(aov_query, AdCreativeFeatures.shop_id == aov_query.c.shop_id, isouter=True).add_columns(
-            aov_query.c.aov
-        )
+        query = query.join(
+            aov_query, AdCreativeFeatures.shop_id == aov_query.c.shop_id, isouter=True
+        ).add_columns(aov_query.c.aov)
 
     df = pd.read_sql(query.statement, db.bind)
 

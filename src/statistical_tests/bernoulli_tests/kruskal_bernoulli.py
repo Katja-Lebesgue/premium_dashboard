@@ -1,26 +1,9 @@
-import sys
-from statistics import mean
+from scipy.stats import chi2, kruskal
 
-sys.path.append("././.")
-
-import numpy as np
-import pandas as pd
-from numpy import size
-from scipy.stats import chi2, chi2_contingency, f, fisher_exact, kruskal
-
-from src.statistics import *
-from src.utils.common import nan_to_none
-from src.utils.decorators import print_execution_time
-
-
-def get_r(positive: int, negative: int, rank_0: int, rank_1: int):
-    r = positive * rank_1 + negative * rank_0
-    r = r / (positive + negative)
-    return r
+from src.statistical_tests import *
 
 
 def kruskal_bernoulli(positives: list, sizes: list) -> float:
-
     negatives = [size - positive for size, positive in zip(sizes, positives)]
     means = [positive / size for positive, size in zip(positives, sizes)]
 
@@ -56,16 +39,7 @@ def kruskal_bernoulli(positives: list, sizes: list) -> float:
     return H, p_value
 
 
-def main():
-    positives = [10000000, 120, 20]
-    sizes = [100000000, 1270, 60]
-    samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
-
-    f_moj, p_moj = kruskal_bernoulli(positives=positives, sizes=sizes)
-    print(f"moji: {[f_moj, p_moj]}")
-    f, p = kruskal(*samples)
-    print(f"pravi: {[f, p]}")
-
-
-if __name__ == "__main__":
-    main()
+def get_r(positive: int, negative: int, rank_0: int, rank_1: int):
+    r = positive * rank_1 + negative * rank_0
+    r = r / (positive + negative)
+    return r

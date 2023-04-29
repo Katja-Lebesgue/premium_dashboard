@@ -1,7 +1,6 @@
 from datetime import date, datetime, timedelta
 
-import pandas as pd
-from sqlalchemy import cast, func, orm, select
+from sqlalchemy import func, orm
 from sqlalchemy.orm import Session
 
 from src import models, schemas
@@ -42,29 +41,33 @@ class CRUDImage(
         urls = db.query(models.Image.url).filter(func.random() < 0.001).all()
         return [row.url for row in urls]
 
-    def ping_fb_urls_by_shop(
+    def query_fb_ad_ids_and_image_urls_by_shop(
         self,
         db: Session,
         shop_id: int,
-        performance_columns: list[str] = [],
-        start_date: date | None = None,
-        end_date: date | None = None,
-        monthly: bool = False,
+        column_label_dict: dict = {
+            "spend": "spend",
+            "impressions": "impr",
+            "link_clicks": "link_clicks",
+            "purchases": "purch",
+            "purchases_conversion_value": "purch_value",
+        },
+        end_date: date = date.today(),
+        start_date: date = datetime.strptime("2015-01-01", "%Y-%m-%d").date(),
+        conversion_rates_dict: dict | None = None,
     ):
         fb_ad_image_hash = (
             FacebookAd.creative["object_story_spec"]["link_data"].op("->>")("image_hash").label("image_hash")
         )
-        url_subquery = (
-            db.query(
-                Image.image_hash,
-                Image.url,
-                func.rank()
-                .over(order_by=Image.created_at.desc(), partition_by=Image.image_hash)
-                .label("freshness_rank"),
-            )
-            .filter(Image.shop_id == shop_id)
-            .subquery()
-        )
+
+        url_query = db.query(
+            Image.image_hash,
+            Image.url,
+            func.rank()
+            .over(order_by=Image.created_at.desc(), partition_by=Image.image_hash)
+            .label("freshness_rank"),
+        ).filter(Image.shop_id == shop_id)
+        url_subquery = url_query.subquery()
 
         fb_ad_query = (
             db.query(FacebookAd.ad_id, FacebookAd.account_id, url_subquery.c.url)
@@ -72,58 +75,7 @@ class CRUDImage(
             .filter(FacebookAd.shop_id == shop_id, url_subquery.c.freshness_rank == 1)
         )
 
-        if not len(performance_columns):
-            df = pd.read_sql(fb_ad_query.statement, db.bind)
-        else:
-            fb_ad_subquery = fb_ad_query.subquery()
-            columns = [FacebookDailyPerformance.ad_id, FacebookDailyPerformance.account_id]
-            columns.extend(
-                [func.sum(getattr(FacebookDailyPerformance, col)).label(col) for col in performance_columns]
-            )
-
-            group_cols = [
-                FacebookDailyPerformance.ad_id,
-                FacebookDailyPerformance.account_id,
-                fb_ad_subquery.c.url,
-            ]
-
-            if monthly:
-                year_month_col = func.concat(
-                    func.extract("year", FacebookDailyPerformance.date_start),
-                    "-",
-                    func.to_char(func.extract("month", FacebookDailyPerformance.date_start), "fm00"),
-                )
-                columns.append(year_month_col.label("year_month"))
-                group_cols.append(year_month_col)
-
-            filters = [FacebookDailyPerformance.shop_id == shop_id]
-
-            if start_date is not None:
-                filters.extend(
-                    [
-                        FacebookDailyPerformance.date_start >= start_date,
-                        FacebookDailyPerformance.date_start <= end_date,
-                    ]
-                )
-
-            query = (
-                db.query(*columns)
-                .filter(*filters)
-                .join(
-                    fb_ad_subquery,
-                    (FacebookDailyPerformance.ad_id == fb_ad_subquery.c.ad_id)
-                    & (FacebookDailyPerformance.account_id == fb_ad_subquery.c.account_id),
-                )
-                .add_columns(fb_ad_subquery.c.url)
-                .group_by(*group_cols)
-            )
-
-            print(str(query))
-
-            df = pd.read_sql(query.statement, db.bind)
-
-        df["shop_id"] = shop_id
-        return df
+        return fb_ad_query
 
 
 image = CRUDImage(models.Image)

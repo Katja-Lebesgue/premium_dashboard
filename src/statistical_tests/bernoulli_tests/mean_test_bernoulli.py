@@ -1,23 +1,16 @@
-import sys
-
-sys.path.append("./.")
-import inspect
-import itertools
-from statistics import mean
-
 import numpy as np
 import pandas as pd
-from scipy.stats import (f_oneway, kruskal, levene, shapiro, ttest_ind,
-                         ttest_ind_from_stats)
 
-from src.statistics.bernoulli_tests import *
-from src.statistics.get_binomial_sample import *
-from src.utils.common import nan_to_none, none_to_unknown
-from src.utils.decorators import print_execution_time
+
+from src.statistical_tests.bernoulli_tests.ttest_bernoulli import ttest_bernoulli
+from src.statistical_tests.bernoulli_tests.levene_bernoulli import levene_bernoulli
+from src.statistical_tests.bernoulli_tests.f_oneway_bernoulli import f_oneway_bernoulli
+from src.statistical_tests.bernoulli_tests.chi2_contingency_bernoulli import chi2_contingency_bernoulli
+from src.statistical_tests.get_binomial_sample import *
+from src.utils import nan_to_none, none_to_unknown
 
 
 def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> dict:
-
     # remove empties
     groups_df = groups_df[groups_df["size"] > 3]
 
@@ -95,7 +88,6 @@ def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> d
 
 
 def mean_test_bernoulli_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-
     groups_df = create_groups_df(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
 
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
@@ -104,7 +96,6 @@ def mean_test_bernoulli_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_non
 
 
 def mean_test_bernoulli_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-
     groups_df = create_groups_df(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
 
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
@@ -113,7 +104,6 @@ def mean_test_bernoulli_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none
 
 
 def create_groups_df(df: pd.DataFrame, group_col: str, size_col: str, positive_col: str) -> pd.DataFrame:
-
     df[group_col] = df[group_col].fillna("unknown")
 
     values = df[group_col].value_counts(dropna=False).index

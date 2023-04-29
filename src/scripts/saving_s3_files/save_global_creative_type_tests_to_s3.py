@@ -12,11 +12,9 @@ from tqdm import tqdm
 
 from src.pingers import *
 from src.s3 import *
-from src.statistics import *
-from src.statistics.bernoulli_tests import *
-from src.statistics.proportion_test import (proportion_test,
-                                            proportion_test_cr,
-                                            proportion_test_ctr)
+from src.statistical_tests import *
+from src.statistical_tests.bernoulli_tests import *
+from src.statistical_tests.proportion_test import proportion_test, proportion_test_cr, proportion_test_ctr
 from src.utils import *
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
@@ -73,7 +71,9 @@ def save_global_creative_type_tests_to_s3(
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
         print(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
+        data_shop = ping_creative_and_performance(
+            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
+        )
 
         if shop_iter % 10 == 5:
             save_csv_to_s3(
@@ -87,12 +87,16 @@ def save_global_creative_type_tests_to_s3(
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 
-        if not len(data_shop) or any([x not in data_shop.columns for x in ["impr", "creative_type", "targets_US"]]):
+        if not len(data_shop) or any(
+            [x not in data_shop.columns for x in ["impr", "creative_type", "targets_US"]]
+        ):
             continue
 
         data_shop = data_shop.loc[data_shop.targets_US == True, :]
 
-        data_shop = data_shop[(data_shop.link_clicks >= data_shop.purch) & (data_shop.impr >= data_shop.link_clicks)]
+        data_shop = data_shop[
+            (data_shop.link_clicks >= data_shop.purch) & (data_shop.impr >= data_shop.link_clicks)
+        ]
 
         for promotion in [True, False]:
             data_shop_promotion = data_shop.loc[data_shop.discounts_any.isin([promotion]), :]
