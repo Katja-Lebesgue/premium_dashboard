@@ -79,6 +79,7 @@ def ping_ads_insights_by_platform(
 
     query = query.distinct()
 
+    logger.debug(f"db type: {type(db)}")
     df = pd.read_sql(query.statement, db.bind)
 
     if conversion_json is not None:
@@ -130,7 +131,7 @@ def ping_ads_insights_all_platforms(
             end_date=end_date,
             conversion_json=conversion_json,
         )
-        logger.debug(new_df.columns)
+
         if idx == 0:
             df = new_df
         else:

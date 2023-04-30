@@ -23,7 +23,8 @@ from src.app.tabs.user_settings.reset_password import reset_password
 
 st.set_page_config(layout="wide")
 
-warnings.simplefilter(action="ignore", category=pd.core.common.SettingWithCopyWarning)
+pd.set_option("mode.chained_assignment", None)
+
 
 authenticator = authenticate()
 
