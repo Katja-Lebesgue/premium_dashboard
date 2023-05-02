@@ -29,8 +29,9 @@ def save_final(
     image_df = image_df.join(scaled_colors)
 
     full_df = perf_df.merge(image_df, on="url")
-    final_df = pd.DataFrame()
+    final_df_by_shop = pd.DataFrame()
     color_cols = [col for col in full_df.columns if col[0] == "#"]
+    assert all([perf_col in full_df.columns for perf_col in self.performance_columns])
     for perf_col in self.performance_columns:
         relative_perf_col = f"relative_{perf_col}"
         color_df = full_df.copy()
@@ -40,16 +41,18 @@ def save_final(
         sum_by_shop_and_month = color_df.groupby(group_idx)[perf_col].sum()
 
         color_df_with_full_index = color_df.set_index(full_idx)
-        relative_perf_col = pd.Series(
+        relative_perf_series = pd.Series(
             color_df_with_full_index[perf_col].div(sum_by_shop_and_month), name=relative_perf_col
         )
-        color_df = color_df_with_full_index.join(relative_perf_col).reset_index()
+
+        color_df = color_df_with_full_index.join(relative_perf_series).reset_index()
         if (color_df.groupby(["shop_id", "year_month"])[relative_perf_col].sum() - 1 > 1e-2).sum() != 0:
             logger.debug("fail")
-            break
+
         color_df = color_df.loc[
             :, color_cols + ["ad_id", "year_month", "shop_id", perf_col, relative_perf_col]
         ]
+
         noncolor_columns = [col for col in color_df.columns if col[0] != "#"]
         color_df = (
             color_df.set_index(noncolor_columns)
@@ -59,7 +62,9 @@ def save_final(
         )
         for col in [perf_col, relative_perf_col]:
             color_df[col] = color_df.apply(lambda df: df[col] * df["freq"], axis=1)
-        color_df = color_df.groupby(["year_month", "color"])[[perf_col, relative_perf_col]].sum()
-        final_df = pd.concat([final_df, color_df], axis=1)
+        color_df = color_df.groupby(["shop_id", "year_month", "color"])[[perf_col, relative_perf_col]].sum()
+        final_df_by_shop = pd.concat([final_df_by_shop, color_df], axis=1)
 
+    save_csv_to_s3(final_df_by_shop, path=self.final_by_shop_df, index=True)
+    final_df = final_df_by_shop.groupby(["color", "year_month"]).sum().drop(columns="shop_id")
     save_csv_to_s3(final_df, path=table_path, index=True)
