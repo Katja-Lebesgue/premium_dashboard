@@ -22,7 +22,7 @@ from src.utils import big_number_human_format
 
 load_dotenv()
 
-PERF_COLUMNS = ["spend", "impressions", "link_clicks", "purchases", "ctr"]
+PERF_COLUMNS = ["spend", "impr", "link_clicks", "purch", "purch_value", "ctr"]
 
 
 def image_analysis():
