@@ -16,7 +16,6 @@ PERFORMANCE_COLUMNS = ["spend", "link_clicks", "purch", "impr", "purch_value"]
 def save_final(
     self,
 ):
-    table_path = self.final_df
     perf_df = read_csv_from_s3(self.url_performance_df)
     image_df = read_csv_from_s3(self.image_df)
 
@@ -29,6 +28,7 @@ def save_final(
     image_df = image_df.join(scaled_colors)
 
     full_df = perf_df.merge(image_df, on="url")
+    full_df = full_df[full_df.shop_id != 37673090]
     final_df_by_shop = pd.DataFrame()
     color_cols = [col for col in full_df.columns if col[0] == "#"]
     assert all([perf_col in full_df.columns for perf_col in self.performance_columns])
@@ -66,5 +66,5 @@ def save_final(
         final_df_by_shop = pd.concat([final_df_by_shop, color_df], axis=1)
 
     save_csv_to_s3(final_df_by_shop, path=self.final_by_shop_df, index=True)
-    final_df = final_df_by_shop.groupby(["color", "year_month"]).sum().drop(columns="shop_id")
-    save_csv_to_s3(final_df, path=table_path, index=True)
+    final_df = final_df_by_shop.reset_index().groupby(["color", "year_month"]).sum().drop(columns=["shop_id"])
+    save_csv_to_s3(final_df, path=self.final_df, index=True)
