@@ -22,7 +22,7 @@ from src.utils import big_number_human_format
 
 load_dotenv()
 
-PERF_COLUMNS = ["spend", "impressions", "link_clicks", "purchases"]
+PERF_COLUMNS = ["spend", "impressions", "link_clicks", "purchases", "ctr"]
 
 
 def image_analysis():
@@ -30,6 +30,7 @@ def image_analysis():
     color_df = st_read_csv_from_s3(color_df_s3_path, add_global_path=True)
 
     color_df["year_month"] = color_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
+    color_df["ctr"] = color_df.link_clicks.div(color_df.impr)
 
     col, _ = st.columns([1, 2])
     with col:
@@ -65,7 +66,7 @@ def pie_charts(color_df: pd.DataFrame, add_title: bool = True) -> None:
     with col1:
         descriptive_metric = st.radio(
             "Select metric",
-            s3_image.performance_columns,
+            PERF_COLUMNS,
             format_func=lambda x: x.replace("_", " "),
             key="descriptive_metric",
         )
@@ -87,6 +88,10 @@ def pie_charts(color_df: pd.DataFrame, add_title: bool = True) -> None:
             color_discrete_map={c: c for c in color_df.color.unique()},
         )
 
+        fig.update_layout(
+            title={"text": "12 predominant colors on facebook ads in last three months", "x": 0.5}
+        )
+
         st.plotly_chart(fig)
 
 
@@ -96,7 +101,7 @@ def text_features_through_time(color_df: pd.DataFrame) -> None:
     with col1:
         performance_metric = st.selectbox(
             "Select metric",
-            s3_image.performance_columns,
+            PERF_COLUMNS,
             format_func=lambda x: x.replace("_", " "),
             key="performance_metric",
         )
@@ -118,10 +123,12 @@ def text_features_through_time(color_df: pd.DataFrame) -> None:
             x="year_month",
             y=performance_metric,
             color="color",
-            title="Performance",
+            title="Colors over time",
             color_discrete_map={c: c for c in color_df.color.unique()},
         )
 
-        fig.update_layout(barmode="stack")
+        fig.update_layout(
+            barmode="stack",
+        )
 
         st.plotly_chart(fig)
