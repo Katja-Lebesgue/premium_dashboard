@@ -9,7 +9,7 @@ class s3Image:
     top_n_ads_per_shop_and_month_by_spend = global_folder + "top_n_ads_per_shop_and_month_by_spend.csv"
     final_df = global_folder + "final.csv"
     final_by_shop_df = global_folder + "final_by_shop.csv"
-    performance_columns = ["spend", "impr", "link_clicks", "purch", "purch_value"]
+    performance_columns = ["spend_USD", "impr", "link_clicks", "purch", "purch_value"]
 
     def __init__(
         self,

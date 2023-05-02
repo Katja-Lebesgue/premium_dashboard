@@ -10,7 +10,7 @@ from src.utils import *
 db = SessionLocal()
 
 # TODO: global perf columns
-PERFORMANCE_COLUMNS = ["spend", "link_clicks", "purch", "impr", "purch_value"]
+PERFORMANCE_COLUMNS = ["spend_USD", "link_clicks", "purch", "impr", "purch_value"]
 
 
 def save_final(
