@@ -7,3 +7,4 @@ from .converters import *
 from .enum import *
 from .nlp import *
 from .s3 import *
+from .image import *

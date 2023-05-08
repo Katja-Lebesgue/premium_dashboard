@@ -22,7 +22,7 @@ load_dotenv()
 
 
 def text_analysis():
-    df = st_read_csv_from_s3("global/data/texts_2022.csv")
+    df = st_read_csv_from_s3("data/texts_2022.csv")
     df = df.copy()
     col, _ = st.columns([1, 2])
     with col:
@@ -81,12 +81,6 @@ def text_analysis():
     text_length_df_path = list_of_objects[len(list_of_objects) - 2]
     text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_path=False)
     text_length_through_time(df=text_length_df, text_col=text_col)
-
-
-@st.experimental_memo
-def st_get_text_data():
-    df = read_csv_from_s3("global/data/texts_2022.csv")
-    return df
 
 
 @st.experimental_memo
