@@ -4,7 +4,6 @@ from tqdm import tqdm
 from loguru import logger
 
 from src.database.session import SessionLocal
-from src.image_analysis.utils import *
 from src.models import *
 from src.utils import *
 
@@ -26,11 +25,11 @@ def save_ad_images_to_s3(
         if type(row["uploaded"]) is bool:
             continue
         url = row["url"]
-        img = download_image(img_url=url, convert_to_rgb=True)
-        img = shrink_image_without_distortion(img, n_pixels=self.n_pixels)
-        save_image_to_s3(img=img, path=f'{self.image_folder}/{row["uuid"]}.png')
+        image = download_image_from_url(image_url=url)
+        image = image.shrink_without_distortion(n_pixels=self.n_pixels)
+        save_image_to_s3(image=image, path=f'{self.image_folder}/{row["uuid"]}.png')
 
-        image_df.loc[idx, "uploaded"] = img is not None
+        image_df.loc[idx, "uploaded"] = image is not None
 
         if idx % n_iterations_between_save == 5:
             save_csv_to_s3(df=image_df, path=table_path, index=False)

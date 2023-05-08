@@ -4,7 +4,6 @@ from tqdm import tqdm
 from loguru import logger
 
 from src.database.session import SessionLocal
-from src.image_analysis.utils import *
 from src.models import *
 from src.utils import *
 
@@ -27,17 +26,18 @@ def add_global_centroids(
 
     basic_colors = calculate_basic_colors(full_df=full_df, n_clusters=self.n_global_centroids)
     logger.debug(f"len basic colors: {len(basic_colors)}")
-    nn = train_nn_on_basic_colors(basic_colors=basic_colors)
+    nn = MyNN(n_neighbors=1, algorithm="brute")
+    nn.fit(basic_colors)
     i = 0
     for idx, row in tqdm(image_df.iterrows(), total=len(image_df)):
         if row["uploaded"] is False or type(row["global_color_centroids"]) == dict:
             continue
-        img = read_image_from_s3(path=f'{self.image_folder}/{row["uuid"]}.png')
-        img_projected_to_basic_colors = project_image_onto_basic_colors(
-            img=img, nn=nn, n_pixels=self.n_pixels, plot=False
+        image = read_image_from_s3(path=f'{self.image_folder}/{row["uuid"]}.png')
+        image_projected_to_basic_colors = image.project_onto_basic_colors(
+            image=image, nn=nn, n_pixels=self.n_pixels, plot=False
         )
-        unpacked_img = img_projected_to_basic_colors.reshape(-1, 3).tolist()
-        color_centroids = dict(Counter(map(tuple, unpacked_img)))
+        unpacked_image = image_projected_to_basic_colors.rgb.reshape(-1, 3).tolist()
+        color_centroids = dict(Counter(map(tuple, unpacked_image)))
         try:
             assert all([color in basic_colors for color in color_centroids.keys()])
         except Exception:
@@ -74,5 +74,5 @@ def calculate_basic_colors(full_df: pd.DataFrame, n_clusters: int = 12) -> np.ar
     color_df.weight = color_df.weight.div(color_df.weight.std())
     clf = KMeans(n_clusters=n_clusters)
     clf.fit(np.array(color_df.color.tolist()), sample_weight=color_df.weight)
-    basic_colors = clf.cluster_centers_
+    basic_colors = np.array(clf.cluster_centers_).astype(int)
     return basic_colors

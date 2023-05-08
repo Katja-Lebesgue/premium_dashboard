@@ -3,14 +3,13 @@ import uuid
 import pandas as pd
 
 from src.database.session import SessionLocal
-from src.image_analysis.utils import *
 from src.models import *
 from src.utils import *
 
 db = SessionLocal()
 
 
-def initialize_image_df(
+def update_image_df(
     self,
     table_path: str = "data/fb_images/image.csv",
 ):

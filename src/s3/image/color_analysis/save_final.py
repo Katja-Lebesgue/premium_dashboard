@@ -3,7 +3,6 @@ from datetime import date, datetime
 import pandas as pd
 
 from src.database.session import SessionLocal
-from src.image_analysis.utils import *
 from src.models import *
 from src.utils import *
 
