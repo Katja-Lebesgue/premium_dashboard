@@ -27,6 +27,7 @@ PERF_COLUMNS = ["spend_USD", "impr", "link_clicks", "purch", "purch_value", "ctr
 
 def image_analysis():
     color_df_s3_path = s3_image.final_df
+    st.write(color_df_s3_path)
     color_df = st_read_csv_from_s3(color_df_s3_path, add_global_path=True)
 
     color_df["year_month"] = color_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
