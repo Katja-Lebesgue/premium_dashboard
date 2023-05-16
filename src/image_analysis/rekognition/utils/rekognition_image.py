@@ -37,9 +37,9 @@ logger = logging.getLogger(__name__)
 
 TEXT_FILTERS = {
     "WordFilter": {
-        "MinConfidence": 0.8,
-        "MinBoundingBoxWidth": 0,
-        "MinBoundingBoxHeight": 0.00,
+        "MinConfidence": 0,
+        "MinBoundingBoxWidth": 0.01,
+        "MinBoundingBoxHeight": 0.01,
     }
 }
 
@@ -120,7 +120,7 @@ class RekognitionImage(MyImage):
     # snippet-end:[python.example_code.rekognition.RekognitionImage.from_bucket]
 
     # snippet-start:[python.example_code.rekognition.DetectFaces]
-    def detect_faces(self):
+    def detect_faces(self, convert_to_dict: bool = True):
         """
         Detects faces in the image.
 
@@ -129,11 +129,14 @@ class RekognitionImage(MyImage):
         try:
             response = self.rekognition_client.detect_faces(Image=self.image, Attributes=["ALL"])
             faces = [RekognitionFace(face) for face in response["FaceDetails"]]
+            # return response['FaceDetails']
             logger.info("Detected %s faces.", len(faces))
         except ClientError:
             logger.exception("Couldn't detect faces in %s.", self.image_name)
             raise
         else:
+            if convert_to_dict:
+                faces = [face.to_dict() for face in faces]
             return faces
 
     # snippet-end:[python.example_code.rekognition.DetectFaces]
@@ -166,7 +169,7 @@ class RekognitionImage(MyImage):
     # snippet-end:[python.example_code.rekognition.CompareFaces]
 
     # snippet-start:[python.example_code.rekognition.DetectLabels]
-    def detect_labels(self, max_labels):
+    def detect_labels(self, max_labels, convert_to_dict: bool = True):
         """
         Detects labels in the image. Labels are objects and people.
 
@@ -181,6 +184,8 @@ class RekognitionImage(MyImage):
             logger.info("Couldn't detect labels in %s.", self.image_name)
             raise
         else:
+            if convert_to_dict:
+                labels = [label.to_dict() for label in labels]
             return labels
 
     # snippet-end:[python.example_code.rekognition.DetectLabels]
@@ -206,7 +211,7 @@ class RekognitionImage(MyImage):
     # snippet-end:[python.example_code.rekognition.DetectModerationLabels]
 
     # snippet-start:[python.example_code.rekognition.DetectText]
-    def detect_text(self, Filters: dict = TEXT_FILTERS):
+    def detect_text(self, Filters: dict = TEXT_FILTERS, convert_to_dict: bool = True):
         """
         Detects text in the image.
 
@@ -220,6 +225,8 @@ class RekognitionImage(MyImage):
             logger.exception("Couldn't detect text in %s.", self.image_name)
             raise
         else:
+            if convert_to_dict:
+                texts = [text.to_dict() for text in texts]
             return texts
 
     # snippet-end:[python.example_code.rekognition.DetectText]

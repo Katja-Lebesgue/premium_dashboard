@@ -1,0 +1,7 @@
+services:
+  premium_dashboard:
+    build:
+      context: .
+      dockerfile: docker/premium_dashboard.dockerfile
+    volumes:
+      - .:/app

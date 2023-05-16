@@ -121,6 +121,12 @@ class RekognitionFace:
             rendering["image_id"] = self.image_id
         if self.timestamp is not None:
             rendering["timestamp"] = self.timestamp
+        if self.confidence is not None:
+            rendering["confidence"] = self.confidence
+        if self.pose is not None:
+            rendering["pose"] = self.pose
+        if self.quality is not None:
+            rendering["quality"] = self.quality
         has = []
         if self.smile:
             has.append("smile")
@@ -255,6 +261,8 @@ class RekognitionLabel:
             rendering["parents"] = self.parents
         if self.instances is not None:
             rendering["instances"] = self.instances
+        if self.confidence is not None:
+            rendering["confidence"] = self.confidence
         return rendering
 
 
@@ -328,7 +336,7 @@ class RekognitionText:
         if self.kind is not None:
             rendering["kind"] = self.kind
         if self.geometry is not None:
-            rendering["polygon"] = self.geometry.get("Polygon")
+            rendering["geometry"] = self.geometry
         if self.confidence is not None:
             rendering["confidence"] = self.confidence
         return rendering

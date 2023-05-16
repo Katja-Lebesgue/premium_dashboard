@@ -38,7 +38,7 @@ class CRUDImage(
         )
 
     def get_random_urls(self, db: orm.Session):
-        urls = db.query(models.Image.url).filter(func.random() < 0.001).all()
+        urls = db.query(self.model.url).filter(func.random() < 0.001, self.model.source != "facebook").all()
         return [row.url for row in urls]
 
     def query_fb_ad_ids_and_image_urls_by_shop(

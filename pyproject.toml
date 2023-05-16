@@ -4,12 +4,14 @@ version = "0.1.0"
 description = ""
 authors = ["sanjin-lebesgue <sanjin@lebesgue.io>"]
 readme = "README.md"
+packages = [{include = "premium_dashboard"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+numpy = "^1.24.3"
 pandas = "1.4.3"
-opencv-python = "^4.7.0.72"
 streamlit = "1.9.2"
+opencv-python = "^4.7.0.72"
 python-dotenv = "^1.0.0"
 streamlit-option-menu = "^0.3.2"
 sqlalchemy = "1.4.35"
@@ -18,18 +20,22 @@ bcrypt = "^4.0.1"
 extra-streamlit-components = "^0.1.56"
 loguru = "^0.7.0"
 psycopg2-binary = "^2.9.6"
-emojis = "^0.7.0"
-pydantic = {extras = ["email"], version = "^1.10.7"}
+emoji = "^2.2.0"
+pydantic = "^1.10.7"
 nltk = "^3.8.1"
 langdetect = "^1.0.9"
 textblob = "^0.17.1"
 wordcloud = "^1.9.1.1"
-boto3 = "^1.26.123"
+boto3 = "^1.26.133"
 scikit-learn = "^1.2.2"
 plotly = "^5.14.1"
 seaborn = "^0.12.2"
-statsmodels = "^0.13.5"
-pyjwt = "^2.6.0"
+statsmodels = "^0.14.0"
+pyjwt = "^2.7.0"
+altair = "4.2.2"
+ipykernel = "^6.23.0"
+jupyter = "^1.0.0"
+emojis = "^0.7.0"
 
 
 [build-system]
