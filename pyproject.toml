@@ -20,7 +20,7 @@ extra-streamlit-components = "^0.1.56"
 loguru = "^0.7.0"
 psycopg2-binary = "^2.9.6"
 emoji = "^2.2.0"
-pydantic = "^1.10.7"
+pydantic = {extras = ["email"], version = "^1.10.7"}
 nltk = "^3.8.1"
 langdetect = "^1.0.9"
 textblob = "^0.17.1"
