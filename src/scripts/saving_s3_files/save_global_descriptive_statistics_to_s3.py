@@ -40,8 +40,9 @@ def save_global_descriptive_statistics_to_s3(
 
     done_shop_ids_path = folder + csv_file_name + "_done_shop_ids" + ".csv"
 
-    shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    shop_ids_query = db.query(AdCreativeFeatures.shop_id).join(Shop, on=Shop.id == AdCreativeFeatures.shop_id).filter(Shop.installed == True).distinct()
     all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
+    print(f'total of {len(all_shop_ids)}')
 
     group_cols = [
         "year_month",

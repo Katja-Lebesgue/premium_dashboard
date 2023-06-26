@@ -30,7 +30,7 @@ def main():
         print(f"updating shop id {shop_id}...")
         try:
             update_df, success = upsert_creative_by_shop_id(
-                shop_id=shop_id, update_df=update_df, end_date="2023-01-04"
+                shop_id=shop_id, update_df=update_df, end_date="2023-06-13"
             )
 
             print(f"success: {success}")

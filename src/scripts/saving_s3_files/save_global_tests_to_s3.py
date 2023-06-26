@@ -7,14 +7,14 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from src.database.session import db
-from src.scripts.saving_s3_files.save_global_creative_type_tests_to_s3 import \
-    save_global_creative_type_tests_to_s3
-from src.scripts.saving_s3_files.save_global_descriptive_statistics_to_s3 import \
-    save_global_descriptive_statistics_to_s3
-from src.scripts.saving_s3_files.save_global_feature_tests_to_s3 import \
-    save_global_feature_tests_to_s3
-from src.scripts.saving_s3_files.save_global_promotion_tests_to_s3 import \
-    save_global_promotion_tests_to_s3
+from src.scripts.saving_s3_files.save_global_creative_type_tests_to_s3 import (
+    save_global_creative_type_tests_to_s3,
+)
+from src.scripts.saving_s3_files.save_global_descriptive_statistics_to_s3 import (
+    save_global_descriptive_statistics_to_s3,
+)
+from src.scripts.saving_s3_files.save_global_feature_tests_to_s3 import save_global_feature_tests_to_s3
+from src.scripts.saving_s3_files.save_global_promotion_tests_to_s3 import save_global_promotion_tests_to_s3
 from src.utils import *
 
 
@@ -24,7 +24,7 @@ def main():
 
     end_date = date.today().strftime("%Y-%m-%d")
 
-    end_date = "2023-03-01"
+    end_date = "2023-06-01"
 
     for months in [3, 6, 12]:
         end_date_date = datetime.strptime(end_date, "%Y-%m-%d")
