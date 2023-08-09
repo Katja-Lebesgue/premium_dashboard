@@ -30,10 +30,8 @@ def main():
         print(f"updating shop id {shop_id}...")
         try:
             update_df, success = upsert_creative_by_shop_id(
-                shop_id=shop_id, update_df=update_df, end_date="2023-06-13"
+                shop_id=shop_id, update_df=update_df, end_date="2023-08-08"
             )
-
-            print(f"success: {success}")
 
             if success:
                 update_df.to_csv(update_df_path)

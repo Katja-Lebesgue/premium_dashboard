@@ -28,6 +28,7 @@ class CRUDFacebookAdset(CRUDBase[FacebookAdset, FacebookAdsetCreate, FacebookAds
             FacebookAdset.targeting["age_max"].label("age_max"),
             FacebookAdset.targeting["age_min"].label("age_min"),
             FacebookAdset.targeting["custom_audiences"].label("custom_audiences"),
+            FacebookAdset.targeting["flexible_specs"].label("flexible_specs"),
         )
 
         if shop_id is not None:

@@ -58,7 +58,6 @@ def save_global_promotion_tests_to_s3(
         logger.debug(f"we have {len(done_shop_ids)} done shop ids.")
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
         logger.debug(f"{len(shop_ids)} more to go")
-        return all_shop_ids, done_shop_ids
 
     else:
         table = pd.DataFrame(columns=idx_cols + table_columns)
@@ -74,8 +73,6 @@ def save_global_promotion_tests_to_s3(
                 path=table_path,
                 bucket=bucket,
             )
-
-            logger.debug(table)
 
             done_shop_ids = shop_ids[: shop_iter - 1]
             done_shop_ids_df = pd.DataFrame(done_shop_ids, columns=["shop_id"])

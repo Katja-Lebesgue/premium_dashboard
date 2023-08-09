@@ -61,6 +61,7 @@ def save_global_feature_tests_to_s3(
         done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
         print(f"we have {len(done_shop_ids)} done shop ids.")
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
+        logger.debug(f"{len(shop_ids)} more to go")
 
     else:
         table = pd.DataFrame(columns=idx_cols + table_columns)
@@ -88,8 +89,6 @@ def save_global_feature_tests_to_s3(
 
             done_shop_ids = shop_ids[: shop_iter - 1]
             done_shop_ids_df = pd.DataFrame(done_shop_ids, columns=["shop_id"])
-
-            logger.debug(table)
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 

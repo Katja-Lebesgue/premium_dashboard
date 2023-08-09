@@ -39,11 +39,7 @@ class CRUDFacebookDailyPerformance(
         },
         monthly: bool = True,
     ) -> Query:
-        group_columns = [
-            self.model.ad_id,
-            self.model.shop_id,
-            self.model.account_id,
-        ]
+        group_columns = [self.model.ad_id, self.model.shop_id, self.model.account_id, self.model.adset_id]
 
         performance_columns = [
             func.sum(getattr(self.model, col)).label(label) for col, label in column_label_dict.items()
