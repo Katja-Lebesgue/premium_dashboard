@@ -18,8 +18,6 @@ def descriptive_statistics(data_shop: pd.DataFrame):
         st.warning("No data")
         return
 
-    # st.write(data_shop.columns)
-
     pie_charts(data_shop.copy())
 
     text_features_through_time(data_shop)

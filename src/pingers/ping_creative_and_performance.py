@@ -11,7 +11,6 @@ from src.models import *
 from src.pingers.ping_creative import ping_creative
 
 
-# @print_execution_time
 def ping_creative_and_performance(
     db: Session,
     ad_id: str | list[str] = None,
