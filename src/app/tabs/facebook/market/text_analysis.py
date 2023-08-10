@@ -118,7 +118,7 @@ def display_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, emoji_cloud):
     display_cloud(ec)
 
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 def get_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, emoji_cloud):
     full = " ".join(df[f"concatinated_{text_col}"].tolist())
     wc = WordCloud().generate_from_text(full)
