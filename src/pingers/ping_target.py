@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from src.feature_extractors import *
 from src.models import *
-from src.utils import element_to_list
+from src.utils import element_to_list, convert_enum_to_its_value
 
 
 class Audience(str, Enum):
@@ -28,6 +28,7 @@ def ping_target(
     shop_id: str | list[str] = None,
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
+    enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):
         print("No filters in ping_target!")
@@ -65,9 +66,11 @@ def ping_target(
         return df
 
     audience_and_interests = df.targeting.apply(lambda x: deduce_audience(x))
-    logger.debug(audience_and_interests.apply(pd.Series))
     df = df.join(audience_and_interests.apply(pd.Series))
     df["gender"] = df.targeting.apply(lambda x: deduce_gender(x))
+
+    if enum_to_value:
+        df = df.applymap(convert_enum_to_its_value)
 
     return df
 

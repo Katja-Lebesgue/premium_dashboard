@@ -123,7 +123,7 @@ def f(df):
 
 
 def get_new_table_by_shop_id(db: Session, shop_id: int) -> pd.DataFrame:
-    df = ping_creative_and_performance(db=db, shop_id=shop_id)
+    df = ping_facebook_creative_and_performance(db=db, shop_id=shop_id)
 
     if any([x not in df.columns for x in ["primary", "year_month"]]):
         return pd.DataFrame()

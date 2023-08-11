@@ -71,7 +71,7 @@ def save_global_creative_type_tests_to_s3(
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
         print(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         )
 

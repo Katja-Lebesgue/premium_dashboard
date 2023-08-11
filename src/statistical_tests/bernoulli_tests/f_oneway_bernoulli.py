@@ -60,7 +60,7 @@ def f_oneway_bernoulli(positives: pd.Series | list, sizes: pd.Series | list):
 
 
 def main():
-    df = ping_creative_and_performance(shop_id="2")
+    df = ping_facebook_creative_and_performance(shop_id="2")
     samples = [get_binomial_sample(positive=positive, size=size) for positive, size in zip(positives, sizes)]
     f_moj, p_moj = f_oneway_bernoulli(positives=positives, sizes=sizes)
     print(f"moji: {[f_moj, p_moj]}")

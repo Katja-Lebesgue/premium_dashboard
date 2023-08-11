@@ -21,12 +21,20 @@ def ping_target_and_performance(
     monthly: bool = True,
     cast_to_date: bool = True,
     add_performance_columns_bool: bool = True,
+    enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):
         print("No filters in ping_target_and_performance!")
         return None
 
-    target_df = ping_target(db=db, ad_id=ad_id, shop_id=shop_id, start_date=start_date, end_date=end_date)
+    target_df = ping_target(
+        db=db,
+        ad_id=ad_id,
+        shop_id=shop_id,
+        start_date=start_date,
+        end_date=end_date,
+        enum_to_value=enum_to_value,
+    )
 
     if len(target_df) == 0:
         return target_df
@@ -41,9 +49,9 @@ def ping_target_and_performance(
     )
 
     performance_df = pd.read_sql(performance_query.statement, db.bind)
-    df = target_df.merge(performance_df, on=["adset_id", "account_id", "shop_id"])
     if add_performance_columns_bool:
-        df = add_performance_columns(df, db=db)
+        performance_df = add_performance_columns(performance_df, db=db)
+    df = target_df.merge(performance_df, on=["adset_id", "account_id", "shop_id"])
 
     if monthly and cast_to_date:
         df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))

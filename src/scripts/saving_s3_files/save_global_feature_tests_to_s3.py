@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from metadata.globals import *
 from src.models import AdCreativeFeatures
-from src.pingers import ping_creative_and_performance
+from src.pingers import ping_facebook_creative_and_performance
 from src.s3 import *
 from src.statistical_tests import *
 from src.utils import *
@@ -76,7 +76,7 @@ def save_global_feature_tests_to_s3(
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
         logger.debug(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, monthly=False
         )
 

@@ -79,7 +79,7 @@ def save_global_promotion_tests_to_s3(
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         )
 

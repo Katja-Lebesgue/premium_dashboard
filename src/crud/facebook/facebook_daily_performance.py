@@ -73,7 +73,7 @@ class CRUDFacebookDailyPerformance(
         if start_date is not None:
             query = query.filter(
                 self.model.date_start >= start_date,
-                self.model.date_start < end_date,
+                self.model.date_start <= end_date,
             )
 
         query = query.group_by(*group_columns)

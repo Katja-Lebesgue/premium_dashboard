@@ -40,9 +40,14 @@ def save_global_descriptive_statistics_to_s3(
 
     done_shop_ids_path = folder + csv_file_name + "_done_shop_ids" + ".csv"
 
-    shop_ids_query = db.query(AdCreativeFeatures.shop_id).join(Shop, on=Shop.id == AdCreativeFeatures.shop_id).filter(Shop.installed == True).distinct()
+    shop_ids_query = (
+        db.query(AdCreativeFeatures.shop_id)
+        .join(Shop, on=Shop.id == AdCreativeFeatures.shop_id)
+        .filter(Shop.installed == True)
+        .distinct()
+    )
     all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
-    print(f'total of {len(all_shop_ids)}')
+    print(f"total of {len(all_shop_ids)}")
 
     group_cols = [
         "year_month",
@@ -78,7 +83,7 @@ def save_global_descriptive_statistics_to_s3(
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
         logger.debug(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db,
             shop_id=shop_id,
             monthly=True,
@@ -112,7 +117,9 @@ def save_global_descriptive_statistics_to_s3(
 
         for col_iter, col in enumerate(descriptive_features):
             # for col_iter, col in enumerate(["target"]):
-            filtered = data_shop.loc[:, ["year_month", col] + metric_columns].rename(columns={col: "feature_value"})
+            filtered = data_shop.loc[:, ["year_month", col] + metric_columns].rename(
+                columns={col: "feature_value"}
+            )
             sum_by_month = filtered.groupby("year_month").sum()
             grouped = filtered.groupby(
                 [
@@ -122,7 +129,9 @@ def save_global_descriptive_statistics_to_s3(
             )
 
             absolute_sum = grouped.sum().loc[:, metric_columns]
-            relative_sum = (absolute_sum / sum_by_month).rename(columns=lambda col_name: col_name + "_by_shop")
+            relative_sum = (absolute_sum / sum_by_month).rename(
+                columns=lambda col_name: col_name + "_by_shop"
+            )
 
             full = absolute_sum.join(relative_sum)
 
