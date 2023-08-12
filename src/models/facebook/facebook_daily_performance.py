@@ -1,7 +1,7 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from src.database.base_class import Base
 
@@ -24,5 +24,11 @@ class FacebookDailyPerformance(Base):
     actions = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
     action_values = Column(JSONB().with_variant(sqlite.JSON, "sqlite"))
     purchases_conversion_value = Column(Numeric)
+
+    # synonyms
+    adgroup_id_ = synonym("adset_id")
+    clicks_ = synonym("link_clicks")
+    purch_ = synonym("purchases")
+    purch_value_ = synonym("purchases_conversion_value")
 
     shop = relationship("Shop", back_populates="facebook_daily_performance")

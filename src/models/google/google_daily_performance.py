@@ -1,5 +1,5 @@
 from sqlalchemy import BigInteger, Column, Date, ForeignKey, Numeric, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from src.models.google.google_base import GoogleBase
 
@@ -21,5 +21,12 @@ class GoogleDailyPerformance(GoogleBase):
     spend = Column(Numeric)
     conversions_purchase = Column(Numeric)
     conversions_value_purchase = Column(Numeric)
+
+    # synonyms
+    # TODO: provjeri s Josipom
+    adgroup_id_ = synonym("adgroup_id")
+    clicks_ = synonym("clicks")
+    purch_ = synonym("conversions_all")
+    purch_value_ = synonym("conversions_value_all")
 
     shop = relationship("Shop")

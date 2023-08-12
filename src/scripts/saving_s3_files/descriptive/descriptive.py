@@ -56,7 +56,6 @@ class Descriptive(ABC):
                     main_df = shop_descriptive_df
                 else:
                     main_df = main_df.add(shop_descriptive_df, fill_value=0)
-                logger.debug(main_df)
                 n_unsaved_shops += 1
         save_csv_to_s3(df=main_df, path=main_df_path, index=True)
         save_csv_to_s3(df=done_shop_ids, path=done_shop_ids_path)
@@ -67,9 +66,16 @@ class Descriptive(ABC):
         shop_df = self.get_shop_df(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
         shop_df["n_ads"] = 1
         shop_descriptive_df = pd.DataFrame()
-        if not len(shop_df) or not all(
-            [col in shop_df.columns for col in self.descriptive_columns + self.metric_columns]
+        if not len(shop_df) or len(
+            (
+                fale := [
+                    col
+                    for col in self.descriptive_columns + self.metric_columns
+                    if col not in shop_df.columns
+                ]
+            )
         ):
+            print(fale)
             return shop_descriptive_df
 
         for descriptive_column in self.descriptive_columns:
@@ -116,7 +122,7 @@ class Descriptive(ABC):
     s3_descriptive_folder = "descriptive"
     # TODO: change to 24 after testing is over
     n_months = 2
-    metric_columns = ["spend_USD", "impr", "link_clicks", "purch", "n_ads"]
+    metric_columns = ["spend_USD", "impr", "clicks", "purch", "purch_value", "n_ads"]
     save_every_n_shops = 15
     main_df_index = ["year_month", "feature", "feature_value"]
 

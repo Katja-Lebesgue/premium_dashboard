@@ -20,7 +20,6 @@ def ping_target_and_performance(
     end_date: str = date.today().strftime("%Y-%m-%d"),
     monthly: bool = True,
     cast_to_date: bool = True,
-    add_performance_columns_bool: bool = True,
     enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):
@@ -39,21 +38,16 @@ def ping_target_and_performance(
     if len(target_df) == 0:
         return target_df
 
-    performance_query = crud.fb_daily_performance.query_performance(
+    performance_df = crud.fb_daily_performance.get_performance(
         db=db,
         shop_id=shop_id,
         ad_id=ad_id,
         start_date=start_date,
         end_date=end_date,
         monthly=monthly,
+        cast_to_date=cast_to_date,
     )
 
-    performance_df = pd.read_sql(performance_query.statement, db.bind)
-    if add_performance_columns_bool:
-        performance_df = add_performance_columns(performance_df, db=db)
     df = target_df.merge(performance_df, on=["adset_id", "account_id", "shop_id"])
-
-    if monthly and cast_to_date:
-        df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
     return df

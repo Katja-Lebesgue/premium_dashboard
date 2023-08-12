@@ -35,24 +35,18 @@ def ping_facebook_creative_and_performance(
     if len(creative) == 0:
         return creative
 
-    performance_query = crud.fb_daily_performance.query_performance(
+    performance = crud.fb_daily_performance.get_performance(
         db=db,
         shop_id=shop_id,
         ad_id=ad_id,
         start_date=start_date,
         end_date=end_date,
         monthly=monthly,
+        cast_to_date=cast_to_date,
     )
-
-    performance = pd.read_sql(performance_query.statement, db.bind)
 
     if len(performance) == 0:
         return creative
-
-    performance = add_performance_columns(performance, db=db)
-
-    if monthly and cast_to_date:
-        performance["year_month"] = performance.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
     df = creative.merge(performance)
 
