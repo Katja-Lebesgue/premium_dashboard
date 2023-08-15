@@ -3,14 +3,17 @@ from dateutil.relativedelta import relativedelta
 import os
 from abc import ABC, abstractmethod, abstractproperty
 
+from loguru import logger
+
 from tqdm import tqdm
 from sqlalchemy.orm import Session
 
+from src.abc.descriptive import Descriptive
 from src import crud
 from src.utils import *
 
 
-class Descriptive(ABC):
+class DescriptiveSaver(Descriptive):
     # main function
     def save_to_s3(self, db: Session, end_date: date, force_from_scratch: bool = False) -> None:
         # end_date should be the last day of the month so we always
@@ -38,27 +41,27 @@ class Descriptive(ABC):
             max_done_shop_id = max(done_shop_ids)
             undone_shop_ids = active_shop_ids[active_shop_ids > max_done_shop_id]
 
-        undone_shop_ids = [16038, 44301396]
+        # FOR DEBUGGING
+        # undone_shop_ids = [16038, 44301396]
         n_unsaved_shops = 0
         for shop_id in tqdm(undone_shop_ids):
             if n_unsaved_shops == self.save_every_n_shops:
-                save_csv_to_s3(df=main_df, path=main_df_path, index=True)
-                save_csv_to_s3(df=done_shop_ids, path=done_shop_ids_path)
+                # save_csv_to_s3(df=main_df, path=main_df_path, index=True)
+                # save_csv_to_s3(df=done_shop_ids, path=done_shop_ids_path)
                 n_unsaved_shops = 0
 
-            logger.debug(f"{start_date = }, {end_date = }")
             shop_descriptive_df = self.get_shop_descriptive_df(
                 db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
             )
-            logger.debug(f"{len(shop_descriptive_df) = }")
+
             if len(shop_descriptive_df):
                 if not (len(main_df)):
                     main_df = shop_descriptive_df
                 else:
                     main_df = main_df.add(shop_descriptive_df, fill_value=0)
                 n_unsaved_shops += 1
-        save_csv_to_s3(df=main_df, path=main_df_path, index=True)
-        save_csv_to_s3(df=done_shop_ids, path=done_shop_ids_path)
+        # save_csv_to_s3(df=main_df, path=main_df_path, index=True)
+        # save_csv_to_s3(df=done_shop_ids, path=done_shop_ids_path)
 
     def get_shop_descriptive_df(
         self, db: Session, shop_id: int, start_date: date, end_date: date
@@ -66,16 +69,21 @@ class Descriptive(ABC):
         shop_df = self.get_shop_df(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
         shop_df["n_ads"] = 1
         shop_descriptive_df = pd.DataFrame()
-        if not len(shop_df) or len(
+
+        if not len(shop_df):
+            logger.debug(f"No data for shop {shop_id}.")
+            return shop_descriptive_df
+
+        if len(
             (
-                fale := [
+                missing_columns := [
                     col
                     for col in self.descriptive_columns + self.metric_columns
                     if col not in shop_df.columns
                 ]
             )
         ):
-            print(fale)
+            logger.debug(f"{missing_columns = }")
             return shop_descriptive_df
 
         for descriptive_column in self.descriptive_columns:
@@ -106,13 +114,6 @@ class Descriptive(ABC):
         return shop_descriptive_df
 
     # abstract properties and methods
-    @abstractproperty
-    def descriptive_columns(self) -> list[str]:
-        ...
-
-    @abstractproperty
-    def tag(self) -> str:
-        ...
 
     @abstractmethod
     def get_shop_df(db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
@@ -122,7 +123,7 @@ class Descriptive(ABC):
     s3_descriptive_folder = "descriptive"
     # TODO: change to 24 after testing is over
     n_months = 2
-    metric_columns = ["spend_USD", "impr", "clicks", "purch", "purch_value", "n_ads"]
+
     save_every_n_shops = 15
     main_df_index = ["year_month", "feature", "feature_value"]
 

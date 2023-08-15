@@ -37,7 +37,7 @@ class CRUDGoogleDailyPerformance(
             cast_to_date=cast_to_date,
             extra_column_names=["type"],
         )
-        df = df.rename(columns={"adgroup_id_": "adset_id"})
+        df = df.rename(columns={"adgroup_id_": "adset_id", "type": "campaign_type"})
         return df
 
 

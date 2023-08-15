@@ -4,11 +4,12 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
-from src.scripts.saving_s3_files.descriptive.descriptive import Descriptive
+from src.services.descriptive.descriptive_saver import DescriptiveSaver
+from src.abc.descriptive import FacebookCreativeDescriptive
 from src.pingers import ping_facebook_creative_and_performance
 
 
-class FacebookCreativeDescriptive(Descriptive):
+class FacebookCreativeDescriptiveSaver(DescriptiveSaver, FacebookCreativeDescriptive):
     descriptive_columns = BOOLEAN_TEXT_FEATURES
     tag = "facebook_creative"
 
@@ -22,4 +23,4 @@ class FacebookCreativeDescriptive(Descriptive):
         )
 
 
-facebook_creative_descriptive = FacebookCreativeDescriptive()
+facebook_creative_descriptive_saver = FacebookCreativeDescriptiveSaver()

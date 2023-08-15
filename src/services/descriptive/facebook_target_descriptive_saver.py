@@ -3,11 +3,12 @@ from datetime import date
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from src.scripts.saving_s3_files.descriptive.descriptive import Descriptive
+from src.services.descriptive.descriptive_saver import DescriptiveSaver
+from src.abc.descriptive import FacebookTargetDescriptive
 from src.pingers import ping_target_and_performance
 
 
-class FacebookTargetDescriptive(Descriptive):
+class FacebookTargetDescriptiveSaver(DescriptiveSaver, FacebookTargetDescriptive):
     descriptive_columns = ["target", "gender", "audience"]
     tag = "facebook_target"
 
@@ -22,4 +23,4 @@ class FacebookTargetDescriptive(Descriptive):
         )
 
 
-facebook_target_descriptive = FacebookTargetDescriptive()
+facebook_target_descriptive_saver = FacebookTargetDescriptiveSaver()

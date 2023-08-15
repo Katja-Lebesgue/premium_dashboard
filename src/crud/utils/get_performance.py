@@ -23,7 +23,7 @@ column_label_dict = {
     "purch_value_": "purch_value",
 }
 
-money_columns = ("spend", "purch")
+money_columns = ("spend", "purch_value")
 
 
 def get_performance(
