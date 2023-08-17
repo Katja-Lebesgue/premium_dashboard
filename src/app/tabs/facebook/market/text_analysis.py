@@ -22,7 +22,7 @@ load_dotenv()
 
 
 def text_analysis():
-    df = st_read_csv_from_s3("data/texts_2022.csv")
+    df = st_read_csv_from_s3("prljavo/texts_2022.csv")
     df = df.copy()
     col, _ = st.columns([1, 2])
     with col:
@@ -77,7 +77,7 @@ def text_analysis():
     st.pyplot(fig)
 
     st.subheader("Text length through time")
-    list_of_objects = pd.Series(list_objects_from_prefix(prefix="data/global/text_length")).sort_values()
+    list_of_objects = pd.Series(list_objects_from_prefix(prefix="prljavo/text_length")).sort_values()
     text_length_df_path = list_of_objects[len(list_of_objects) - 2]
     text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_path=False)
     text_length_through_time(df=text_length_df, text_col=text_col)

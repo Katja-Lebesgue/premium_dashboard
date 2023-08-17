@@ -9,5 +9,5 @@ from src.pingers import ping_facebook_creative_and_performance
 
 
 class FacebookCreativeDescriptive(Descriptive):
-    descriptive_columns = BOOLEAN_TEXT_FEATURES
+    descriptive_columns = BOOLEAN_TEXT_FEATURES + ["creative_type", "target"]
     tag = "facebook_creative"

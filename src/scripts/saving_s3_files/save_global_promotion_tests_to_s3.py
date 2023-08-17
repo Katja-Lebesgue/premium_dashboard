@@ -23,7 +23,7 @@ def save_global_promotion_tests_to_s3(
     db: Session,
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
-    folder="data/global/",
+    folder="prljavo/",
     bucket="creative-features",
     csv_file_name: str = None,
     force_from_scratch: bool = False,

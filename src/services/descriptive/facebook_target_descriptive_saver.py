@@ -9,9 +9,6 @@ from src.pingers import ping_target_and_performance
 
 
 class FacebookTargetDescriptiveSaver(DescriptiveSaver, FacebookTargetDescriptive):
-    descriptive_columns = ["target", "gender", "audience"]
-    tag = "facebook_target"
-
     def get_shop_df(self, db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
         return ping_target_and_performance(
             db=db,

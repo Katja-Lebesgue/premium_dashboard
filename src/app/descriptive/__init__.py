@@ -1,0 +1,4 @@
+from .descriptive_tab import DescriptiveTab
+from .facebook_creative_descriptive_tab import facebook_creative_descriptive_tab
+from .facebook_target_descriptive_tab import facebook_target_descriptive_tab
+from .google_campaign_type_descriptive_tab import google_campaign_type_descriptive_tab

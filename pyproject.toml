@@ -35,6 +35,8 @@ altair = "4.2.2"
 ipykernel = "^6.23.0"
 jupyter = "^1.0.0"
 emojis = "^0.7.0"
+black = "^23.7.0"
+python-intervals = "^1.10.0.post1"
 
 
 [build-system]

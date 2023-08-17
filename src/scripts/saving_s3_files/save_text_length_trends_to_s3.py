@@ -26,7 +26,7 @@ warnings.filterwarnings(
 @print_execution_time
 def save_text_length_trends_to_s3(
     db: Session,
-    folder=f"data/global/",
+    folder=f"prljavo/",
     bucket="creative-features",
     csv_file_name: str = None,
     end_date=date.today().strftime("%Y-%m-%d"),

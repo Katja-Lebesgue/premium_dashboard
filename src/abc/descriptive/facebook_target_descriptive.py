@@ -8,5 +8,6 @@ from src.pingers import ping_target_and_performance
 
 
 class FacebookTargetDescriptive(Descriptive):
-    descriptive_columns = ["target", "gender", "audience"]
+    descriptive_columns = ["target", "gender", "audience", "age_groups"]
+    explode_descriptive_columns = ["age_groups"]
     tag = "facebook_target"

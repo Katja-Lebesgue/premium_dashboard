@@ -10,9 +10,6 @@ from src.pingers import ping_facebook_creative_and_performance
 
 
 class FacebookCreativeDescriptiveSaver(DescriptiveSaver, FacebookCreativeDescriptive):
-    descriptive_columns = BOOLEAN_TEXT_FEATURES
-    tag = "facebook_creative"
-
     def get_shop_df(self, db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
         return ping_facebook_creative_and_performance(
             db=db,
@@ -20,6 +17,7 @@ class FacebookCreativeDescriptiveSaver(DescriptiveSaver, FacebookCreativeDescrip
             start_date=start_date,
             end_date=end_date,
             cast_to_date=False,
+            enum_to_value=True,
         )
 
 

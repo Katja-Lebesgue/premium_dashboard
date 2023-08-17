@@ -4,16 +4,29 @@ from enum import Enum
 from loguru import logger
 import pandas as pd
 from sqlalchemy.orm import Session
-
+import numpy as np
 from src.feature_extractors import *
 from src.models import *
-from src.utils import element_to_list, convert_enum_to_its_value
+from src.utils import element_to_list, convert_enum_to_its_value, MyInterval, recursively_apply_func
 
 
 class Audience(str, Enum):
     broad = "broad"
     lookalike = "lookalike"
     interest = "interest"
+
+
+class AgeGroup(str, Enum):
+    young = "young"
+    middle = "middle"
+    old = "old"
+
+
+agegroup_interval_dict = {
+    AgeGroup.young: MyInterval(13, 30),
+    AgeGroup.middle: MyInterval(30, 48),
+    AgeGroup.old: MyInterval(48, 65),
+}
 
 
 class Gender(str, Enum):
@@ -68,9 +81,10 @@ def ping_target(
     audience_and_interests = df.targeting.apply(lambda x: deduce_audience(x))
     df = df.join(audience_and_interests.apply(pd.Series))
     df["gender"] = df.targeting.apply(lambda x: deduce_gender(x))
+    df["age_groups"] = df.targeting.apply(lambda x: get_agegroups(x))
 
     if enum_to_value:
-        df = df.applymap(convert_enum_to_its_value)
+        df = df.applymap(lambda x: recursively_apply_func(obj=x, func=convert_enum_to_its_value))
 
     return df
 
@@ -99,3 +113,19 @@ def deduce_audience(targeting) -> Audience:
     if any(["lookalike" in ca_name.lower() for ca_name in custom_audiences_names]):
         return {"audience": Audience.lookalike, "interests": []}
     return {"audience": Audience.broad, "interests": []}
+
+
+def get_agegroups(targeting: dict) -> list[AgeGroup]:
+    age_min = targeting.get("age_min")
+    age_max = targeting.get("age_max")
+    if age_min is None or age_max is None:
+        return []
+    age_interval = MyInterval(age_min, age_max)
+    age_groups = []
+    for agegroup, agegroup_interval in agegroup_interval_dict.items():
+        if (
+            age_interval.mid in agegroup_interval
+            or (age_interval & agegroup_interval).length / agegroup_interval.length > 0.3
+        ):
+            age_groups.append(agegroup)
+    return age_groups

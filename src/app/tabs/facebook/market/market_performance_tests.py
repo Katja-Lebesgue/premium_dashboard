@@ -18,7 +18,7 @@ files_dict = {
 
 
 def market_performance_tests(
-    global_data_s3_path: str = f"data/global/",
+    global_data_s3_path: str = f"prljavo/",
 ):
     col1, col2 = st.columns(2)
 
@@ -123,7 +123,7 @@ def market_performance_tests(
             st.markdown("No promotional ads.")
 
 
-def get_global_dates(prefix: str = "data/global/global_feature"):
+def get_global_dates(prefix: str = "prljavo/global_feature"):
     list_of_paths = list_objects_from_prefix(prefix=prefix)
 
     str_from_from = lambda x: x[x.find("from") : -4] if x.find("from") > -1 else None

@@ -18,6 +18,7 @@ def ping_facebook_creative(
     ad_id: str | list[str] = None,
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
+    enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):
         raise Exception("No filters!")
@@ -69,5 +70,8 @@ def ping_facebook_creative(
     query = query.distinct(FacebookCreativeFeatures.ad_id, FacebookCreativeFeatures.shop_id)
 
     df = pd.read_sql(query.statement, db.bind)
+
+    if enum_to_value:
+        df = df.applymap(convert_enum_to_its_value)
 
     return df

@@ -1,15 +1,13 @@
 from datetime import date, datetime
 
-from loguru import logger
-from sqlalchemy import and_, case, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session, DeclarativeMeta
-from sqlalchemy.orm.query import Query
+
+from loguru import logger
 import pandas as pd
+import numpy as np
 
 
-from src.crud.utils import add_performance_columns
-from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
 from src.utils import element_to_list
@@ -86,10 +84,16 @@ def get_performance(
     if not len(df):
         return df
 
+    metric_columns = list(column_label_dict.values())
+    df[metric_columns] = df[metric_columns].fillna(0)
+
     conversion_rates_dict = get_conversion_rates_dict(db=db, account_model=account_model, shop_id=shop_id)
+    df = df[df.account_id.isin(conversion_rates_dict.keys())]
+    if not len(df):
+        return df
     for column in money_columns:
         df[f"{column}_USD"] = df.apply(
-            lambda df_: df_[column] / conversion_rates_dict[df_["account_id"]], axis=1
+            lambda df_: df_[column] / conversion_rates_dict.get(df_["account_id"], np.inf), axis=1
         )
 
     if cast_to_date and monthly:
@@ -101,9 +105,13 @@ def get_performance(
 def get_conversion_rates_dict(db: Session, account_model: DeclarativeMeta, shop_id: int | list[int]) -> dict:
     shop_id = element_to_list(shop_id)
     conversion_rates_subquery = (
-        db.query(CurrencyExchangeRate.code, CurrencyExchangeRate.rate_from_usd)
-        .order_by(CurrencyExchangeRate.code, CurrencyExchangeRate.date.desc())
-        .distinct(CurrencyExchangeRate.code)
+        db.query(
+            CurrencyExchangeRate.code,
+            CurrencyExchangeRate.rate_from_usd,
+            func.rank()
+            .over(partition_by=CurrencyExchangeRate.code, order_by=CurrencyExchangeRate.date.desc())
+            .label("date_rank"),
+        ).order_by(CurrencyExchangeRate.code, CurrencyExchangeRate.date.desc())
     ).subquery()
 
     query = (
@@ -113,7 +121,7 @@ def get_conversion_rates_dict(db: Session, account_model: DeclarativeMeta, shop_
             conversion_rates_subquery.c.rate_from_usd,
         )
         .join(conversion_rates_subquery, conversion_rates_subquery.c.code == account_model.currency)
-        .filter(account_model.shop_id.in_(shop_id))
+        .filter(account_model.shop_id.in_(shop_id), conversion_rates_subquery.c.date_rank == 1)
     )
 
     return {row.channel_account_id: row.rate_from_usd for row in query.all()}
