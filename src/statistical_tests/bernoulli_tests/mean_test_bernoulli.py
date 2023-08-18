@@ -10,7 +10,7 @@ from src.statistical_tests.get_binomial_sample import *
 from src.utils import nan_to_none, none_to_unknown
 
 
-def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> dict:
+def mean_test_bernoulli(groups_df: pd.DataFrame, convert_nan_to_none: bool = False) -> dict:
     # remove empties
     groups_df = groups_df[groups_df["size"] > 3]
 
@@ -79,9 +79,7 @@ def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> d
         }
 
     significant = p < 0.1
-
     result["conclusion"] = "significant" if significant else "insignificant"
-
     result["winner"] = groups_df.idxmax()["mean"] if significant else None
 
     return result
@@ -89,34 +87,26 @@ def mean_test_bernoulli(groups_df: dict, convert_nan_to_none: bool = False) -> d
 
 def mean_test_bernoulli_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
     groups_df = create_groups_df(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
-
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
-
     return result
 
 
 def mean_test_bernoulli_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
     groups_df = create_groups_df(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
-
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
-
     return result
 
 
 def create_groups_df(df: pd.DataFrame, group_col: str, size_col: str, positive_col: str) -> pd.DataFrame:
     df[group_col] = df[group_col].fillna("unknown")
-
     values = df[group_col].value_counts(dropna=False).index
-
     groups_df = pd.DataFrame(0, index=values, columns=["positive", "size"])
-
     for value in values:
         filtered_df = df[df[group_col] == value]
         size = filtered_df[size_col].sum()
         positive = filtered_df[positive_col].sum()
         groups_df.loc[value, "positive"] = positive
         groups_df.loc[value, "size"] = size
-
     return groups_df
 
 

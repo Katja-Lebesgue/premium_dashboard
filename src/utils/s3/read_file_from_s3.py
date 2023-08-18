@@ -15,9 +15,9 @@ def read_csv_from_s3(
     client=s3_client,
     bucket="creative-features",
     evaluate=True,
-    add_global_path: bool = True,
+    add_global_folder: bool = True,
 ):
-    if add_global_path:
+    if add_global_folder:
         path = add_global_s3_folder(path)
 
     object = client.get_object(Bucket=bucket, Key=path)
@@ -34,9 +34,9 @@ def read_json_from_s3(
     path: str,
     client=s3_client,
     bucket="creative-features",
-    add_global_path: bool = True,
+    add_global_folder: bool = True,
 ):
-    if add_global_path:
+    if add_global_folder:
         path = add_global_s3_folder(path)
 
     object = client.get_object(Bucket=bucket, Key=path)
@@ -50,10 +50,10 @@ def read_image_from_s3(
     path: str,
     client=s3_client,
     bucket="creative-features",
-    add_global_path: bool = True,
+    add_global_folder: bool = True,
 ):
     image_bytes = read_image_bytes_from_s3(
-        path=path, client=client, bucket=bucket, add_global_path=add_global_path
+        path=path, client=client, bucket=bucket, add_global_folder=add_global_folder
     )
 
     file_name, _ = os.path.splitext(os.path.basename(path))
@@ -65,9 +65,9 @@ def read_image_bytes_from_s3(
     path: str,
     client=s3_client,
     bucket="creative-features",
-    add_global_path: bool = True,
+    add_global_folder: bool = True,
 ):
-    if add_global_path:
+    if add_global_folder:
         path = add_global_s3_folder(path)
     object = client.get_object(Bucket=bucket, Key=path)
     image_bytes = bytearray(object["Body"].read())

@@ -48,6 +48,6 @@ def manage_user_privileges():
         st.experimental_rerun()
 
 
-@st.experimental_memo
+@st.cache_data
 def st_ping_shops():
     return crud.shop.ping_all(db=db)

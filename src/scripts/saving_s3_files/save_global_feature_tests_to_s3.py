@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from metadata.globals import *
 from src.models import AdCreativeFeatures
-from src.pingers import ping_creative_and_performance
+from src.pingers import ping_facebook_creative_and_performance
 from src.s3 import *
 from src.statistical_tests import *
 from src.utils import *
@@ -26,7 +26,7 @@ def save_global_feature_tests_to_s3(
     db: Session,
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
-    folder="data/global/",
+    folder="prljavo/",
     bucket="creative-features",
     csv_file_name: str = None,
     force_from_scratch: bool = False,
@@ -61,6 +61,7 @@ def save_global_feature_tests_to_s3(
         done_shop_ids = read_csv_from_s3(path=done_shop_ids_path, bucket=bucket)["shop_id"].astype(int)
         print(f"we have {len(done_shop_ids)} done shop ids.")
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
+        logger.debug(f"{len(shop_ids)} more to go")
 
     else:
         table = pd.DataFrame(columns=idx_cols + table_columns)
@@ -75,7 +76,7 @@ def save_global_feature_tests_to_s3(
     for shop_iter, shop_id in tqdm(enumerate(shop_ids), total=len(shop_ids)):
         logger.debug(f"shop_id: {shop_id}")
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, monthly=False
         )
 
@@ -88,8 +89,6 @@ def save_global_feature_tests_to_s3(
 
             done_shop_ids = shop_ids[: shop_iter - 1]
             done_shop_ids_df = pd.DataFrame(done_shop_ids, columns=["shop_id"])
-
-            logger.debug(table)
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 

@@ -5,10 +5,12 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from src.utils import *
 
-from src import crud, utils
+from src import crud
 
 
-def add_performance_columns(performance: pd.DataFrame, db: Session) -> pd.DataFrame:
+def add_performance_columns(
+    db: Session, performance: pd.DataFrame, cast_to_date: bool = False
+) -> pd.DataFrame:
     if len(performance) == 0:
         return performance
 
@@ -17,14 +19,14 @@ def add_performance_columns(performance: pd.DataFrame, db: Session) -> pd.DataFr
     performance.fillna(0, inplace=True)
     performance.replace(to_replace="None", value=0, inplace=True)
 
-    performance["ctr"] = performance.apply(lambda df: df.link_clicks / df.impr if df.impr else np.nan, axis=1)
-    performance["cr"] = performance.apply(
-        lambda df: df.purch / df.link_clicks if df.link_clicks else np.nan, axis=1
-    )
+    # performance["ctr"] = performance.apply(lambda df: df.link_clicks / df.impr if df.impr else np.nan, axis=1)
+    # performance["cr"] = performance.apply(
+    #     lambda df: df.purch / df.link_clicks if df.link_clicks else np.nan, axis=1
+    # )
 
-    performance["roas"] = performance.apply(
-        lambda df: df.purch_value / df.spend if df.spend else np.nan, axis=1
-    )
+    # performance["roas"] = performance.apply(
+    #     lambda df: df.purch_value / df.spend if df.spend else np.nan, axis=1
+    # )
 
     int_cols = ["impr", "link_clicks", "purch"]
 
@@ -43,5 +45,8 @@ def add_performance_columns(performance: pd.DataFrame, db: Session) -> pd.DataFr
         ),
         axis=1,
     )
+
+    if cast_to_date and "year_month" in performance.columns:
+        performance["year_month"] = performance.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 
     return performance

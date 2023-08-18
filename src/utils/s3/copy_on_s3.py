@@ -1,18 +1,26 @@
+import os
+from loguru import logger
 from src.utils.s3.utils import s3_client, list_objects_from_prefix
+from src.utils.common import print_dict
+import botocore
 
 
 def copy_on_s3(
     original_prefix: str,
-    copy_prefix: str,
-    add_global_path: bool = False,
-    client=s3_client,
-    bucket: str = "creative-features",
+    target_prefix: str,
+    add_global_folder: bool = False,
+    s3_client=s3_client,
+    bucket: str = os.getenv("S3_BUCKET"),
 ):
-    list_of_objects = list_objects_from_prefix(prefix=original_prefix, add_global_folder=add_global_path)
+    if add_global_folder:
+        original_prefix = add_global_folder(original_prefix)
+        target_prefix = add_global_folder(target_prefix)
 
-    for key in list_of_objects:
-        short_key = key[len(original_prefix) :]
-        copy_source = {"Bucket": bucket, "Key": key}
-        new_key = copy_prefix + short_key
-        print(new_key)
-        client.copy(copy_source, bucket, new_key)
+    object_paths = list_objects_from_prefix(prefix=original_prefix, add_global_folder=False)
+    for obj_path in object_paths:
+        copy_source = {
+            "Bucket": bucket,
+            "Key": obj_path,
+        }
+        new_path = os.path.join(target_prefix, obj_path.removeprefix(original_prefix).removeprefix("/"))
+        s3_client.copy(copy_source, bucket, new_path)

@@ -22,7 +22,7 @@ load_dotenv()
 
 
 def text_analysis():
-    df = st_read_csv_from_s3("data/texts_2022.csv")
+    df = st_read_csv_from_s3("prljavo/texts_2022.csv")
     df = df.copy()
     col, _ = st.columns([1, 2])
     with col:
@@ -37,7 +37,7 @@ def text_analysis():
         st.markdown("#")
         st.markdown("##### All industries", unsafe_allow_html=True)
         st.markdown("######")
-        display_word_and_emoji_cloud(df=sbs, text_col=text_col, emoji_cloud=emoji_cloud)
+        display_word_and_emoji_cloud(df=sbs, text_col=text_col, _emoji_cloud=emoji_cloud)
         market_collocations = get_sorted_collocations(df=sbs, min_shops_using_phrase=5)
         st.write("Most common phrases")
         st.write(" | ".join(market_collocations))
@@ -46,7 +46,7 @@ def text_analysis():
         grouped_by_industry = sbs.groupby("industry")
         industry = st.selectbox(label="Choose industry", options=sorted(df.industry.unique()))
         df = grouped_by_industry.get_group(industry)
-        display_word_and_emoji_cloud(df=df, text_col=text_col, emoji_cloud=emoji_cloud)
+        display_word_and_emoji_cloud(df=df, text_col=text_col, _emoji_cloud=emoji_cloud)
         collocations = get_sorted_collocations(df=df, min_shops_using_phrase=2)
         st.write("Most common phrases")
         collocations_md = ""
@@ -77,13 +77,13 @@ def text_analysis():
     st.pyplot(fig)
 
     st.subheader("Text length through time")
-    list_of_objects = pd.Series(list_objects_from_prefix(prefix="data/global/text_length")).sort_values()
+    list_of_objects = pd.Series(list_objects_from_prefix(prefix="prljavo/text_length")).sort_values()
     text_length_df_path = list_of_objects[len(list_of_objects) - 2]
-    text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_path=False)
+    text_length_df = st_read_csv_from_s3(text_length_df_path, add_global_folder=False)
     text_length_through_time(df=text_length_df, text_col=text_col)
 
 
-@st.experimental_memo
+@st.cache_data
 def get_samples_by_shop(df: pd.DataFrame, text_col: str) -> pd.DataFrame:
     df = df[df[text_col].apply(lambda x: len(x) > 0)]
     df[f"concatinated_{text_col}"] = df[text_col].apply(lambda x: " ".join(x))
@@ -110,19 +110,19 @@ def get_samples_by_shop(df: pd.DataFrame, text_col: str) -> pd.DataFrame:
     return sbs, sentiment.columns
 
 
-def display_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, emoji_cloud):
-    wc, ec = get_word_and_emoji_cloud(df, text_col, emoji_cloud)
+def display_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
+    wc, ec = get_word_and_emoji_cloud(df, text_col, _emoji_cloud)
     st.write("Word cloud")
     display_cloud(wc)
     st.write("Emoji cloud")
     display_cloud(ec)
 
 
-# @st.cache(allow_output_mutation=True)
-def get_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, emoji_cloud):
+@st.cache_data
+def get_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
     full = " ".join(df[f"concatinated_{text_col}"].tolist())
     wc = WordCloud().generate_from_text(full)
-    ec = emoji_cloud.generate(full)
+    ec = _emoji_cloud.generate(full)
     logger.debug("Opet wc!")
     return wc, ec
 
@@ -142,7 +142,7 @@ def get_sorted_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 2):
     return sorted_collocations
 
 
-@st.experimental_memo
+@st.cache_data
 def get_collocations(df: pd.DataFrame, min_shops_using_phrase: int = 1):
     all_word_tokens = sum(df.word_tokens.tolist(), [])
     all_word_tokens = [token for token in all_word_tokens if "_" not in token]

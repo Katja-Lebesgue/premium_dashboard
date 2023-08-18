@@ -6,3 +6,4 @@ from .shop import Shop
 from .shopify import *
 from .streamlit import *
 from .tiktok import *
+from .crm import Crm

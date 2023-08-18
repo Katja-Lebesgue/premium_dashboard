@@ -11,46 +11,35 @@ import pandas as pd
 import signal
 import time
 from matplotlib import pyplot as plt
-
-# import colorsys
-# from sqlalchemy import func
-
-import boto3
-
+import colorsys
 from sqlalchemy import func
 
-import os
-import pandas as pd
-from shapely.geometry import Polygon
-from src.models import *
-from src import crud
-from src.pingers import *
-from src.database.session import db
-from src.image_analysis.rekognition.RekognitionImage import *
-from src.s3.image import s3_image
 import boto3
-from tqdm import tqdm
-import random
-import uuid
+from botocore.exceptions import NoCredentialsError
+import requests
+import mimetypes
+from src.utils import add_two_dicts
+from itertools import product
+from src.crud import image as cr_image
+from src.models import *
+from src.database.session import db
 
-# from botocore.exceptions import NoCredentialsError
-# import requests
-# import mimetypes
-# from src.utils import add_two_dicts
-# from itertools import product
-# from src.crud import image as cr_image
-# from src.models import *
-# from src.database.session import db
-from src.image_analysis.rekognition.utils import *
+from src.s3 import *
+from src.pingers import ping_ads_insights_all_platforms
 
-# from src.s3 import *
-
-# from src.image_analysis.utils import *
+from src.image_analysis.utils import *
 
 if __name__ == "__main__":
-    with open(f'{os.getenv("GLOBAL_PATH_TO_REPO")}/data/bernardo.png', "rb") as f:
-        image_bytes = bytearray(f.read())
-        A = MyRekognitionImage(image_bytes=image_bytes)
-
-    labels = A.get_faces()
-    print(labels)
+    # s3_image.save_urls_and_performance_to_s3(db=db, force_from_scratch=False)
+    # s3_image.filter_and_save_top_n_ads_per_shop_and_month_by_spend()
+    # s3_image.initialize_image_df()
+    # s3_image.save_ad_images_to_s3()
+    # s3_image.add_local_centroids()
+    # s3_image.add_global_centroids(force_from_scratch=True)
+    # s3_image.save_final()
+    # shop_id = 20347698
+    # df = cr_image.ping_fb_urls_by_shop(
+    #     db=db,
+    #     shop_id=shop_id,
+    # )
+    ping_ads_insights_all_platforms(db=db)

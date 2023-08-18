@@ -16,6 +16,12 @@ from src.utils import *
 def all_platforms():
     st.markdown(hide_dataframe_row_index, unsafe_allow_html=True)
     df = st_ping_ads_insights(get_industry=True, columns=["spend", "revenue"])
+
+    try:
+        df.to_csv(f"{os.getenv('GLOBAL_PATH_TO_REPO')}/data/ads_insights.csv", index=False)
+        logger.debug("saved it!")
+    except Exception:
+        pass
     df = df[~df.shop_id.isin([50517862, 39831581])]
 
     df = df.groupby(["shop_id", "year_month", "industry"]).sum().reset_index()
@@ -62,7 +68,7 @@ def all_platforms():
     platform_spend_through_time(df=df)
 
 
-@st.experimental_memo
+@st.cache_data
 def st_ping_ads_insights(**kwargs):
     return ping_ads_insights_all_platforms(db=db, **kwargs)
 

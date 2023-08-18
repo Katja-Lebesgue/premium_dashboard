@@ -23,7 +23,7 @@ def save_global_promotion_tests_to_s3(
     db: Session,
     start_date: str = "2015-01-01",
     end_date: str = datetime.strftime(datetime.today(), "%Y-%m-%d"),
-    folder="data/global/",
+    folder="prljavo/",
     bucket="creative-features",
     csv_file_name: str = None,
     force_from_scratch: bool = False,
@@ -58,7 +58,6 @@ def save_global_promotion_tests_to_s3(
         logger.debug(f"we have {len(done_shop_ids)} done shop ids.")
         shop_ids = all_shop_ids[~all_shop_ids.isin(done_shop_ids)]
         logger.debug(f"{len(shop_ids)} more to go")
-        return all_shop_ids, done_shop_ids
 
     else:
         table = pd.DataFrame(columns=idx_cols + table_columns)
@@ -75,14 +74,12 @@ def save_global_promotion_tests_to_s3(
                 bucket=bucket,
             )
 
-            logger.debug(table)
-
             done_shop_ids = shop_ids[: shop_iter - 1]
             done_shop_ids_df = pd.DataFrame(done_shop_ids, columns=["shop_id"])
 
             save_csv_to_s3(df=done_shop_ids_df, bucket=bucket, path=done_shop_ids_path)
 
-        data_shop = ping_creative_and_performance(
+        data_shop = ping_facebook_creative_and_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         )
 

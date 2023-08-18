@@ -6,7 +6,12 @@ import pandas as pd
 
 load_dotenv()
 
+import nltk
 
+nltk.download("vader_lexicon")
+nltk.download("stopwords")
+
+from src.app import *
 from src.app.authenticate import authenticate, is_admin
 from src.app.tabs.admin_settings.admin_settings import admin_settings
 from src.app.tabs.all_platforms import all_platforms
@@ -82,18 +87,22 @@ if st.session_state["authentication_status"]:
                 market_subtab = option_menu(
                     menu_title="Market",
                     options=[
-                        "Descriptive statistics",
+                        "Creative descriptive",
+                        "Target descriptive",
                         "Default performance tests",
                         "Text analysis",
                         "Image analysis",
                     ],
                     menu_icon="globe",
-                    icons=["pie-chart-fill", "lightning-fill", "cursor-text", "card-image"],
+                    icons=["brush", "bullseye", "lightning-fill", "cursor-text", "card-image"],
                     default_index=0,
                 )
 
-            if market_subtab == "Descriptive statistics":
-                market_descriptive_statistics()
+            if market_subtab == "Creative descriptive":
+                facebook_creative_descriptive_tab.show()
+
+            if market_subtab == "Target descriptive":
+                facebook_target_descriptive_tab.show()
 
             if market_subtab == "Default performance tests":
                 market_performance_tests()
@@ -115,7 +124,7 @@ if st.session_state["authentication_status"]:
             )
 
         if google_subtab == "Descriptive statistics":
-            google_market_descriptive_statistics()
+            google_campaign_type_descriptive_tab.show()
 
     if main_tab == "Settings":
         if is_admin():

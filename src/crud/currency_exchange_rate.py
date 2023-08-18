@@ -70,6 +70,7 @@ class CRUDCurrencyExchangeRate(
             .order_by(self.model.code, self.model.date.desc())
             .distinct(self.model.code)
         )
+        print(query)
         return query
 
     def ping_current_rates_dict(self, db: Session) -> dict:

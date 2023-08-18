@@ -3,6 +3,7 @@ import os
 import boto3
 from dotenv import load_dotenv
 from enum import Enum
+from loguru import logger
 
 load_dotenv()
 

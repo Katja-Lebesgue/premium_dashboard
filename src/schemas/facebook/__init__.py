@@ -8,3 +8,4 @@ from .facebook_api import *
 from .facebook_campaign import *
 from .facebook_customaudience import *
 from .facebook_daily_performance import *
+from .facebook_creative_features import *

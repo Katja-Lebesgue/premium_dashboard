@@ -18,7 +18,7 @@ files_dict = {
 
 
 def market_performance_tests(
-    global_data_s3_path: str = f"data/global/",
+    global_data_s3_path: str = f"prljavo/",
 ):
     col1, col2 = st.columns(2)
 
@@ -72,7 +72,7 @@ def market_performance_tests(
 
         promotion_table = create_test_table(global_promotion_tests_df)
         promotion_table_style = style_feature_test_table(promotion_table)
-        st.dataframe(promotion_table_style)
+        st.write(promotion_table_style.to_html(escape=False), unsafe_allow_html=True)
 
     st.empty()
 
@@ -123,7 +123,7 @@ def market_performance_tests(
             st.markdown("No promotional ads.")
 
 
-def get_global_dates(prefix: str = "data/global/global_feature"):
+def get_global_dates(prefix: str = "prljavo/global_feature"):
     list_of_paths = list_objects_from_prefix(prefix=prefix)
 
     str_from_from = lambda x: x[x.find("from") : -4] if x.find("from") > -1 else None
@@ -135,7 +135,7 @@ def get_global_dates(prefix: str = "data/global/global_feature"):
     return global_dates
 
 
-@st.experimental_memo
+@st.cache_data
 def st_read_csv_from_s3(*args, **kwargs):
     df = read_csv_from_s3(*args, **kwargs)
 
@@ -162,12 +162,12 @@ def display_test_tables(global_feature_tests_df: pd.DataFrame, global_creative_t
         filtered_df = global_feature_tests_df.loc[global_feature_tests_df.feature == feature, :]
         test_table = create_test_table(filtered_df)
         test_table_style = style_feature_test_table(test_table)
-        st.dataframe(test_table_style)
+        st.write(test_table_style.to_html(escape=False), unsafe_allow_html=True)
 
     st.write("Creative type")
     creative_type_test_table = create_creative_type_test_table(global_creative_type_tests_df)
     creative_type_test_table_style = style_creative_type_test_table(creative_type_test_table)
-    st.dataframe(creative_type_test_table_style)
+    st.write(creative_type_test_table_style.to_html(escape=False), unsafe_allow_html=True)
 
 
 def create_test_table(df: pd.DataFrame) -> pd.DataFrame:

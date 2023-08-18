@@ -1,16 +1,14 @@
 from datetime import date, datetime
 
 import pytz
-from sqlalchemy import (BigInteger, Boolean, Column, ForeignKey, Sequence,
-                        String)
+from sqlalchemy import BigInteger, Boolean, Column, ForeignKey, Sequence, String
 from sqlalchemy.dialects import sqlite
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 
 from src.database.base_class import Base
 
 
 class GoogleAdAccount(Base):
-
     id = Column(
         BigInteger().with_variant(sqlite.INTEGER, "sqlite"),
         Sequence("hibernate_sequence"),
@@ -26,6 +24,9 @@ class GoogleAdAccount(Base):
     login_customer_id = Column(BigInteger)
 
     shop = relationship("Shop", back_populates="google_ad_accounts")
+
+    # synonyms
+    channel_account_id = synonym("google_id")
 
     @property
     def date_now(self) -> date:

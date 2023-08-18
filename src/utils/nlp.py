@@ -9,8 +9,8 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 from wordcloud import WordCloud
 
-nltk.download("vader_lexicon")
-nltk.download("stopwords")
+# nltk.download("vader_lexicon")
+# nltk.download("stopwords")
 
 
 def detect_language(text: str) -> None | str:
