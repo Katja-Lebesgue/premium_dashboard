@@ -22,12 +22,14 @@ def all_platforms():
         logger.debug("saved it!")
     except Exception:
         pass
+
     df = df[~df.shop_id.isin([50517862, 39831581])]
 
     df = df.groupby(["shop_id", "year_month", "industry"]).sum().reset_index()
+
     shop_size = (
-        df.groupby(["shop_id"])
-        .mean()["total_revenue"]
+        df.groupby(["shop_id"])["total_revenue"]
+        .mean()
         .reset_index()
         .rename(columns={"total_revenue": "mean_monthly_revenue"})
     )
@@ -75,7 +77,7 @@ def st_ping_ads_insights(**kwargs):
 
 def display_spend_statistics(df: pd.DataFrame, bins=list[float]):
     st.header(f"Total marketing budget: {big_number_human_format(df.total_spend.sum())}")
-    df = df.groupby(["shop_id", "industry"]).mean().reset_index()
+    df = df.groupby(["shop_id", "industry"]).mean(numeric_only=True).reset_index()
     col_budget1, col_budget2 = st.columns(2)
 
     fig = go.Figure(
@@ -123,7 +125,7 @@ def display_platform_table(df: pd.DataFrame):
         shops = filtered.shop_id.nunique()
         shops_prc = shops / num_shops
         spend = filtered[f"{platform}_spend"].sum()
-        monthly_spend = filtered.groupby(["shop_id", "industry"]).median()[f"{platform}_spend"].median()
+        monthly_spend = filtered.groupby(["shop_id", "industry"])[f"{platform}_spend"].median().median()
         row = {
             "platform": platform,
             # "shops": shops,
@@ -149,7 +151,7 @@ def display_platform_table(df: pd.DataFrame):
 
 
 def display_combinations_table(df: pd.DataFrame):
-    df = df.groupby(["shop_id", "industry"]).sum().copy()
+    df = df.groupby(["shop_id", "industry"]).sum(numeric_only=True).copy()
 
     table = pd.DataFrame(columns=["combination", "shops", "budget_split"])
     platform_combinations = get_all_subsets(PLATFORMS)
@@ -253,7 +255,7 @@ def platform_spend_through_time(df: pd.DataFrame):
         bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 
         if bar_height == "Relative":
-            monthly = a.reset_index().groupby("year_month").sum()
+            monthly = a.reset_index().groupby("year_month").sum(numeric_only=True)
             a = a / monthly
 
         a = pd.DataFrame(a).reset_index()
