@@ -35,7 +35,7 @@ class DescriptiveTab(Descriptive):
 
     def show(self) -> None:
         st.markdown(hide_table_row_index(), unsafe_allow_html=True)
-        main_df = self.get_most_recent_descriptive_df()
+        main_df = self.get_most_recent_descriptive_df(tag=self.tag, convert_str_to_date=True)
 
         col1, _ = st.columns([1, 2])
         with col1:
@@ -48,19 +48,24 @@ class DescriptiveTab(Descriptive):
         if analysis_type == "by shop":
             main_df = main_df.drop(columns=self.metric_columns)
             main_df = main_df.rename(columns={col + "_by_shop": col for col in self.metric_columns})
-            main_df[self.metric_columns] = main_df[self.metric_columns].divide(main_df.n_shops, axis=0)
+            # TODO: normalise
+            # n_shops_per_month = main_df[main_df.feature == self.fake_column_for_total_sum_name].set_index(
+            #     ["year_month"]
+            # )["n_shops"]
+            # main_df[self.metric_columns] = (
+            #     main_df.set_index("year_month")[self.metric_columns].divide(n_shops_per_month).reset_index()
+            # )[self.metric_columns]
             pie_func = "mean"
         else:
             pie_func = "sum"
 
-        st.write(main_df.feature.unique())
         self.pie_charts(main_df=main_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
 
         self.descriptive_features_through_time(main_df=main_df)
 
     @st.cache_data
-    def get_most_recent_descriptive_df(_self, convert_str_to_date: bool = True):
-        main_df_path_prefix = os.path.join(_self.s3_descriptive_folder, _self.tag)
+    def get_most_recent_descriptive_df(_self, tag: str, convert_str_to_date: bool = True):
+        main_df_path_prefix = os.path.join(_self.s3_descriptive_folder, tag)
         list_of_objects = list_objects_from_prefix(prefix=main_df_path_prefix)
         # we take the penultimate element (since the last one is the corresponding done_shop_ids)
         main_df_path = sorted(list_of_objects)[len(list_of_objects) - 3]
@@ -77,6 +82,7 @@ class DescriptiveTab(Descriptive):
             main_df.year_month.drop_duplicates().nlargest(n=self.last_n_months).sort_values()
         )
         main_df = main_df[main_df.year_month.isin(last_n_months_series.tolist())]
+
         col1, col2 = st.columns([1, 4])
 
         with col1:
@@ -142,7 +148,7 @@ class DescriptiveTab(Descriptive):
                     "font": {"size": 25},
                 }
             else:
-                title = None
+                title = {}
 
             fig.update_traces(
                 textposition="inside",
@@ -155,7 +161,6 @@ class DescriptiveTab(Descriptive):
 
     def descriptive_features_through_time(self, main_df: pd.DataFrame) -> None:
         col1, col2 = st.columns([1, 3])
-
         with col1:
             selected_feature = st.selectbox(
                 "Select feature",
@@ -211,7 +216,6 @@ def add_pie_subplot(
     func: Literal["sum", "mean"],
 ):
     pie_df = df[df.feature == descriptive_column]
-
     pie_df = pd.DataFrame(getattr(pie_df.groupby("feature_value")[metric], func)()).reset_index()
 
     if descriptive_column.startswith("n_"):
