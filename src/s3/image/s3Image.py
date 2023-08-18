@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 
 class s3Image:
-    fb_images_folder = "data/fb_images/"
+    fb_images_folder = "fb_images/"
     color_analysis_folder = fb_images_folder + "color_analysis/"
     image_folder = color_analysis_folder + "images_1000px"
     url_performance_df = fb_images_folder + "url_performance.csv"
