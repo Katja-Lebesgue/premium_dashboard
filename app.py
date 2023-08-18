@@ -89,7 +89,7 @@ if st.session_state["authentication_status"]:
                         "Image analysis",
                     ],
                     menu_icon="globe",
-                    icons=["pie-chart-fill", "pie-chart-fill", "lightning-fill", "cursor-text", "card-image"],
+                    icons=["brush", "bullseye", "lightning-fill", "cursor-text", "card-image"],
                     default_index=0,
                 )
 

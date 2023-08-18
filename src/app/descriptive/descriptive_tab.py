@@ -53,18 +53,19 @@ class DescriptiveTab(Descriptive):
         else:
             pie_func = "sum"
 
-        logger.debug(main_df)
+        st.write(main_df.feature.unique())
         self.pie_charts(main_df=main_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
 
         self.descriptive_features_through_time(main_df=main_df)
 
-    def get_most_recent_descriptive_df(self, convert_str_to_date: bool = True):
-        main_df_path_prefix = os.path.join(self.s3_descriptive_folder, self.tag)
+    @st.cache_data
+    def get_most_recent_descriptive_df(_self, convert_str_to_date: bool = True):
+        main_df_path_prefix = os.path.join(_self.s3_descriptive_folder, _self.tag)
         list_of_objects = list_objects_from_prefix(prefix=main_df_path_prefix)
         # we take the penultimate element (since the last one is the corresponding done_shop_ids)
         main_df_path = sorted(list_of_objects)[len(list_of_objects) - 3]
         logger.debug(main_df_path)
-        main_df = read_csv_from_s3(path=main_df_path, add_global_path=False)
+        main_df = read_csv_from_s3(path=main_df_path, add_global_folder=False)
         if convert_str_to_date:
             main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         return main_df

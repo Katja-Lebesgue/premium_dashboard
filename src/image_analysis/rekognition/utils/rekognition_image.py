@@ -59,7 +59,7 @@ class RekognitionImage(MyImage):
         url: str | None = None,
         bucket: str = "creative-features",
         path: str | None = None,
-        add_global_path: bool = True,
+        add_global_folder: bool = True,
     ):
         """
         Initializes the image object.
@@ -71,7 +71,9 @@ class RekognitionImage(MyImage):
         """
 
         if path is not None:
-            image_bytes = read_image_bytes_from_s3(path=path, add_global_path=add_global_path, bucket=bucket)
+            image_bytes = read_image_bytes_from_s3(
+                path=path, add_global_folder=add_global_folder, bucket=bucket
+            )
             if name is None:
                 name, _ = os.path.splitext(os.path.basename(path))
 

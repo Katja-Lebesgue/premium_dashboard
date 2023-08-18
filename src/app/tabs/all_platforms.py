@@ -68,7 +68,7 @@ def all_platforms():
     platform_spend_through_time(df=df)
 
 
-@st.experimental_memo
+@st.cache_data
 def st_ping_ads_insights(**kwargs):
     return ping_ads_insights_all_platforms(db=db, **kwargs)
 

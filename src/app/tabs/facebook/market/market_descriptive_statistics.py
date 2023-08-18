@@ -29,7 +29,7 @@ def market_descriptive_statistics(
 
     descriptive_df_path = list_of_objects[len(list_of_objects) - 2]
 
-    descriptive_df = read_csv_from_s3(descriptive_df_path, add_global_path=False)
+    descriptive_df = read_csv_from_s3(descriptive_df_path, add_global_folder=False)
 
     descriptive_df["year_month"] = descriptive_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
 

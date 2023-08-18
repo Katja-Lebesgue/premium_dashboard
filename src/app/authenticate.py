@@ -47,7 +47,7 @@ def authenticate():
     return authenticator
 
 
-# @st.experimental_memo
+# @st.cache_data
 def get_username_config():
     try:
         user_data = db.query(StreamlitUser).all()

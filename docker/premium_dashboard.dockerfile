@@ -16,4 +16,6 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 COPY . /app
 
+RUN python3.10 -c "import nltk; nltk.download('punkt'); nltk.download('vader_lexicon');"
+
 CMD ["sleep", "infinity"]

@@ -1,18 +1,31 @@
-from src.utils.s3.utils import s3_client, list_objects_from_prefix
+import os
+from loguru import logger
+from src.utils.s3.utils import s3_resource, list_objects_from_prefix
+from src.utils.common import print_dict
+import botocore
 
 
 def copy_on_s3(
     original_prefix: str,
-    copy_prefix: str,
-    add_global_path: bool = False,
-    client=s3_client,
-    bucket: str = "creative-features",
+    target_prefix: str,
+    add_global_folder: bool = False,
+    s3_resource=s3_resource,
+    bucket: str = os.getenv("S3_BUCKET"),
 ):
-    list_of_objects = list_objects_from_prefix(prefix=original_prefix, add_global_folder=add_global_path)
+    if add_global_folder:
+        original_prefix = add_global_folder(original_prefix)
+        target_prefix = add_global_folder(target_prefix)
 
-    for key in list_of_objects:
-        short_key = key[len(original_prefix) :]
-        copy_source = {"Bucket": bucket, "Key": key}
-        new_key = copy_prefix + short_key
-        print(new_key)
-        client.copy(copy_source, bucket, new_key)
+    s3_bucket = s3_resource.Bucket(bucket)
+    logger.debug(f"{original_prefix = }")
+    objects = s3_bucket.objects.filter(Prefix=original_prefix)
+    try:
+        for obj in objects:
+            pass
+            # old_source = {"Bucket": bucket, "Key": obj.key}
+            # # replace the prefix
+            # new_key = obj.key.replace(original_prefix, target_prefix, 1)
+            # new_obj = s3_bucket.Object(new_key)
+            # new_obj.copy(old_source)
+    except botocore.exceptions.ClientError as err:
+        print_dict(err.response)
