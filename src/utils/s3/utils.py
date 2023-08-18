@@ -14,7 +14,6 @@ class s3ConnectionType(str, Enum):
 
 
 def s3_connect(conn_type: s3ConnectionType = s3ConnectionType.client):
-    logger.debug(f'{os.environ["AWS_DEFAULT_REGION"]}')
     resource = boto3.resource(
         service_name="s3",
         region_name=os.environ["AWS_DEFAULT_REGION"],
@@ -38,11 +37,8 @@ s3_resource = s3_connect(conn_type=s3ConnectionType.resource)
 
 def list_objects_from_prefix(prefix: str, client=s3_client, add_global_folder: bool = True):
     if add_global_folder:
-        logger.debug(f"zasto je true za {prefix = }?")
         prefix = add_global_s3_folder(prefix)
     response = client.list_objects_v2(Bucket="creative-features", Prefix=prefix)
-
-    logger.debug(f"raw prefix = {prefix}")
 
     if "Contents" in response.keys():
         list_of_paths = [content["Key"] for content in response["Contents"]]

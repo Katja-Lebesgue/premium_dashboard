@@ -1,18 +1,5 @@
-. venv/bin/activate
-
-git checkout dev
-
-pip freeze > requirements.txt
-
-git add .
-
-git commit -m 'deployment dependencies'
-
-git push
-
+python src/scripts/copy_development_to_production_on_s3.py
 git checkout main
-
 git merge dev
-
 git push
 

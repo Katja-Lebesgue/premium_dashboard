@@ -6,6 +6,11 @@ import pandas as pd
 
 load_dotenv()
 
+import nltk
+
+nltk.download("vader_lexicon")
+nltk.download("stopwords")
+
 from src.app import *
 from src.app.authenticate import authenticate, is_admin
 from src.app.tabs.admin_settings.admin_settings import admin_settings

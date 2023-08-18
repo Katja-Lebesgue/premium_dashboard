@@ -12,6 +12,5 @@ def delete_from_s3(
         prefix = add_global_s3_folder(prefix)
 
     bucket = s3_resource.Bucket(bucket)
-    logger.debug(f"{prefix = }")
     objects = bucket.objects.filter(Prefix=prefix)
     objects.delete()
