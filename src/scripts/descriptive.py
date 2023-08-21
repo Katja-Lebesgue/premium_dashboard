@@ -21,15 +21,19 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--force_from_scratch", action="store_true", default=False)
     args = parser.parse_args()
     end_date = to_date(args.end_date)
+    last_day_of_previous_month = get_last_day_of_the_previous_month(end_date)
 
-    facebook_creative_descriptive_saver.save_to_s3(
+    facebook_creative_descriptive_saver.create_and_save_main(
         db=db, end_date=end_date, force_from_scratch=args.force_from_scratch
     )
+    facebook_creative_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
 
-    facebook_target_descriptive_saver.save_to_s3(
+    facebook_target_descriptive_saver.create_and_save_main(
         db=db, end_date=end_date, force_from_scratch=args.force_from_scratch
     )
+    facebook_target_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
 
-    google_campaign_type_descriptive_saver.save_to_s3(
+    google_campaign_type_descriptive_saver.create_and_save_main(
         db=db, end_date=end_date, force_from_scratch=args.force_from_scratch
     )
+    google_campaign_type_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)

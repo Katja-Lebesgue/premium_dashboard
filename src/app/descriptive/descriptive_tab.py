@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Literal
 
-from src.abc.descriptive import Descriptive
+from src.abc.descriptive import Descriptive, DescriptiveDF
 from src.app.frontend_names import get_frontend_name
 from src.app.utils.css import hide_table_row_index
 from src.utils import *
@@ -48,16 +48,11 @@ class DescriptiveTab(Descriptive):
         if analysis_type == "by shop":
             main_df = main_df.drop(columns=self.metric_columns)
             main_df = main_df.rename(columns={col + "_by_shop": col for col in self.metric_columns})
-            # TODO: normalise
-            # n_shops_per_month = main_df[main_df.feature == self.fake_column_for_total_sum_name].set_index(
-            #     ["year_month"]
-            # )["n_shops"]
-            # main_df[self.metric_columns] = (
-            #     main_df.set_index("year_month")[self.metric_columns].divide(n_shops_per_month).reset_index()
-            # )[self.metric_columns]
             pie_func = "mean"
         else:
             pie_func = "sum"
+
+        st.dataframe(main_df)
 
         self.pie_charts(main_df=main_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
 
@@ -65,12 +60,8 @@ class DescriptiveTab(Descriptive):
 
     @st.cache_data
     def get_most_recent_descriptive_df(_self, tag: str, convert_str_to_date: bool = True):
-        main_df_path_prefix = os.path.join(_self.s3_descriptive_folder, tag)
-        list_of_objects = list_objects_from_prefix(prefix=main_df_path_prefix)
-        # we take the penultimate element (since the last one is the corresponding done_shop_ids)
-        main_df_path = sorted(list_of_objects)[len(list_of_objects) - 3]
-        logger.debug(main_df_path)
-        main_df = read_csv_from_s3(path=main_df_path, add_global_folder=False)
+        end_date = max(_self.get_available_dates(df_type=DescriptiveDF.summary))
+        main_df = _self.read_df(df_type=DescriptiveDF.summary, end_date=end_date)
         if convert_str_to_date:
             main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         return main_df
@@ -120,9 +111,7 @@ class DescriptiveTab(Descriptive):
 
             # Creating title
             if add_title:
-                total_df = main_df.loc[
-                    main_df.feature == self.fake_column_for_total_sum_name, selected_metric
-                ]
+                total_df = main_df.loc[main_df.feature == self.fake_feature, selected_metric]
 
                 if selected_metric.startswith("n_"):
                     total_number = total_df.mean()

@@ -1,4 +1,4 @@
-from .descriptive import Descriptive
+from .descriptive import Descriptive, DescriptiveDF
 from .facebook_creative_descriptive import FacebookCreativeDescriptive
 from .facebook_target_descriptive import FacebookTargetDescriptive
 from .google_campaign_type_descriptive import GoogleCampaignTypeDescriptive
