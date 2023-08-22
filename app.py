@@ -88,21 +88,37 @@ if st.session_state["authentication_status"]:
                     menu_title="Market",
                     options=[
                         "Creative descriptive",
+                        "Creative benchmarks",
                         "Target descriptive",
+                        "Target benchmarks",
                         "Default performance tests",
                         "Text analysis",
                         "Image analysis",
                     ],
                     menu_icon="globe",
-                    icons=["brush", "bullseye", "lightning-fill", "cursor-text", "card-image"],
+                    icons=[
+                        "brush",
+                        "clipboard-data",
+                        "bullseye",
+                        "clipboard-data",
+                        "lightning-fill",
+                        "cursor-text",
+                        "card-image",
+                    ],
                     default_index=0,
                 )
 
             if market_subtab == "Creative descriptive":
                 facebook_creative_descriptive_tab.show()
 
+            if market_subtab == "Creative benchmarks":
+                facebook_creative_benchmarks_tab.show()
+
             if market_subtab == "Target descriptive":
                 facebook_target_descriptive_tab.show()
+
+            if market_subtab == "Target benchmarks":
+                facebook_target_benchmarks_tab.show()
 
             if market_subtab == "Default performance tests":
                 market_performance_tests()
@@ -117,14 +133,17 @@ if st.session_state["authentication_status"]:
         with st.sidebar:
             google_subtab = option_menu(
                 menu_title="Google",
-                options=["Descriptive statistics"],
+                options=["Descriptive statistics", "Benchmarks"],
                 menu_icon="globe",
-                icons=["pie-chart-fill"],
+                icons=["pie-chart-fill", "clipboard-data"],
                 default_index=0,
             )
 
         if google_subtab == "Descriptive statistics":
             google_campaign_type_descriptive_tab.show()
+
+        if google_subtab == "Benchmarks":
+            google_campaign_type_benchmarks_tab.show()
 
     if main_tab == "Settings":
         if is_admin():

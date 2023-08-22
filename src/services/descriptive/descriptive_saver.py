@@ -16,18 +16,36 @@ from src.utils import *
 
 class DescriptiveSaver(Descriptive):
     def create_and_save_summary(self, end_date: date) -> None:
-        main_df = self.read_df(df_type=DescriptiveDF.main, end_date=end_date)
+        main_df = self.read_df("main", end_date=end_date)
         main_df["n_shops"] = 1
-        sum_by_month_and_feature = main_df.groupby(["year_month", "feature"])[self.metric_columns].sum()
-        grouped = main_df.groupby(["year_month", "feature", "feature_value"])
+        sum_by_shop_and_feature = main_df.groupby(["shop_id", "year_month", "feature"])[
+            self.metric_columns
+        ].sum()
+        grouped_by_shop_and_value = main_df.groupby(["shop_id", "year_month", "feature", "feature_value"])
 
-        absolute_sum_df = grouped[self.metric_columns + ["n_shops"]].sum()
-
-        relative_sum_df = (absolute_sum_df / sum_by_month_and_feature)[self.metric_columns].rename(
-            columns={col: col + "_by_shop" for col in self.metric_columns}
+        absolute_sum_by_shop_and_value = grouped_by_shop_and_value[self.metric_columns + ["n_shops"]].sum()
+        relative_sum_by_shop_and_value = (
+            absolute_sum_by_shop_and_value[self.metric_columns] / sum_by_shop_and_feature
         )
-        summary_df = absolute_sum_df.join(relative_sum_df)
-        self.save_df(df=summary_df, df_type=DescriptiveDF.summary, end_date=end_date)
+        relative_sum_by_value = (
+            relative_sum_by_shop_and_value.reset_index()
+            .groupby(["year_month", "feature", "feature_value"])[self.metric_columns]
+            .sum()
+        )
+        n_shops_by_month_and_feature = (
+            relative_sum_by_value.reset_index().groupby(["year_month", "feature"])[self.metric_columns].sum()
+        )
+        normalised_relative_sum_by_value = relative_sum_by_value.div(n_shops_by_month_and_feature, axis=0)
+        normalised_relative_sum_by_value.rename(
+            columns={col: col + "_by_shop" for col in self.metric_columns}, inplace=True
+        )
+        absolute_sum_by_value = (
+            absolute_sum_by_shop_and_value.reset_index()
+            .groupby(["year_month", "feature", "feature_value"])
+            .sum()
+        )
+        summary_df = absolute_sum_by_value.join(normalised_relative_sum_by_value)
+        self.save_df(df=summary_df, df_type=DescriptiveDF.summary, end_date=end_date, index=True)
 
     # main function
     def create_and_save_main(

@@ -35,7 +35,7 @@ class DescriptiveTab(Descriptive):
 
     def show(self) -> None:
         st.markdown(hide_table_row_index(), unsafe_allow_html=True)
-        main_df = self.get_most_recent_descriptive_df(tag=self.tag, convert_str_to_date=True)
+        main_df = self.get_most_recent_summary_df(tag=self.tag, convert_str_to_date=True)
 
         col1, _ = st.columns([1, 2])
         with col1:
@@ -52,14 +52,12 @@ class DescriptiveTab(Descriptive):
         else:
             pie_func = "sum"
 
-        st.dataframe(main_df)
-
         self.pie_charts(main_df=main_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
 
         self.descriptive_features_through_time(main_df=main_df)
 
     @st.cache_data
-    def get_most_recent_descriptive_df(_self, tag: str, convert_str_to_date: bool = True):
+    def get_most_recent_summary_df(_self, tag: str, convert_str_to_date: bool = True):
         end_date = max(_self.get_available_dates(df_type=DescriptiveDF.summary))
         main_df = _self.read_df(df_type=DescriptiveDF.summary, end_date=end_date)
         if convert_str_to_date:
