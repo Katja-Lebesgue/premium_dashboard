@@ -10,6 +10,9 @@ from src.app.utils.css import *
 from src.app.utils.labels_and_values import *
 from src.statistical_tests.proportion_test import *
 from src.utils import *
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
+from src.app.frontend_names import get_frontend_name
+from uuid import uuid1
 
 
 def custom_performance_test(data_shop: pd.DataFrame):
@@ -21,7 +24,7 @@ def custom_performance_test(data_shop: pd.DataFrame):
 
     test_group2 = data_shop.copy()
 
-    features = custom_feature_dict.keys()
+    features = BOOLEAN_TEXT_FEATURES
 
     col1, col2 = st.columns(2)
 
@@ -68,7 +71,7 @@ def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
 
         with st.expander(f"{custom_group_dict[group]}"):
             for target in df[group].unique():
-                check = st.checkbox(str(target), value=True, key=group + id)
+                check = st.checkbox(str(target), value=True, key=group + id + str(uuid1()))
                 if check:
                     filter.append(target)
 
@@ -83,10 +86,10 @@ def feature_filtering(df: pd.DataFrame, features: list[str], id: str) -> pd.Data
     for feature in features:
         filter = []
 
-        with st.expander(f"{custom_feature_dict[feature]}"):
+        with st.expander(get_frontend_name(feature)):
             if df[feature].unique() is not None:
                 for target in df[feature].unique():
-                    check = st.checkbox(str(target), value=True, key=feature + id)
+                    check = st.checkbox(str(target), value=True, key=feature + id + str(uuid1()))
                     if check:
                         filter.append(target)
 
@@ -114,14 +117,14 @@ def create_test_table(group_true: pd.Series, group_false: pd.Series) -> pd.DataF
     table.loc["group 1", :] = [
         group_true.spend.sum(),
         group_true.impr.sum(),
-        group_true.link_clicks.sum(),
+        group_true.clicks.sum(),
         result_ctr[True]["mean"] if True in result_ctr.keys() else np.nan,
         result_cr[True]["mean"] if True in result_ctr.keys() else np.nan,
     ]
     table.loc["group 2", :] = [
         group_false.spend.sum(),
         group_false.impr.sum(),
-        group_false.link_clicks.sum(),
+        group_false.clicks.sum(),
         result_ctr[False]["mean"] if False in result_ctr.keys() else np.nan,
         result_cr[False]["mean"] if False in result_ctr.keys() else np.nan,
     ]

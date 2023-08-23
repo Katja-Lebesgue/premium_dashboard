@@ -21,56 +21,28 @@ analysis_type_help = (
     " June 2023."
 )
 
+metrics = [cr, ctr, cpm]
+
 
 class DescriptiveTab(Descriptive):
-    def __init__(self):
-        self.available_metrics = self.metric_columns + ["n_shops"]
+    @abstractproperty
+    def available_metrics(self) -> list[str]:
+        ...
+
+    @abstractproperty
+    def show(self, **kwargs) -> None:
+        ...
 
     last_n_months = 3
     colors = ["gold", "mediumturquoise", "darkorange", "lightgreen"]
 
-    @abstractproperty
-    def pie_columns(self) -> list[str]:
-        ...
-
-    def show(self) -> None:
-        st.markdown(hide_table_row_index(), unsafe_allow_html=True)
-        main_df = self.get_most_recent_summary_df(tag=self.tag, convert_str_to_date=True)
-
-        col1, _ = st.columns([1, 2])
-        with col1:
-            analysis_type = st.selectbox(
-                label="Analysis type",
-                options=("total", "by shop"),
-                help=analysis_type_help,
-            )
-
-        if analysis_type == "by shop":
-            main_df = main_df.drop(columns=self.metric_columns)
-            main_df = main_df.rename(columns={col + "_by_shop": col for col in self.metric_columns})
-            pie_func = "mean"
-        else:
-            pie_func = "sum"
-
-        self.pie_charts(main_df=main_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
-
-        self.descriptive_features_through_time(main_df=main_df)
-
-    @st.cache_data
-    def get_most_recent_summary_df(_self, tag: str, convert_str_to_date: bool = True):
-        end_date = max(_self.get_available_dates(df_type=DescriptiveDF.summary))
-        main_df = _self.read_df(df_type=DescriptiveDF.summary, end_date=end_date)
-        if convert_str_to_date:
-            main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
-        return main_df
-
     def pie_charts(
-        self, main_df: pd.DataFrame, add_title: bool = True, func: Literal["mean", "sum"] = "sum"
+        self, summary_df: pd.DataFrame, add_title: bool = True, func: Literal["mean", "sum"] = "sum"
     ) -> None:
         last_n_months_series = (
-            main_df.year_month.drop_duplicates().nlargest(n=self.last_n_months).sort_values()
+            summary_df.year_month.drop_duplicates().nlargest(n=self.last_n_months).sort_values()
         )
-        main_df = main_df[main_df.year_month.isin(last_n_months_series.tolist())]
+        summary_df = summary_df[summary_df.year_month.isin(last_n_months_series.tolist())]
 
         col1, col2 = st.columns([1, 4])
 
@@ -99,7 +71,7 @@ class DescriptiveTab(Descriptive):
             for idx, descriptive_column in enumerate(self.pie_columns):
                 add_pie_subplot(
                     fig=fig,
-                    df=main_df,
+                    df=summary_df,
                     descriptive_column=descriptive_column,
                     metric=selected_metric,
                     plot_row_idx=1,
@@ -109,7 +81,7 @@ class DescriptiveTab(Descriptive):
 
             # Creating title
             if add_title:
-                total_df = main_df.loc[main_df.feature == self.fake_feature, selected_metric]
+                total_df = summary_df.loc[summary_df.feature == self.fake_feature, selected_metric]
 
                 if selected_metric.startswith("n_"):
                     total_number = total_df.mean()
@@ -140,13 +112,13 @@ class DescriptiveTab(Descriptive):
             fig.update_traces(
                 textposition="inside",
                 textinfo="percent+label",
-                marker={"colors": self.colors},
+                # marker={"colors": self.colors},
                 textfont_size=15,
             )
             fig.update_layout(height=500, width=900, showlegend=False, title=title)
             st.plotly_chart(fig)
 
-    def descriptive_features_through_time(self, main_df: pd.DataFrame) -> None:
+    def descriptive_features_through_time(self, summary_df: pd.DataFrame) -> None:
         col1, col2 = st.columns([1, 3])
         with col1:
             selected_feature = st.selectbox(
@@ -161,15 +133,15 @@ class DescriptiveTab(Descriptive):
                 format_func=get_frontend_name,
             )
 
-            main_df = main_df[main_df.feature == selected_feature]
-            metric_by_month_and_value = main_df.groupby(["year_month", "feature_value"])[
+            summary_df = summary_df[summary_df.feature == selected_feature]
+            metric_by_month_and_value = summary_df.groupby(["year_month", "feature_value"])[
                 selected_metric
             ].sum()
 
             bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 
             if bar_height == "Relative":
-                metric_by_month = main_df.groupby("year_month")[selected_metric].sum()
+                metric_by_month = summary_df.groupby("year_month")[selected_metric].sum()
                 metric_by_month_and_value = metric_by_month_and_value / metric_by_month
 
             metric_by_month_and_value_df = pd.DataFrame(metric_by_month_and_value).reset_index()
@@ -180,7 +152,7 @@ class DescriptiveTab(Descriptive):
                 x="year_month",
                 y=selected_metric,
                 color="feature_value",
-                title="Performance",
+                title="Features through time",
             )
 
             fig.update_layout(
@@ -188,6 +160,55 @@ class DescriptiveTab(Descriptive):
                 xaxis_title=get_frontend_name("month"),
                 yaxis_title=get_frontend_name(selected_metric),
                 legend_title="value",
+            )
+
+            st.plotly_chart(fig)
+
+    def benchmarks(self, main_df: pd.DataFrame) -> None:
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            selected_feature = st.selectbox(
+                "Select feature",
+                options=self.descriptive_columns,
+                format_func=get_frontend_name,
+                key="time_feature",
+            )
+            selected_metric = st.selectbox(
+                "Select metric",
+                options=metrics,
+                format_func=lambda x: get_frontend_name(str(x)),
+                key="time_metric",
+            )
+
+        feature_df = main_df[main_df.feature == selected_feature]
+        feature_df = feature_df[
+            feature_df[selected_metric.denom] > max(100, feature_df[selected_metric.denom].quantile(0.25))
+        ]
+
+        with col2:
+            fig = go.Figure()
+            feature_values = feature_df.feature_value.unique().tolist()
+            for value in feature_values:
+                fig.add_trace(
+                    go.Box(
+                        y=feature_df.loc[feature_df.feature_value == value, str(selected_metric)],
+                        name=get_frontend_name(value),
+                        boxmean=True,
+                        boxpoints=False,
+                    )
+                )
+
+                fig.add_annotation(
+                    x=get_frontend_name(value),
+                    y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].max(),
+                    text=f"n = {big_number_human_format(len(feature_df[feature_df.feature_value == value]))}",
+                    yshift=10,
+                    showarrow=False,
+                )
+            fig.update_layout(
+                title={"text": "Benchmarks"},
+                yaxis_title=f"{selected_metric} ({selected_metric.unit})",
+                xaxis_title=get_frontend_name(selected_feature),
             )
 
             st.plotly_chart(fig)

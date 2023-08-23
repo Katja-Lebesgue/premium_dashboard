@@ -46,9 +46,9 @@ def proportion_test_cr(
     group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
 ) -> float:
     positive1 = group1.purch.sum()
-    size1 = group1.link_clicks.sum()
+    size1 = group1.clicks.sum()
     positive2 = group2.purch.sum()
-    size2 = group2.link_clicks.sum()
+    size2 = group2.clicks.sum()
 
     result = proportion_test(
         positive1=positive1,
@@ -64,9 +64,9 @@ def proportion_test_cr(
 def proportion_test_ctr(
     group1: pd.DataFrame, group2: pd.DataFrame, convert_nan_to_none: bool = False
 ) -> float:
-    positive1 = group1.link_clicks.sum()
+    positive1 = group1.clicks.sum()
     size1 = group1.impr.sum()
-    positive2 = group2.link_clicks.sum()
+    positive2 = group2.clicks.sum()
     size2 = group2.impr.sum()
 
     result = proportion_test(

@@ -60,7 +60,7 @@ if st.session_state["authentication_status"]:
 
         if fb_subtab == "Shop":
             with st.sidebar:
-                data_shop = select_shop_and_load_data()
+                data_shop, selected_shop_id = select_shop_and_load_data()
                 shop_subtab = option_menu(
                     menu_title="Shop",
                     options=[
@@ -74,7 +74,7 @@ if st.session_state["authentication_status"]:
                 )
 
             if shop_subtab == "Descriptive statistics":
-                descriptive_statistics(data_shop)
+                facebook_creative_shop_descriptive_tab.show(shop_id=selected_shop_id)
 
             if shop_subtab == "Default performance tests":
                 default_performance_tests(data_shop)
@@ -88,9 +88,7 @@ if st.session_state["authentication_status"]:
                     menu_title="Market",
                     options=[
                         "Creative descriptive",
-                        "Creative benchmarks",
                         "Target descriptive",
-                        "Target benchmarks",
                         "Default performance tests",
                         "Text analysis",
                         "Image analysis",
@@ -98,9 +96,7 @@ if st.session_state["authentication_status"]:
                     menu_icon="globe",
                     icons=[
                         "brush",
-                        "clipboard-data",
                         "bullseye",
-                        "clipboard-data",
                         "lightning-fill",
                         "cursor-text",
                         "card-image",
@@ -109,16 +105,10 @@ if st.session_state["authentication_status"]:
                 )
 
             if market_subtab == "Creative descriptive":
-                facebook_creative_descriptive_tab.show()
-
-            if market_subtab == "Creative benchmarks":
-                facebook_creative_benchmarks_tab.show()
+                facebook_creative_market_descriptive_tab.show()
 
             if market_subtab == "Target descriptive":
-                facebook_target_descriptive_tab.show()
-
-            if market_subtab == "Target benchmarks":
-                facebook_target_benchmarks_tab.show()
+                facebook_target_market_descriptive_tab.show()
 
             if market_subtab == "Default performance tests":
                 market_performance_tests()
@@ -133,17 +123,14 @@ if st.session_state["authentication_status"]:
         with st.sidebar:
             google_subtab = option_menu(
                 menu_title="Google",
-                options=["Descriptive statistics", "Benchmarks"],
+                options=["Descriptive statistics"],
                 menu_icon="globe",
-                icons=["pie-chart-fill", "clipboard-data"],
+                icons=["pie-chart-fill"],
                 default_index=0,
             )
 
         if google_subtab == "Descriptive statistics":
-            google_campaign_type_descriptive_tab.show()
-
-        if google_subtab == "Benchmarks":
-            google_campaign_type_benchmarks_tab.show()
+            google_campaign_type_market_descriptive_tab.show()
 
     if main_tab == "Settings":
         if is_admin():

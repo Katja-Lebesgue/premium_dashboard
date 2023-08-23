@@ -12,10 +12,11 @@ import re
 from src.abc.descriptive import Descriptive, DescriptiveDF
 from src import crud
 from src.utils import *
+from src.abc.descriptive import *
 
 
 class DescriptiveSaver(Descriptive):
-    def create_and_save_summary(self, end_date: date) -> None:
+    def create_and_save_summary(self, end_date: date) -> pd.DataFrame:
         main_df = self.read_df("main", end_date=end_date)
         main_df["n_shops"] = 1
         sum_by_shop_and_feature = main_df.groupby(["shop_id", "year_month", "feature"])[
@@ -46,24 +47,27 @@ class DescriptiveSaver(Descriptive):
         )
         summary_df = absolute_sum_by_value.join(normalised_relative_sum_by_value)
         self.save_df(df=summary_df, df_type=DescriptiveDF.summary, end_date=end_date, index=True)
+        return summary_df
 
     # main function
     def create_and_save_main(
-        self, db: Session, end_date: date, force_from_scratch: bool = False, repeat_for_failed: bool = False
-    ) -> None:
+        self,
+        db: Session,
+        force_from_scratch: bool = False,
+        repeat_for_failed: bool = False,
+        testing: bool = False,
+    ) -> pd.DataFrame:
         # end_date should be the last day of the month so we always
         # only consider data from full months
-        end_date_plus_one = date(year=end_date.year, month=end_date.month, day=1)
-        start_date = end_date_plus_one - relativedelta(months=self.n_months)
-        end_date = end_date_plus_one - timedelta(days=1)
 
         all_shops = crud.shop.get_nontest_shops(db=db)
         all_shop_ids = pd.Series([shop_.id for shop_ in all_shops], name="shop_id").sort_values()
 
         list_of_objects_on_s3 = list_objects_from_prefix(
-            prefix=self.get_df_path(df_type=DescriptiveDF.main, end_date=end_date)
+            prefix=self.get_df_path(df_type=DescriptiveDF.main, end_date=self.end_date)
         )
-        from_scratch = force_from_scratch or len(list_of_objects_on_s3) > 0
+        logger.debug(f"{list_of_objects_on_s3 = }")
+        from_scratch = force_from_scratch or len(list_of_objects_on_s3) == 0
 
         if from_scratch:
             main_df = pd.DataFrame()
@@ -71,9 +75,13 @@ class DescriptiveSaver(Descriptive):
             failed_shop_ids = pd.Series([], name="shop_id")
             undone_shop_ids = all_shop_ids
         else:
-            main_df = self.get_df(df_type=DescriptiveDF.main, end_date=end_date)
-            done_shop_ids = self.get_df(df_type=DescriptiveDF.done_shop_ids, end_date=end_date)["shop_id"]
-            failed_shop_ids = self.get_df(df_type=DescriptiveDF.failed_shop_ids, end_date=end_date)["shop_id"]
+            main_df = self.read_df(df_type=DescriptiveDF.main, end_date=self.end_date)
+            done_shop_ids = self.read_df(df_type=DescriptiveDF.done_shop_ids, end_date=self.end_date)[
+                "shop_id"
+            ]
+            failed_shop_ids = self.read_df(df_type=DescriptiveDF.failed_shop_ids, end_date=self.end_date)[
+                "shop_id"
+            ]
             logger.debug(f"{failed_shop_ids = }")
             max_done_shop_id = max(done_shop_ids)
             undone_shop_ids = all_shop_ids[all_shop_ids > max_done_shop_id]
@@ -84,23 +92,23 @@ class DescriptiveSaver(Descriptive):
         new_failed_shop_ids = []
         new_done_shop_ids = []
 
-        # FOR DEBUGGING
-        undone_shop_ids = [16038, 44301396]
+        if testing:
+            undone_shop_ids = [16038, 44301396]
         n_unsaved_shops = 0
         for shop_id in tqdm(undone_shop_ids):
-            if n_unsaved_shops == self.save_every_n_shops:
+            if n_unsaved_shops == self.save_every_n_shops and not testing:
                 self.save_df(df=main_df, df_type=DescriptiveDF.main, index=False, end_date=end_date)
                 self.save_df(
                     df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
                     df_type=DescriptiveDF.done_shop_ids,
                     index=False,
-                    end_date=end_date,
+                    end_date=self.end_date,
                 )
                 self.save_df(
                     df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
                     df_type=DescriptiveDF.failed_shop_ids,
                     index=False,
-                    end_date=end_date,
+                    end_date=self.end_date,
                 )
                 new_failed_shop_ids = []
                 new_done_shop_ids = []
@@ -108,7 +116,7 @@ class DescriptiveSaver(Descriptive):
 
             try:
                 shop_descriptive_df = self.get_shop_descriptive_df(
-                    db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
+                    db=db, shop_id=shop_id, start_date=self.start_date, end_date=self.end_date
                 )
 
                 if len(shop_descriptive_df):
@@ -123,76 +131,41 @@ class DescriptiveSaver(Descriptive):
                 logger.error(f"Error for shop id {shop_id}: \n {e}")
                 new_failed_shop_ids.append(shop_id)
 
-        self.save_df(df=main_df, df_type=DescriptiveDF.main, index=True, end_date=end_date)
-        self.save_df(
-            df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
-            df_type=DescriptiveDF.done_shop_ids,
-            index=False,
-            end_date=end_date,
-        )
-        self.save_df(
-            df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
-            df_type=DescriptiveDF.failed_shop_ids,
-            index=False,
-            end_date=end_date,
-        )
-
-    def get_shop_descriptive_df(
-        self, db: Session, shop_id: int, start_date: date, end_date: date
-    ) -> pd.DataFrame:
-        shop_df = self.get_shop_df(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
-        shop_df["n_ads"] = 1
-        shop_descriptive_df = pd.DataFrame()
-
-        if not len(shop_df):
-            logger.debug(f"{shop_id}: -")
-            return shop_descriptive_df
-
-        logger.debug(f"{shop_id}: +")
-
-        if len(
-            (
-                missing_columns := [
-                    col
-                    for col in self.descriptive_columns + self.metric_columns
-                    if col not in shop_df.columns
-                ]
+        if not testing:
+            self.save_df(df=main_df, df_type=DescriptiveDF.main, index=True, end_date=self.end_date)
+            self.save_df(
+                df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
+                df_type=DescriptiveDF.done_shop_ids,
+                index=False,
+                end_date=self.end_date,
             )
-        ):
-            logger.debug(f"{missing_columns = }")
-            return shop_descriptive_df
-
-        shop_df[self.fake_feature] = "."
-        for descriptive_column in self.descriptive_columns + [self.fake_feature]:
-            filtered = shop_df.loc[:, ["year_month", descriptive_column] + self.metric_columns].rename(
-                columns={descriptive_column: "feature_value"}
+            self.save_df(
+                df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
+                df_type=DescriptiveDF.failed_shop_ids,
+                index=False,
+                end_date=self.end_date,
             )
 
-            if descriptive_column in self.explode_descriptive_columns:
-                filtered = filtered.explode("feature_value").dropna(axis=0, subset="feature_value")
-            descriptive_column_df = (
-                filtered.groupby(["year_month", "feature_value"])[self.metric_columns].sum().reset_index()
-            )
-            descriptive_column_df["feature"] = descriptive_column
-
-            descriptive_column_df["shop_id"] = shop_id
-            shop_descriptive_df = pd.concat([shop_descriptive_df, descriptive_column_df], axis=0)
-
-        return shop_descriptive_df
-
-    # abstract properties and methods
-
-    @abstractmethod
-    def get_shop_df(db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
-        ...
-
-    # concrete properties and methods
-
-    # TODO: change to 24 after testing is over
-    n_months = 24
+        return main_df
 
     save_every_n_shops = 15
-    main_df_index = ["year_month", "feature", "feature_value"]
 
     def save_df(self, df: pd.DataFrame, df_type: DescriptiveDF, end_date: date, index: bool = True):
         return save_csv_to_s3(df=df, path=self.get_df_path(df_type=df_type, end_date=end_date), index=index)
+
+
+class FacebookCreativeDescriptiveSaver(DescriptiveSaver, FacebookCreativeDescriptive):
+    ...
+
+
+class FacebookTargetDescriptiveSaver(DescriptiveSaver, FacebookTargetDescriptive):
+    ...
+
+
+class GoogleCampaignTypeDescriptiveSaver(DescriptiveSaver, GoogleCampaignTypeDescriptive):
+    ...
+
+
+facebook_creative_descriptive_saver = FacebookCreativeDescriptiveSaver()
+facebook_target_descriptive_saver = FacebookTargetDescriptiveSaver()
+google_campaign_type_descriptive_saver = GoogleCampaignTypeDescriptiveSaver()

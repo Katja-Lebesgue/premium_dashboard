@@ -86,13 +86,13 @@ def mean_test_bernoulli(groups_df: pd.DataFrame, convert_nan_to_none: bool = Fal
 
 
 def mean_test_bernoulli_ctr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-    groups_df = create_groups_df(df=df, group_col=group_col, size_col="impr", positive_col="link_clicks")
+    groups_df = create_groups_df(df=df, group_col=group_col, size_col="impr", positive_col="clicks")
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
     return result
 
 
 def mean_test_bernoulli_cr(df: pd.DataFrame, group_col: str, convert_nan_to_none: bool = False):
-    groups_df = create_groups_df(df=df, group_col=group_col, size_col="link_clicks", positive_col="purch")
+    groups_df = create_groups_df(df=df, group_col=group_col, size_col="clicks", positive_col="purch")
     result = mean_test_bernoulli(groups_df=groups_df, convert_nan_to_none=convert_nan_to_none)
     return result
 

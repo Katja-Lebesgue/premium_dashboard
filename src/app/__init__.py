@@ -1,2 +1,1 @@
-from .descriptive import *
-from .benchmarks import *
+from .descriptive_tab import *

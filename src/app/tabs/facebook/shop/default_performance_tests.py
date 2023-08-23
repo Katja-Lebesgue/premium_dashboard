@@ -12,6 +12,8 @@ from src.statistical_tests.bernoulli_tests.mean_test_bernoulli import *
 from src.statistical_tests.mean_test import mean_test
 from src.utils import *
 from src.utils import big_number_human_format
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES, TextFeature
+from src.app.frontend_names import get_frontend_name
 
 
 def default_performance_tests(data_shop: pd.DataFrame):
@@ -64,7 +66,7 @@ def default_performance_tests(data_shop: pd.DataFrame):
 
     with col3:
         st.write("Promotional")
-        promotion_table = create_test_table(df=data_shop, group_col="discounts_any")
+        promotion_table = create_test_table(df=data_shop, group_col="discount")
         promotion_table_style = style_test_table(promotion_table)
         st.dataframe(promotion_table_style)
 
@@ -75,7 +77,7 @@ def default_performance_tests(data_shop: pd.DataFrame):
     with col3:
         st.header("Promotional ads")
 
-        data_promotional = data_shop.loc[data_shop.discounts_any == True, :]
+        data_promotional = data_shop.loc[data_shop.discount == True, :]
 
         st.write(f"total of {data_promotional.ad_id.nunique()} promotional ads")
 
@@ -85,7 +87,7 @@ def default_performance_tests(data_shop: pd.DataFrame):
     with col4:
         st.header("Non-promotional ads")
 
-        data_nonpromotional = data_shop.loc[data_shop.discounts_any == False, :]
+        data_nonpromotional = data_shop.loc[data_shop.discount == False, :]
 
         st.write(f"total of {data_nonpromotional.ad_id.nunique()} non-promotional ads")
 
@@ -94,18 +96,11 @@ def default_performance_tests(data_shop: pd.DataFrame):
 
 
 def display_test_tables(df: pd.DataFrame):
-    column_title_dict = {
-        "emojis_any": "has emojis",
-        "urgency_any": "creates urgency",
-        "starts_with_question_any": "starts with a question",
-        "user_addressing_any": "adresses user",
-        "fact_words_any": "states facts",
-        "prices_any": "mentions price",
-    }
+    features = [feature for feature in BOOLEAN_TEXT_FEATURES if feature != "discount"]
 
-    for col, tit in column_title_dict.items():
-        st.write(tit)
-        test_table = create_test_table(df=df, group_col=col)
+    for feature in features:
+        st.write(get_frontend_name(feature))
+        test_table = create_test_table(df=df, group_col=feature)
         if test_table.loc[:, ["ctr", "cr"]].count().sum():
             test_table_style = style_test_table(test_table)
             st.dataframe(test_table_style)
@@ -129,9 +124,9 @@ def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
     pvalue = [np.nan, np.nan, np.nan]
 
     # divide groups
-    group_true = df.loc[df[group_col].isin([True]), :].dropna(axis=0, subset=["ctr", "cr"])
+    group_true = df.loc[df[group_col].isin([True]), :]  # .dropna(axis=0, subset=["ctr", "cr"])
 
-    group_false = df.loc[df[group_col].isin([False]), :].dropna(axis=0, subset=["ctr", "cr"])
+    group_false = df.loc[df[group_col].isin([False]), :]  # .dropna(axis=0, subset=["ctr", "cr"])
 
     result_ctr = mean_test_bernoulli_ctr(df=df, group_col=group_col, convert_nan_to_none=True)
     result_cr = mean_test_bernoulli_cr(df=df, group_col=group_col, convert_nan_to_none=True)
@@ -141,14 +136,14 @@ def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:
     table.loc["yes", :] = [
         group_true.spend.sum(),
         group_true.impr.sum(),
-        group_true.link_clicks.sum(),
+        group_true.clicks.sum(),
         result_ctr[True]["mean"] if True in result_ctr.keys() else np.nan,
         result_cr[True]["mean"] if True in result_cr.keys() else np.nan,
     ]
     table.loc["no", :] = [
         group_false.spend.sum(),
         group_false.impr.sum(),
-        group_false.link_clicks.sum(),
+        group_false.clicks.sum(),
         result_ctr[False]["mean"] if False in result_ctr.keys() else np.nan,
         result_cr[False]["mean"] if False in result_cr.keys() else np.nan,
     ]
@@ -181,7 +176,7 @@ def create_creative_type_test_table(df: pd.DataFrame) -> pd.DataFrame:
         table.loc[value, ["spend", "impr", "clicks"]] = [
             filtered_df.spend.sum(),
             filtered_df.impr.sum(),
-            filtered_df.link_clicks.sum(),
+            filtered_df.clicks.sum(),
         ]
 
     for metric in ["ctr", "cr"]:

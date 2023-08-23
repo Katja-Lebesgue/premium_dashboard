@@ -43,7 +43,7 @@ def select_shop_and_load_data() -> pd.DataFrame:
     data_shop = st_get_data_by_shop_id(selected_shop_id)
     data_shop_copy = data_shop.copy()
 
-    return data_shop_copy
+    return data_shop_copy, selected_shop_id
 
 
 @st.cache_data
@@ -56,6 +56,6 @@ def st_get_shops() -> pd.Series:
 @st.cache_data
 def st_get_data_by_shop_id(shop_id) -> pd.DataFrame:
     print("st_select_shop")
-    df = ping_facebook_creative_and_performance(db=db, shop_id=shop_id)
+    df = ping_facebook_creative_and_performance(db=db, shop_id=shop_id, enum_to_value=True)
     df["count"] = 1
     return df

@@ -128,7 +128,7 @@ def pie_charts(data_shop: pd.DataFrame) -> None:
 
 
 def add_pie_subplot(fig, df: pd.DataFrame, group: str, y: str, row: int, col: int):
-    pie_df = pd.DataFrame(df.replace({None: "unknown"}).groupby(group).sum()[y]).reset_index()
+    pie_df = pd.DataFrame(df.replace({None: "unknown"}).groupby(group)[y].sum()).reset_index()
 
     fig.add_trace(
         go.Pie(
@@ -176,12 +176,12 @@ def text_features_through_time(data_shop: pd.DataFrame) -> None:
         if performance_metric == "counts":
             data_shop = data_shop.drop_duplicates(subset="ad_id")
 
-        performance_series = data_shop.groupby(["year_month", text_feature]).sum()[performance_metric]
+        performance_series = data_shop.groupby(["year_month", text_feature])[performance_metric].sum()
 
         bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 
         if bar_height == "Relative":
-            monthly = data_shop.groupby("year_month").sum()[performance_metric]
+            monthly = data_shop.groupby("year_month")[performance_metric].sum()
             performance_series = performance_series / monthly
 
         performance_data = pd.DataFrame(performance_series).reset_index()
