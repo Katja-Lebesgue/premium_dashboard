@@ -16,7 +16,9 @@ from src.abc.descriptive import *
 
 
 class DescriptiveSaver(Descriptive):
-    def create_and_save_summary(self, end_date: date) -> pd.DataFrame:
+    save_every_n_shops = 15
+
+    def create_and_save_summary(self, end_date: date | None = None) -> pd.DataFrame:
         main_df = self.read_df("main", end_date=end_date)
         main_df["n_shops"] = 1
         sum_by_shop_and_feature = main_df.groupby(["shop_id", "year_month", "feature"])[
@@ -55,6 +57,7 @@ class DescriptiveSaver(Descriptive):
         db: Session,
         force_from_scratch: bool = False,
         repeat_for_failed: bool = False,
+        df_type: str = DescriptiveDF.main,
         testing: bool = False,
     ) -> pd.DataFrame:
         # end_date should be the last day of the month so we always
@@ -64,7 +67,7 @@ class DescriptiveSaver(Descriptive):
         all_shop_ids = pd.Series([shop_.id for shop_ in all_shops], name="shop_id").sort_values()
 
         list_of_objects_on_s3 = list_objects_from_prefix(
-            prefix=self.get_df_path(df_type=DescriptiveDF.main, end_date=self.end_date)
+            prefix=self.get_df_path(df_type=df_type, end_date=self.end_date)
         )
         logger.debug(f"{list_of_objects_on_s3 = }")
         from_scratch = force_from_scratch or len(list_of_objects_on_s3) == 0
@@ -75,7 +78,7 @@ class DescriptiveSaver(Descriptive):
             failed_shop_ids = pd.Series([], name="shop_id")
             undone_shop_ids = all_shop_ids
         else:
-            main_df = self.read_df(df_type=DescriptiveDF.main, end_date=self.end_date)
+            main_df = self.read_df(df_type=df_type, end_date=self.end_date)
             done_shop_ids = self.read_df(df_type=DescriptiveDF.done_shop_ids, end_date=self.end_date)[
                 "shop_id"
             ]
@@ -94,10 +97,11 @@ class DescriptiveSaver(Descriptive):
 
         if testing:
             undone_shop_ids = [16038, 44301396]
+        undone_shop_ids = [16038, 44301396]
         n_unsaved_shops = 0
         for shop_id in tqdm(undone_shop_ids):
             if n_unsaved_shops == self.save_every_n_shops and not testing:
-                self.save_df(df=main_df, df_type=DescriptiveDF.main, index=False, end_date=end_date)
+                self.save_df(df=main_df, df_type=df_type, index=False, end_date=self.end_date)
                 self.save_df(
                     df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
                     df_type=DescriptiveDF.done_shop_ids,
@@ -132,7 +136,7 @@ class DescriptiveSaver(Descriptive):
                 new_failed_shop_ids.append(shop_id)
 
         if not testing:
-            self.save_df(df=main_df, df_type=DescriptiveDF.main, index=True, end_date=self.end_date)
+            self.save_df(df=main_df, df_type=df_type, index=False, end_date=self.end_date)
             self.save_df(
                 df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
                 df_type=DescriptiveDF.done_shop_ids,
@@ -148,9 +152,9 @@ class DescriptiveSaver(Descriptive):
 
         return main_df
 
-    save_every_n_shops = 15
-
-    def save_df(self, df: pd.DataFrame, df_type: DescriptiveDF, end_date: date, index: bool = True):
+    def save_df(
+        self, df: pd.DataFrame, df_type: DescriptiveDF, end_date: date | None = None, index: bool = True
+    ):
         return save_csv_to_s3(df=df, path=self.get_df_path(df_type=df_type, end_date=end_date), index=index)
 
 

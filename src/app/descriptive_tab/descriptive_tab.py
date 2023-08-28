@@ -37,7 +37,10 @@ class DescriptiveTab(Descriptive):
     colors = ["gold", "mediumturquoise", "darkorange", "lightgreen"]
 
     def pie_charts(
-        self, summary_df: pd.DataFrame, add_title: bool = True, func: Literal["mean", "sum"] = "sum"
+        self,
+        summary_df: pd.DataFrame,
+        add_title: bool = True,
+        func: Literal["mean", "sum"] = "sum",
     ) -> None:
         last_n_months_series = (
             summary_df.year_month.drop_duplicates().nlargest(n=self.last_n_months).sort_values()
@@ -81,12 +84,11 @@ class DescriptiveTab(Descriptive):
 
             # Creating title
             if add_title:
-                total_df = summary_df.loc[summary_df.feature == self.fake_feature, selected_metric]
-
+                feature_series = summary_df.loc[summary_df.feature == self.fake_feature, selected_metric]
                 if selected_metric.startswith("n_"):
-                    total_number = total_df.mean()
+                    total_number = feature_series.mean()
                 else:
-                    total_number = total_df.sum()
+                    total_number = feature_series.sum()
                 total_str = big_number_human_format(total_number)
 
                 if "USD" in selected_metric:
@@ -118,7 +120,9 @@ class DescriptiveTab(Descriptive):
             fig.update_layout(height=500, width=900, showlegend=False, title=title)
             st.plotly_chart(fig)
 
-    def descriptive_features_through_time(self, summary_df: pd.DataFrame) -> None:
+    def descriptive_features_through_time(
+        self, summary_df: pd.DataFrame, show_relative_option: bool = True
+    ) -> None:
         col1, col2 = st.columns([1, 3])
         with col1:
             selected_feature = st.selectbox(
@@ -133,18 +137,23 @@ class DescriptiveTab(Descriptive):
                 format_func=get_frontend_name,
             )
 
-            summary_df = summary_df[summary_df.feature == selected_feature]
-            metric_by_month_and_value = summary_df.groupby(["year_month", "feature_value"])[
+            feature_df = summary_df[summary_df.feature == selected_feature]
+            metric_by_month_and_value = feature_df.groupby(["year_month", "feature_value"])[
                 selected_metric
             ].sum()
 
-            bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
+            if show_relative_option:
+                bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
 
-            if bar_height == "Relative":
-                metric_by_month = summary_df.groupby("year_month")[selected_metric].sum()
-                metric_by_month_and_value = metric_by_month_and_value / metric_by_month
+                if bar_height == "Relative":
+                    metric_by_month = feature_df.groupby("year_month")[selected_metric].sum()
+                    metric_by_month_and_value = metric_by_month_and_value / metric_by_month
 
             metric_by_month_and_value_df = pd.DataFrame(metric_by_month_and_value).reset_index()
+
+        extra_bar_kwargs = {}
+        if "color" in selected_feature:
+            extra_bar_kwargs["color_discrete_map"] = {c: c for c in feature_df.feature_value.unique()}
 
         with col2:
             fig = px.bar(
@@ -153,6 +162,7 @@ class DescriptiveTab(Descriptive):
                 y=selected_metric,
                 color="feature_value",
                 title="Features through time",
+                **extra_bar_kwargs,
             )
 
             fig.update_layout(
@@ -189,12 +199,16 @@ class DescriptiveTab(Descriptive):
             fig = go.Figure()
             feature_values = feature_df.feature_value.unique().tolist()
             for value in feature_values:
+                extra_box_kwargs = {}
+                if "color" in selected_feature:
+                    extra_box_kwargs = extra_box_kwargs | {"fillcolor": value, "line": {"color": value}}
                 fig.add_trace(
                     go.Box(
                         y=feature_df.loc[feature_df.feature_value == value, str(selected_metric)],
                         name=get_frontend_name(value),
                         boxmean=True,
                         boxpoints=False,
+                        **extra_box_kwargs,
                     )
                 )
 
@@ -208,7 +222,6 @@ class DescriptiveTab(Descriptive):
             fig.update_layout(
                 title={"text": "Benchmarks"},
                 yaxis_title=f"{selected_metric} ({selected_metric.unit})",
-                xaxis_title=get_frontend_name(selected_feature),
             )
 
             st.plotly_chart(fig)
@@ -244,3 +257,6 @@ def add_pie_subplot(
         row=plot_row_idx,
         col=plot_column_idx,
     )
+
+    if "color" in descriptive_column:
+        fig.update_traces(marker={"colors": pie_df.feature_value.tolist()})

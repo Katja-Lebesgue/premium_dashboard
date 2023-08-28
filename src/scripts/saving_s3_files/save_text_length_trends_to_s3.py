@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 from metadata.globals import *
 from src.pingers import *
-from src.s3 import *
 from src.utils import *
 
 warnings.filterwarnings("ignore", message="Mean of empty slice")

@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 
 from sqlalchemy import func, orm
 from sqlalchemy.orm import Session
+import pandas as pd
 
 from src import models, schemas
 from src.crud.base import CRUDBase
@@ -41,20 +42,10 @@ class CRUDImage(
         urls = db.query(self.model.url).filter(func.random() < 0.001, self.model.source != "facebook").all()
         return [row.url for row in urls]
 
-    def query_fb_ad_ids_and_image_urls_by_shop(
+    def get_fb_ad_ids_and_image_urls_by_shop(
         self,
         db: Session,
         shop_id: int,
-        column_label_dict: dict = {
-            "spend": "spend",
-            "impressions": "impr",
-            "link_clicks": "link_clicks",
-            "purchases": "purch",
-            "purchases_conversion_value": "purch_value",
-        },
-        end_date: date = date.today(),
-        start_date: date = datetime.strptime("2015-01-01", "%Y-%m-%d").date(),
-        conversion_rates_dict: dict | None = None,
     ):
         fb_ad_image_hash = (
             FacebookAd.creative["object_story_spec"]["link_data"].op("->>")("image_hash").label("image_hash")
@@ -75,7 +66,7 @@ class CRUDImage(
             .filter(FacebookAd.shop_id == shop_id, url_subquery.c.freshness_rank == 1)
         )
 
-        return fb_ad_query
+        return pd.read_sql(fb_ad_query.statement, db.bind).assign(shop_id=shop_id)
 
 
 image = CRUDImage(models.Image)

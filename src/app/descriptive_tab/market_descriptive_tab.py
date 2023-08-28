@@ -39,8 +39,14 @@ class MarketDescriptiveTab(DescriptiveTab):
         else:
             pie_func = "sum"
 
-        self.pie_charts(summary_df=summary_df.copy(), add_title=(analysis_type == "total"), func=pie_func)
-        self.descriptive_features_through_time(summary_df=summary_df)
+        self.pie_charts(
+            summary_df=summary_df.copy(),
+            add_title=(analysis_type == "total"),
+            func=pie_func,
+        )
+        self.descriptive_features_through_time(
+            summary_df=summary_df, show_relative_option=(analysis_type == "total")
+        )
 
         main_df = self.get_most_recent_df(cache_id=type(self).__name__, df_type=DescriptiveDF.main)
         main_df = main_df[main_df.spend_USD > main_df.spend_USD.quantile(0.25)]
@@ -68,10 +74,15 @@ class FacebookTargetMarketDescriptiveTab(MarketDescriptiveTab, FacebookTargetDes
     ...
 
 
+class FacebookImageMarketDescriptiveTab(MarketDescriptiveTab, FacebookImageDescriptive):
+    ...
+
+
 class GoogleCampaignTypeMarketDescriptiveTab(MarketDescriptiveTab, GoogleCampaignTypeDescriptive):
     ...
 
 
 facebook_creative_market_descriptive_tab = FacebookCreativeMarketDescriptiveTab()
 facebook_target_market_descriptive_tab = FacebookTargetMarketDescriptiveTab()
+facebook_image_market_descriptive_tab = FacebookImageMarketDescriptiveTab()
 google_campaign_type_market_descriptive_tab = GoogleCampaignTypeMarketDescriptiveTab()

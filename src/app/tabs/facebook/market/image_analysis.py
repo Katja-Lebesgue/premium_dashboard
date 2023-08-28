@@ -17,7 +17,6 @@ from src.app.utils.cache_functions import st_read_csv_from_s3
 from src.app.utils.css import hide_table_row_index
 from src.app.utils.labels_and_values import *
 from src.app.utils.labels_and_values import feature_dict_market
-from src.s3 import *
 from src.utils import big_number_human_format
 
 load_dotenv()
@@ -26,7 +25,7 @@ PERF_COLUMNS = ["spend_USD", "impr", "link_clicks", "purch", "purch_value", "ctr
 
 
 def image_analysis():
-    color_df_s3_path = s3_image.final_df
+    color_df_s3_path = s3_image_tmp.final_df
     st.write(color_df_s3_path)
     color_df = st_read_csv_from_s3(color_df_s3_path, add_global_folder=True)
 
@@ -38,7 +37,7 @@ def image_analysis():
         total_or_shop_average = st.selectbox(label="Choose wisely:", options=["Total", "Shop average"])
 
     if total_or_shop_average == "Shop average":
-        color_df = color_df.drop(columns=s3_image.performance_columns)
+        color_df = color_df.drop(columns=s3_image_tmp.performance_columns)
         color_df = color_df.rename(columns={col: col.removeprefix("relative_") for col in color_df})
 
     pie_charts(

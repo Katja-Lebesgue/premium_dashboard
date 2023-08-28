@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from src.pingers import *
-from src.s3 import *
+
 from src.statistical_tests import *
 from src.statistical_tests.bernoulli_tests import *
 from src.statistical_tests.proportion_test import proportion_test, proportion_test_cr, proportion_test_ctr

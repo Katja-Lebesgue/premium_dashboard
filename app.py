@@ -15,15 +15,14 @@ from src.app import *
 from src.app.authenticate import authenticate, is_admin
 from src.app.tabs.admin_settings.admin_settings import admin_settings
 from src.app.tabs.all_platforms import all_platforms
-from src.app.tabs.facebook.market.image_analysis import image_analysis
-from src.app.tabs.facebook.market.market_descriptive_statistics import market_descriptive_statistics
+
 from src.app.tabs.facebook.market.market_performance_tests import market_performance_tests
 from src.app.tabs.facebook.market.text_analysis import text_analysis
 from src.app.tabs.facebook.shop.custom_performance_test import custom_performance_test
 from src.app.tabs.facebook.shop.default_performance_tests import default_performance_tests
-from src.app.tabs.facebook.shop.descriptive_statistics import descriptive_statistics
+
 from src.app.tabs.facebook.shop.select_shop_and_load_data import select_shop_and_load_data
-from src.app.tabs.google.google_market_descriptive_statistics import google_market_descriptive_statistics
+
 from src.app.tabs.user_settings.reset_password import reset_password
 
 st.set_page_config(layout="wide")
@@ -117,7 +116,7 @@ if st.session_state["authentication_status"]:
                 text_analysis()
 
             if market_subtab == "Image analysis":
-                image_analysis()
+                facebook_image_market_descriptive_tab.show()
 
     if main_tab == "Google":
         with st.sidebar:

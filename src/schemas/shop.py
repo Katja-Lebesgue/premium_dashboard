@@ -1,17 +1,15 @@
 from datetime import date, datetime
 
 from pydantic import EmailStr, Field
-
 from src.models.enums import EcommercePlatform
+
 from src.schemas.api_model import APIModel
 from src.schemas.base import OrmBase
 
 
 class ShopBase(APIModel):
     name: str | None = None
-    onboarded: bool | None = False
     billing_date: date | None = None
-    rapp_shop: bool | None = False
     currency: str | None = None
     iana_timezone: str | None = None
     location: str | None = None
@@ -24,36 +22,26 @@ class ShopBase(APIModel):
     contact_name: str | None = None
     shop_name: str | None = None
     mailchimp_subscriber_hash: str | None = None
-    owner_id: str | None = None
+    owner_id: int | None = None
     platform: EcommercePlatform | None = None
-    weekly_report: bool | None = None
+    email_settings: dict | None = None
+    intro_modal_shown: bool | None = None
+    modules: str | None = None
+    app: str | None = None
+    app_store_install: bool | None = None
 
 
 class ShopCreate(ShopBase):
-    name: str
-    platform: EcommercePlatform
-    installed: bool = True
-    install_date: datetime = Field(default_factory=datetime.now)
-    weekly_report: bool = True
+    pass
 
 
 class ShopUpdate(ShopBase):
     pass
 
 
-class ShopUpdateAPI(APIModel):
-    contact_email: EmailStr | None = None
-    contact_name: str | None = None
-    onboarding_completed: bool | None = False
-    weekly_report: bool | None = True
-
-
 class Shop(ShopBase):
     id: int
+    limited_access: bool
 
     class Config:
         orm_mode = True
-
-
-class InternalShop(OrmBase):
-    name: str | None

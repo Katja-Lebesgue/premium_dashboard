@@ -1,14 +1,9 @@
 from datetime import date
 
 import pandas as pd
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src import crud
-from src.database.session import SessionLocal
-from src.models import FacebookCreativeFeatures, FacebookDailyPerformance, AdCreativeFeatures
-from src.pingers.ping_crm import ping_crm
-from src.s3 import *
+from src.models import FacebookCreativeFeatures, FacebookDailyPerformance
 from src.utils import *
 
 

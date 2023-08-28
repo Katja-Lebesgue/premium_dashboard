@@ -16,6 +16,15 @@ class DescriptiveDF(str, Enum):
     summary = "summary"
 
 
+class FacebookImageDescriptiveDF(str, Enum):
+    performance = "performance"
+    filtered = "filtered"
+    image = "image"
+    filtered_image = "filtered_image"
+    main = "main"
+    summary = "summary"
+
+
 class Descriptive(ABC):
     @abstractmethod
     def get_shop_df(db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
@@ -47,6 +56,7 @@ class Descriptive(ABC):
     ]
 
     n_months = 24
+    performance_df_name = DescriptiveDF.main
 
     @property
     def end_date(self):
@@ -106,14 +116,16 @@ class Descriptive(ABC):
         )
         level_column = [col for col in stacked_df.columns if "level" in str(col)][0]
         stacked_df.rename(columns={level_column: "feature", 0: "feature_value"}, inplace=True)
-        shop_descriptive_df = stacked_df.groupby(self.main_df_index)[self.metric_columns].sum()
+        shop_descriptive_df = stacked_df.groupby(self.main_df_index + ["shop_id"])[self.metric_columns].sum()
 
         return shop_descriptive_df
 
     def get_df_path(self, df_type: DescriptiveDF, end_date: date | None = None):
+        if end_date is None:
+            end_date = self.end_date
         return os.path.join(self.s3_descriptive_folder, self.tag, f"{end_date}_{df_type}.csv")
 
-    def read_df(self, df_type: DescriptiveDF, end_date: date):
+    def read_df(self, df_type: DescriptiveDF, end_date: date | None = None):
         return read_csv_from_s3(path=self.get_df_path(df_type=df_type, end_date=end_date))
 
     def get_available_dates(self, df_type: DescriptiveDF) -> list[date]:
@@ -165,3 +177,17 @@ class GoogleCampaignTypeDescriptive(Descriptive):
         return crud.ga_daily_performance.get_performance(
             db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
         )
+
+
+class FacebookImageDescriptive(Descriptive):
+    descriptive_columns = ["color"]
+    tag = "facebook_image"
+    pie_columns = ["color"]
+
+    def get_shop_df(self, db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
+        return ping_image_urls_and_ad_performance(
+            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date
+        )
+
+    def get_shop_descriptive_df(self, **kwargs) -> pd.DataFrame:
+        return self.get_shop_df(**kwargs)
