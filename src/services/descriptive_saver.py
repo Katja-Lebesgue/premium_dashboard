@@ -69,7 +69,7 @@ class DescriptiveSaver(Descriptive):
         list_of_objects_on_s3 = list_objects_from_prefix(
             prefix=self.get_df_path(df_type=df_type, end_date=self.end_date)
         )
-        logger.debug(f"{list_of_objects_on_s3 = }")
+
         from_scratch = force_from_scratch or len(list_of_objects_on_s3) == 0
 
         if from_scratch:
@@ -97,7 +97,7 @@ class DescriptiveSaver(Descriptive):
 
         if testing:
             undone_shop_ids = [16038, 44301396]
-        undone_shop_ids = [16038, 44301396]
+
         n_unsaved_shops = 0
         for shop_id in tqdm(undone_shop_ids):
             if n_unsaved_shops == self.save_every_n_shops and not testing:

@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-from src.app.descriptive_tab.descriptive_tab import DescriptiveTab
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.abc.descriptive import *
 
 from src.utils import *
@@ -25,11 +25,8 @@ class ShopDescriptiveTab(DescriptiveTab):
             shop_id=shop_id,
             cache_id=type(self).__name__,
         )
-        st.write(5)
-        st.write(summary_df.columns)
 
         if not len(summary_df):
-            st.warning("No data.")
             return
 
         self.pie_charts(summary_df=summary_df.copy(), add_title=True)
@@ -41,6 +38,9 @@ class ShopDescriptiveTab(DescriptiveTab):
         summary_df = _self.get_shop_descriptive_df(
             db=_self.db, shop_id=shop_id, start_date=_self.start_date, end_date=_self.end_date
         ).reset_index()
+        if not len(summary_df):
+            st.warning("No data.")
+            return summary_df
         summary_df["year_month"] = summary_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         for metric in metrics:
             summary_df[str(metric)] = summary_df.apply(metric.formula_series, axis=1)

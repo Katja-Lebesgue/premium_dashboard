@@ -176,11 +176,11 @@ def display_combinations_table(df: pd.DataFrame):
         formatter={
             "combination": format_combination_column,
             "shops": lambda x: "{:,.2f}%".format(x * 100),
-            "budget_split": lambda x: "-".join([str(int(y * 100)) for y in x]) if len(x) > 1 else "-",
+            "budget_split": lambda x: "-".join([str(round(y * 100)) for y in x]) if len(x) > 1 else "-",
         },
     )
     st.write("Breakdown by platform combinations")
-    st.dataframe(table_style)
+    st.write(table_style.to_html(escape=False), unsafe_allow_html=True)
 
 
 def format_combination_column(combination: list[str]) -> str:

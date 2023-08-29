@@ -10,12 +10,22 @@ from src.app.utils.css import *
 from src.app.utils.labels_and_values import *
 from src.statistical_tests.proportion_test import *
 from src.utils import *
+from src.app.utils import *
+from src.database.session import db
+from src.pingers import ping_facebook_creative_and_performance
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
 from src.app.frontend_names import get_frontend_name
 from uuid import uuid1
 
 
-def custom_performance_test(data_shop: pd.DataFrame):
+def shop_custom_performance_test(shop_id: int):
+    data_shop = st_cache_data(
+        _func=ping_facebook_creative_and_performance,
+        func_name=ping_facebook_creative_and_performance.__name__,
+        shop_id=shop_id,
+        _db=db,
+    )
+
     if not len(data_shop):
         st.warning("No data")
         return
@@ -32,46 +42,49 @@ def custom_performance_test(data_shop: pd.DataFrame):
         st.header("Group 1")
         test_group1 = group_filtering(test_group1, "1")
         test_group1 = feature_filtering(test_group1, features, "1")
-        st.write(f"Total of {test_group1.ad_id.nunique()} ads filtered.")
+        st.info(f"Total of {test_group1.ad_id.nunique()} ads filtered.")
 
     with col2:
         st.header("Group 2")
         test_group2 = group_filtering(test_group2, "2")
         test_group2 = feature_filtering(test_group2, features, "2")
-        st.write(f"Total of {test_group2.ad_id.nunique()} ads filtered.")
+        st.info(f"Total of {test_group2.ad_id.nunique()} ads filtered.")
 
     if len(test_group1) or len(test_group2):
         test_table = create_test_table(test_group1, test_group2)
-        test_table = style_test_table(test_table)
+        test_table_style = style_test_table(test_table)
 
-        col3, col4, col5 = st.columns([1, 3, 1])
+        _, col, _ = st.columns([1, 3, 1])
 
-        with col4:
-            st.dataframe(test_table)
+        with col:
+            st.write(test_table_style.to_html(escape=False), unsafe_allow_html=True)
 
     return
 
 
 def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
-    st.subheader("Filter ad and target type")
+    st.subheader("Filter target and creative type")
 
-    targeting = st.radio(
-        "Country targets",
-        tuple(targeting_dict.keys()),
-        format_func=lambda x: targeting_dict[x],
-        key=f"targeting_{id}",
-        index=2,
-    )
+    # targeting = st.radio(
+    #     "Country targets",
+    #     tuple(targeting_dict.keys()),
+    #     format_func=get_frontend_name,
+    #     key=f"targeting_{id}",
+    #     index=2,
+    # )
 
-    if targeting in ["targets_US", "targets_english"]:
-        df = df.loc[df[targeting] == True, :]
+    # if targeting in ["targets_US", "targets_english"]:
+    #     df = df.loc[df[targeting] == True, :]
 
     for group in custom_group_dict.keys():
         filter = []
 
+        logger.debug(0)
         with st.expander(f"{custom_group_dict[group]}"):
             for target in df[group].unique():
-                check = st.checkbox(str(target), value=True, key=group + id + str(uuid1()))
+                check = st.checkbox(
+                    get_frontend_name(target), value=True, key=str(group) + str(id) + str(target)
+                )
                 if check:
                     filter.append(target)
 
@@ -88,10 +101,10 @@ def feature_filtering(df: pd.DataFrame, features: list[str], id: str) -> pd.Data
 
         with st.expander(get_frontend_name(feature)):
             if df[feature].unique() is not None:
-                for target in df[feature].unique():
-                    check = st.checkbox(str(target), value=True, key=feature + id + str(uuid1()))
+                for value in df[feature].unique():
+                    check = st.checkbox(str(value), value=True, key=str(id) + str(value) + str(feature))
                     if check:
-                        filter.append(target)
+                        filter.append(value)
 
                 df = df[df[feature].isin(filter)]
 

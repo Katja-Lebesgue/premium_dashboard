@@ -1,6 +1,6 @@
 import streamlit as st
 from sqlalchemy.exc import PendingRollbackError
-
+from loguru import logger
 
 from my_packages import streamlit_authenticator as stauth
 from src.database.session import db

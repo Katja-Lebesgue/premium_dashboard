@@ -79,6 +79,8 @@ class Descriptive(ABC):
         self, db: Session, shop_id: int, start_date: date, end_date: date
     ) -> pd.DataFrame:
         shop_df = self.get_shop_df(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
+        if "shop_id" not in shop_df.columns:
+            shop_df["shop_id"] = shop_id
         shop_df["n_ads"] = 1
         shop_descriptive_df = pd.DataFrame()
 
@@ -100,7 +102,7 @@ class Descriptive(ABC):
             logger.debug(f"{missing_columns = }")
             return shop_descriptive_df
 
-        shop_df = shop_df[self.metric_columns + self.descriptive_columns + ["year_month"]]
+        shop_df = shop_df[self.metric_columns + self.descriptive_columns + ["year_month", "shop_id"]]
         shop_df[self.fake_feature] = "."
         for explode_col in self.explode_descriptive_columns:
             shop_df[self.metric_columns] = shop_df[self.metric_columns].div(

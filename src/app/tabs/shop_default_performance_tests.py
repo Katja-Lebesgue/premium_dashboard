@@ -11,12 +11,21 @@ from src.statistical_tests import *
 from src.statistical_tests.bernoulli_tests.mean_test_bernoulli import *
 from src.statistical_tests.mean_test import mean_test
 from src.utils import *
+from src.app.utils import *
+from src.database.session import db
 from src.utils import big_number_human_format
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES, TextFeature
 from src.app.frontend_names import get_frontend_name
+from src.pingers import *
 
 
-def default_performance_tests(data_shop: pd.DataFrame):
+def shop_default_performance_tests(shop_id: int):
+    data_shop = st_cache_data(
+        _func=ping_facebook_creative_and_performance,
+        func_name=ping_facebook_creative_and_performance.__name__,
+        shop_id=shop_id,
+        _db=db,
+    )
     if not len(data_shop):
         st.warning("No data")
         return
@@ -36,39 +45,41 @@ def default_performance_tests(data_shop: pd.DataFrame):
         data_shop = data_shop[data_shop.year_month > timeperiod[0]]
 
     with col2:
-        targeting = st.radio(
-            "Select targets",
-            tuple(targeting_dict.keys()),
-            format_func=lambda x: targeting_dict[x],
-            key="pie_targeting",
-            index=2,
-        )
+        # targeting = st.radio(
+        #     "Select targets",
+        #     targeting_dict.keys(),
+        #     format_func=get_frontend_name,
+        #     key="pie_targeting",
+        #     index=2,
+        # )
 
-        if targeting in ["targets_US", "targets_english"]:
-            data_shop = data_shop.loc[data_shop[targeting] == True, :]
+        # if targeting in ["targets_US", "targets_english"]:
+        #     data_shop = data_shop.loc[data_shop[targeting] == True, :]
 
         st.write("Choose target:")
 
         target_filter = []
 
         for target in data_shop.target.unique():
-            check = st.checkbox(str(target), value=True)
+            if target is None:
+                continue
+            check = st.checkbox(get_frontend_name(target), value=True)
             if check:
                 target_filter.append(target)
 
         data_shop = data_shop.loc[data_shop.target.isin(target_filter)]
 
     with col1:
-        st.write(f"Total of {len(data_shop.ad_id.unique())} ads filtered.")
+        st.info(f"Total of {len(data_shop.ad_id.unique())} ads filtered.")
 
     if not len(target_filter) or not len(data_shop):
         return
 
     with col3:
-        st.write("Promotional")
+        st.subheader("Promotional")
         promotion_table = create_test_table(df=data_shop, group_col="discount")
         promotion_table_style = style_test_table(promotion_table)
-        st.dataframe(promotion_table_style)
+        st.write(promotion_table_style.to_html(escape=False), unsafe_allow_html=True)
 
     st.empty()
 
@@ -79,7 +90,7 @@ def default_performance_tests(data_shop: pd.DataFrame):
 
         data_promotional = data_shop.loc[data_shop.discount == True, :]
 
-        st.write(f"total of {data_promotional.ad_id.nunique()} promotional ads")
+        st.info(f"total of {data_promotional.ad_id.nunique()} promotional ads")
 
         if len(data_promotional):
             display_test_tables(df=data_promotional)
@@ -89,7 +100,7 @@ def default_performance_tests(data_shop: pd.DataFrame):
 
         data_nonpromotional = data_shop.loc[data_shop.discount == False, :]
 
-        st.write(f"total of {data_nonpromotional.ad_id.nunique()} non-promotional ads")
+        st.info(f"total of {data_nonpromotional.ad_id.nunique()} non-promotional ads")
 
         if len(data_nonpromotional):
             display_test_tables(df=data_nonpromotional)
@@ -99,18 +110,19 @@ def display_test_tables(df: pd.DataFrame):
     features = [feature for feature in BOOLEAN_TEXT_FEATURES if feature != "discount"]
 
     for feature in features:
-        st.write(get_frontend_name(feature))
+        st.subheader(get_frontend_name(feature))
         test_table = create_test_table(df=df, group_col=feature)
         if test_table.loc[:, ["ctr", "cr"]].count().sum():
             test_table_style = style_test_table(test_table)
-            st.dataframe(test_table_style)
+            st.write(test_table_style.to_html(escape=False), unsafe_allow_html=True)
         else:
             st.write("Couldn't perform tests")
+        st.markdown("#")
 
-    st.write("Creative type")
+    st.subheader("creative type")
     creative_type_test_table = create_creative_type_test_table(df)
     creative_type_test_table_style = style_test_table(creative_type_test_table)
-    st.dataframe(creative_type_test_table_style)
+    st.write(creative_type_test_table_style.to_html(escape=False), unsafe_allow_html=True)
 
 
 def create_test_table(df: pd.DataFrame, group_col: str) -> pd.DataFrame:

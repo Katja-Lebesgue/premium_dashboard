@@ -11,30 +11,23 @@ import nltk
 nltk.download("vader_lexicon")
 nltk.download("stopwords")
 
+
 from src.app import *
+from src.database.session import db
 from src.app.authenticate import authenticate, is_admin
-from src.app.tabs.admin_settings.admin_settings import admin_settings
-from src.app.tabs.all_platforms import all_platforms
-
-from src.app.tabs.facebook.market.market_performance_tests import market_performance_tests
-from src.app.tabs.facebook.market.text_analysis import text_analysis
-from src.app.tabs.facebook.shop.custom_performance_test import custom_performance_test
-from src.app.tabs.facebook.shop.default_performance_tests import default_performance_tests
-
-from src.app.tabs.facebook.shop.select_shop_and_load_data import select_shop_and_load_data
-
-from src.app.tabs.user_settings.reset_password import reset_password
 
 st.set_page_config(layout="wide")
 
 pd.set_option("mode.chained_assignment", None)
 
-
 authenticator = authenticate()
 
 if st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
+    get_main_menu().show(authenticator=authenticator)
 
+
+def stari():
     with st.sidebar:
         main_tab = option_menu(
             menu_title="Main menu",

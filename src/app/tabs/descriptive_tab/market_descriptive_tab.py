@@ -1,26 +1,25 @@
 import streamlit as st
 
 
-from src.app.descriptive_tab.descriptive_tab import DescriptiveTab
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.abc.descriptive import DescriptiveDF
 from src.abc.descriptive import *
 
 from src.utils import *
 
-
-analysis_type_help = (
-    "Select which kind of analysis you want to see. This select box changes the content"
-    " of the whole page (including time graph). If you select _total_, you will see sum"
-    " of all metrics in the selected period, i.e. total spend of all Lebesgue shops in"
-    " June 2023, and if you select _by shop_, the number displayed will"
-    " correspond to the average metric by shop, i.e. how much an average shop spent in"
-    " June 2023."
-)
-
 metrics = [cr, ctr, cpm]
 
 
 class MarketDescriptiveTab(DescriptiveTab):
+    analysis_type_help = (
+        "Select which kind of analysis you want to see. This select box changes the content"
+        " of the whole page (including time graph). If you select _total_, you will see sum"
+        " of all metrics in the selected period, i.e. total spend of all Lebesgue shops in"
+        " June 2023, and if you select _by shop_, the number displayed will"
+        " correspond to the average metric by shop, i.e. how much an average shop spent in"
+        " June 2023."
+    )
+
     def show(self):
         summary_df = self.get_most_recent_df(cache_id=type(self).__name__, df_type=DescriptiveDF.summary)
 
@@ -29,7 +28,7 @@ class MarketDescriptiveTab(DescriptiveTab):
             analysis_type = st.selectbox(
                 label="Analysis type",
                 options=("total", "by shop"),
-                help=analysis_type_help,
+                help=self.analysis_type_help,
             )
 
         if analysis_type == "by shop":

@@ -3,9 +3,8 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
-from src.app.utils.css import *
-from src.app.utils.labels_and_values import *
 from src.utils import *
+from src.app.frontend_names import *
 
 load_dotenv()
 
@@ -28,7 +27,7 @@ def market_performance_tests(
         selected_date = st.selectbox(
             "Select time period",
             global_dates,
-            format_func=lambda x: x.replace("_", " "),
+            format_func=get_frontend_name,
         )
 
         # loading global test results from s3
@@ -57,7 +56,7 @@ def market_performance_tests(
         # )
 
         # target filtering
-        target = st.radio("Select target", ("acquisition", "remarketing"))
+        target = st.radio("Select target", ("acquisition", "remarketing"), format_func=get_frontend_name)
 
         global_feature_tests_df = global_feature_tests_df.loc[global_feature_tests_df.target == target]
 
@@ -68,7 +67,7 @@ def market_performance_tests(
         ]
 
     with col2:
-        st.write("Promotion test")
+        st.subheader("Promotion test")
 
         promotion_table = create_test_table(global_promotion_tests_df)
         promotion_table_style = style_feature_test_table(promotion_table)
@@ -158,13 +157,14 @@ def display_test_tables(global_feature_tests_df: pd.DataFrame, global_creative_t
     features = list(global_feature_tests_df.feature.unique())
 
     for feature in features:
-        st.write(feature.replace("_", " "))
+        st.subheader(feature.replace("_", " ").removesuffix("any"))
         filtered_df = global_feature_tests_df.loc[global_feature_tests_df.feature == feature, :]
         test_table = create_test_table(filtered_df)
         test_table_style = style_feature_test_table(test_table)
         st.write(test_table_style.to_html(escape=False), unsafe_allow_html=True)
+        st.markdown("#")
 
-    st.write("Creative type")
+    st.subheader("creative type")
     creative_type_test_table = create_creative_type_test_table(global_creative_type_tests_df)
     creative_type_test_table_style = style_creative_type_test_table(creative_type_test_table)
     st.write(creative_type_test_table_style.to_html(escape=False), unsafe_allow_html=True)

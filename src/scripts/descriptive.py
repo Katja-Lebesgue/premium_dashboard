@@ -8,11 +8,7 @@ from argparse import ArgumentParser
 
 from src.utils import *
 from src.database.session import db
-from src.services.descriptive_saver import (
-    facebook_creative_descriptive_saver,
-    facebook_target_descriptive_saver,
-    google_campaign_type_descriptive_saver,
-)
+from src.services import *
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -35,6 +31,8 @@ if __name__ == "__main__":
     #     db=db, end_date=end_date, force_from_scratch=args.force_from_scratch
     # )
 
-    facebook_creative_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
-    facebook_target_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
-    google_campaign_type_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
+    # facebook_creative_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
+    # facebook_target_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
+    # google_campaign_type_descriptive_saver.create_and_save_summary(end_date=last_day_of_previous_month)
+
+    facebook_image_descriptive_saver.save_everything(force_from_scratch=args.force_from_scratch)

@@ -115,10 +115,8 @@ class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
 
     def filter_image_df(self):
         image_df = self.read_df(df_type=FacebookImageDescriptiveDF.image)
-        image_df = image_df[
-            (image_df.local_color_centroids.apply(type) == dict)
-            & (image_df.local_color_centroids.apply(len) > 0)
-        ]
+        image_df = image_df[image_df.local_color_centroids.apply(type) == dict]
+        image_df = image_df[image_df.local_color_centroids.apply(len) > 0]
         self.save_df(df=image_df, df_type=FacebookImageDescriptiveDF.filtered_image)
 
     def add_global_centroids(self, force_from_scratch: bool = False) -> None:

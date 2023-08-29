@@ -1,1 +1,3 @@
-from .descriptive_tab import *
+from .tabs import *
+from .menus import *
+from .utils import *

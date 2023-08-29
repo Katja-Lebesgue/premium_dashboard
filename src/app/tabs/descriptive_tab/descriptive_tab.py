@@ -8,18 +8,7 @@ from typing import Literal
 
 from src.abc.descriptive import Descriptive, DescriptiveDF
 from src.app.frontend_names import get_frontend_name
-from src.app.utils.css import hide_table_row_index
 from src.utils import *
-
-
-analysis_type_help = (
-    "Select which kind of analysis you want to see. This select box changes the content"
-    " of the whole page (including time graph). If you select _total_, you will see sum"
-    " of all metrics in the selected period, i.e. total spend of all Lebesgue shops in"
-    " June 2023, and if you select _by shop_, the number displayed will"
-    " correspond to the average metric by shop, i.e. how much an average shop spent in"
-    " June 2023."
-)
 
 metrics = [cr, ctr, cpm]
 
@@ -58,9 +47,9 @@ class DescriptiveTab(Descriptive):
 
             last_n_months_series = last_n_months_series.apply(lambda x: datetime.strftime(x, "%b %Y"))
             last_three_months_df = pd.DataFrame(last_n_months_series).rename(
-                columns={"year_month": "Observed time period"}
+                columns={"year_month": "Period for pie charts"}
             )
-            st.table(last_three_months_df.style.hide(axis="index"))
+            st.dataframe(last_three_months_df.style, hide_index=True)
 
         with col2:
             fig = make_subplots(
@@ -216,7 +205,14 @@ class DescriptiveTab(Descriptive):
                     x=get_frontend_name(value),
                     y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].max(),
                     text=f"n = {big_number_human_format(len(feature_df[feature_df.feature_value == value]))}",
-                    yshift=10,
+                    yshift=20,
+                    showarrow=False,
+                )
+                fig.add_annotation(
+                    x=get_frontend_name(value),
+                    y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].median(),
+                    text=f"md = {big_number_human_format(feature_df.loc[feature_df.feature_value == value, str(selected_metric)].median(), small_decimals=1)}",
+                    yshift=8,
                     showarrow=False,
                 )
             fig.update_layout(

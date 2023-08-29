@@ -26,7 +26,7 @@ class GoogleDailyPerformance(GoogleBase):
     # TODO: provjeri s Josipom
     adgroup_id_ = synonym("adgroup_id")
     clicks_ = synonym("clicks")
-    purch_ = synonym("conversions_all")
-    purch_value_ = synonym("conversions_value_all")
+    purch_ = synonym("conversions")
+    purch_value_ = synonym("conversions_value")
 
     shop = relationship("Shop")

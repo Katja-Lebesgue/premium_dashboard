@@ -30,5 +30,13 @@ class CRUDStreamlitUserShop(CRUDBase[StreamlitUserShop, StreamlitUserShopCreate,
         df = pd.read_sql(query.statement, db.bind)
         return df
 
+    def get_shops_by_streamlit_user_id(self, db: Session, streamlit_user_id: int) -> list[Shop]:
+        return (
+            db.query(Shop.id, Shop.name)
+            .join(self.model, self.model.shop_id == Shop.id)
+            .filter(self.model.streamlit_user_id == streamlit_user_id)
+            .all()
+        )
+
 
 streamlit_user_shop = CRUDStreamlitUserShop(StreamlitUserShop)
