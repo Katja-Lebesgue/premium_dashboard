@@ -1,5 +1,5 @@
 from .descriptive_tab import *
-from .user_settings import *
+from .settings import *
 from .market_performance_tests import market_performance_tests
 from .text_analysis import text_analysis
 from .shop_custom_performance_test import shop_custom_performance_test
