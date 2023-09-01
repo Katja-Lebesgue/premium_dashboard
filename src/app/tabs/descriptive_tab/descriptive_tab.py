@@ -6,9 +6,13 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Literal
 
+from scipy.stats import kruskal
+
 from src.abc.descriptive import Descriptive, DescriptiveDF
-from src.app.frontend_names import get_frontend_name
+from src.models.enums.facebook import TextFeature
+from src.app.frontend_names import get_frontend_name, list_to_str
 from src.utils import *
+from src.statistical_tests import perform_test_on_df
 
 metrics = [cr, ctr, cpm]
 
@@ -179,42 +183,76 @@ class DescriptiveTab(Descriptive):
                 key="time_metric",
             )
 
-        feature_df = main_df[main_df.feature == selected_feature]
-        feature_df = feature_df[
-            feature_df[selected_metric.denom] > max(100, feature_df[selected_metric.denom].quantile(0.25))
-        ]
+            feature_df = main_df[main_df.feature == selected_feature]
+            feature_df = feature_df[
+                feature_df[selected_metric.denom] > max(100, feature_df[selected_metric.denom].quantile(0.25))
+            ]
+
+            partition, _ = perform_test_on_df(
+                df=feature_df,
+                group_column="feature_value",
+                metric_column=str(selected_metric),
+                test_func=kruskal,
+                test_func_kwargs={"nan_policy": "omit"},
+                pd_feature_func="median",
+            )
+
+            if (n_groups := len(sum(partition, []))) > 1:
+                if (n_slices := len(partition)) == 1:
+                    st.warning(
+                        f"There is no significant differnce in {get_frontend_name(selected_metric)} among the groups."
+                    )
+                else:
+                    winners = partition[0]
+                    losers = partition[-1]
+                    winners_str = list_to_str(winners)
+                    if winners_str.islower():
+                        winners_str = winners_str.capitalize()
+                    losers_str = list_to_str(losers)
+                    winners_verb = "has" if len(winners) == 1 else "have"
+                    losers_verb = "has" if len(losers) == 1 else "have"
+                    if n_slices == 2:
+                        message = f"{winners_str} {winners_verb} significantly higher {selected_metric} than {losers_str}."
+                    else:
+                        message = f"{winners_str} {winners_verb} significantly the highest {selected_metric}, while {losers_str} {losers_verb} the lowest."
+                    st.success(message)
 
         with col2:
             fig = go.Figure()
-            feature_values = feature_df.feature_value.unique().tolist()
-            for value in feature_values:
-                extra_box_kwargs = {}
-                if "color" in selected_feature:
-                    extra_box_kwargs = extra_box_kwargs | {"fillcolor": value, "line": {"color": value}}
-                fig.add_trace(
-                    go.Box(
-                        y=feature_df.loc[feature_df.feature_value == value, str(selected_metric)],
-                        name=get_frontend_name(value),
-                        boxmean=True,
-                        boxpoints=False,
-                        **extra_box_kwargs,
+            boxplot_idx = 0
+            for slice in partition:
+                for value in slice:
+                    extra_box_kwargs = {}
+                    if "color" in selected_feature:
+                        extra_box_kwargs = extra_box_kwargs | {"fillcolor": value, "line": {"color": value}}
+                    fig.add_trace(
+                        go.Box(
+                            y=feature_df.loc[feature_df.feature_value == value, str(selected_metric)],
+                            name=get_frontend_name(value),
+                            boxmean=True,
+                            boxpoints=False,
+                            **extra_box_kwargs,
+                        )
                     )
-                )
 
-                fig.add_annotation(
-                    x=get_frontend_name(value),
-                    y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].max(),
-                    text=f"n = {big_number_human_format(len(feature_df[feature_df.feature_value == value]))}",
-                    yshift=20,
-                    showarrow=False,
-                )
-                fig.add_annotation(
-                    x=get_frontend_name(value),
-                    y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].median(),
-                    text=f"md = {big_number_human_format(feature_df.loc[feature_df.feature_value == value, str(selected_metric)].median(), small_decimals=1)}",
-                    yshift=8,
-                    showarrow=False,
-                )
+                    fig.add_annotation(
+                        x=get_frontend_name(value),
+                        y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].max(),
+                        text=f"n = {big_number_human_format(len(feature_df[feature_df.feature_value == value]))}",
+                        yshift=20,
+                        showarrow=False,
+                    )
+                    fig.add_annotation(
+                        x=get_frontend_name(value),
+                        y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].median(),
+                        text=f"md = {big_number_human_format(feature_df.loc[feature_df.feature_value == value, str(selected_metric)].median(), small_decimals=1)}",
+                        yshift=8,
+                        showarrow=False,
+                    )
+                    boxplot_idx += 1
+
+                if boxplot_idx < n_groups:
+                    fig.add_vline(x=boxplot_idx - 0.5, line_width=3, line_dash="dash", line_color="green")
             fig.update_layout(
                 title={"text": "Benchmarks"},
                 yaxis_title=f"{selected_metric} ({selected_metric.unit})",

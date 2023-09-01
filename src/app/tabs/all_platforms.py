@@ -23,7 +23,7 @@ def all_platforms():
     except Exception:
         pass
 
-    df = df[~df.shop_id.isin([50517862, 39831581])]
+    df = df[~df.shop_id.isin([50517862, 39831581, 123481234])]
 
     df = df.groupby(["shop_id", "year_month", "industry"]).sum().reset_index()
 
@@ -50,7 +50,7 @@ def all_platforms():
         shop_size_filter = []
         for shop_size in sorted(df.shop_size.unique()):
             check = st.checkbox(
-                f"${big_number_human_format(bins[shop_size])}-${big_number_human_format(bins[shop_size+1])}",
+                f"\${big_number_human_format(bins[shop_size], big_decimals=0)} - \${big_number_human_format(bins[shop_size+1], big_decimals=0)}",
                 value=True,
             )
             if check:
@@ -62,6 +62,8 @@ def all_platforms():
 
         if industry != "all":
             df = df[df.industry == industry]
+
+        st.info(f"Total of {df.shop_id.nunique()} shops selected.")
 
     with col_breakdown2:
         display_platform_table(df=df)

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 import numpy as np
 from src.feature_extractors import *
 from src.models import *
+from src.models.enums.facebook import Target
 from src.utils import element_to_list, convert_enum_to_its_value, MyInterval, recursively_apply_func
 
 
@@ -14,6 +15,7 @@ class Audience(str, Enum):
     broad = "broad"
     lookalike = "lookalike"
     interest = "interest"
+    retargeting = "retargeting"
 
 
 class AgeGroup(str, Enum):
@@ -78,8 +80,11 @@ def ping_target(
     if len(df) == 0:
         return df
 
-    audience_and_interests = df.targeting.apply(lambda x: deduce_audience(x))
+    audience_and_interests = df.apply(
+        lambda df: deduce_audience(target=df.target, targeting=df.targeting), axis=1
+    )
     df = df.join(audience_and_interests.apply(pd.Series))
+
     df["gender"] = df.targeting.apply(lambda x: deduce_gender(x))
     df["age_groups"] = df.targeting.apply(lambda x: get_agegroups(x))
 
@@ -100,7 +105,9 @@ def deduce_gender(targeting: list | None = None):
     return Gender.both
 
 
-def deduce_audience(targeting) -> Audience:
+def deduce_audience(targeting: dict, target: Target) -> Audience:
+    if target == Target.remarketing:
+        return {"audience": Audience.retargeting, "interests": []}
     flexible_spec = targeting.get("flexible_spec", [])
     interest_dicts = [d.get("interests", []) for d in flexible_spec if type(d) == dict]
     interests_packed = [[d.get("name") for d in interest] for interest in interest_dicts]

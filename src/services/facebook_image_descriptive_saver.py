@@ -215,9 +215,7 @@ class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
             .assign(feature="color")
         )
         stacked_color_df = (
-            stacked_color_df.groupby(self.main_df_index + ["shop_id"])[self.metric_columns]
-            .sum()
-            .reset_index()
+            stacked_color_df.groupby(self.main_df_index)[self.metric_columns].sum().reset_index()
         )
 
         # adding fake feature

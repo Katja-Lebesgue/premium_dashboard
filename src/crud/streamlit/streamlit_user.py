@@ -19,12 +19,8 @@ class CRUDStreamlitUser(CRUDBase[StreamlitUser, StreamlitUserCreate, StreamlitUs
         db.query(self.model).filter(self.model.id == id).delete()
         db.commit()
 
-    def ping_all_subusernames(self, db: Session) -> list[dict]:
-        query = db.query(StreamlitUser.id, StreamlitUser.username).filter(
-            StreamlitUser.is_superuser == false()
-        )
-        df = pd.read_sql(query.statement, db.bind)
-        return df
+    def get_all_subusers(self, db: Session) -> list[dict]:
+        return db.query(StreamlitUser).filter(StreamlitUser.is_superuser == false())
 
     def update_hashed_password(self, db: Session, id: str, hashed_password: str):
         db.query(self.model).filter(self.model.id == id).update({"hashed_password": hashed_password})

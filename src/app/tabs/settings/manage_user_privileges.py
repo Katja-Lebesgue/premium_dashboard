@@ -7,16 +7,20 @@ from src.pingers import ping_shops
 
 
 def manage_user_privileges():
-    users = crud.streamlit_user.ping_all_subusernames(db=db)
-    shops = st_ping_shops()
+    users = crud.streamlit_user.get_all_subusers(db=db)
+    user_id_name_dict = {user.id: user.username for user in users}
+    all_shops = crud.shop.get_nontest_shops(db=db)
+    shop_id_name_dict = {shop_.id: shop_.name for shop_ in all_shops}
     user_id = st.selectbox(
         label="Select user",
-        options=users["id"],
-        format_func=lambda x: users.loc[users.id == x, "username"].item(),
+        options=user_id_name_dict.keys(),
+        format_func=lambda id: user_id_name_dict[id],
     )
 
-    user_shops = crud.streamlit_user_shop.ping_shops_by_streamlit_user_id(db=db, streamlit_user_id=user_id)
-    forbidden_shops = shops[~shops.id.isin(user_shops.id)]
+    user_shops = crud.streamlit_user_shop.get_shops_by_streamlit_user_id(db=db, streamlit_user_id=user_id)
+    forbidden_shops = [
+        shop_ for shop_ in all_shops if shop_.id not in set([user_shop.id for user_shop in user_shops])
+    ]
 
     # add shop
     add_shop_form = st.form("Add shop")
@@ -24,8 +28,8 @@ def manage_user_privileges():
 
     shop_id = add_shop_form.selectbox(
         label="Select shop",
-        options=forbidden_shops["id"],
-        format_func=lambda x: forbidden_shops.loc[forbidden_shops.id == x, "name"].item(),
+        options=[shop_.id for shop_ in forbidden_shops],
+        format_func=lambda id: shop_id_name_dict[id],
     )
 
     if add_shop_form.form_submit_button("Add"):
@@ -37,8 +41,8 @@ def manage_user_privileges():
     remove_shop_form.subheader("Remove shop")
     shop_id = remove_shop_form.selectbox(
         label="Select shop",
-        options=user_shops["id"],
-        format_func=lambda x: user_shops.loc[user_shops.id == x, "name"].item(),
+        options=[shop_.id for shop_ in user_shops],
+        format_func=lambda id: shop_id_name_dict[id],
     )
 
     remove_shop_button = remove_shop_form.form_submit_button("Remove")

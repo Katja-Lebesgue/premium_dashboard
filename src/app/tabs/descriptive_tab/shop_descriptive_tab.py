@@ -3,6 +3,7 @@ import streamlit as st
 
 from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.abc.descriptive import *
+from src.app.frontend_names import get_frontend_name
 
 from src.utils import *
 
@@ -42,6 +43,7 @@ class ShopDescriptiveTab(DescriptiveTab):
             st.warning("No data.")
             return summary_df
         summary_df["year_month"] = summary_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
+        summary_df["feature_value"] = summary_df.feature_value.apply(get_frontend_name)
         for metric in metrics:
             summary_df[str(metric)] = summary_df.apply(metric.formula_series, axis=1)
         return summary_df

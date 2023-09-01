@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 import numpy as np
 import pandas as pd
@@ -33,16 +34,19 @@ def shop_default_performance_tests(shop_id: int):
     col1, col2, col3 = st.columns([1, 1, 2])
 
     min_date = data_shop.year_month.min().to_pydatetime()
-    max_date = datetime.today()
+    max_date = data_shop.year_month.max().to_pydatetime()
+    default_min_date = max(min_date, max_date - relativedelta(months=24))
 
     with col1:
-        timeperiod = st.slider(
+        start_date, end_date = st.select_slider(
             label="Choose time period:",
-            value=(min_date, max_date),
-            format="MM/DD/YYYY",
+            value=(default_min_date, max_date),
+            key="a",
+            options=sorted(data_shop.year_month.unique().tolist()),
+            format_func=lambda datetime_: datetime_.strftime("%Y-%m"),
         )
 
-        data_shop = data_shop[data_shop.year_month > timeperiod[0]]
+        data_shop = data_shop[data_shop.year_month.between(start_date, end_date)]
 
     with col2:
         # targeting = st.radio(

@@ -4,6 +4,7 @@ import streamlit as st
 from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.abc.descriptive import DescriptiveDF
 from src.abc.descriptive import *
+from src.app.frontend_names import get_frontend_name
 
 from src.utils import *
 
@@ -60,6 +61,7 @@ class MarketDescriptiveTab(DescriptiveTab):
         end_date = max(_self.get_available_dates(df_type=df_type))
         main_df = _self.read_df(df_type=df_type, end_date=end_date)
         main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
+        main_df["feature_value"] = main_df.feature_value.apply(get_frontend_name)
         for metric in metrics:
             main_df[str(metric)] = main_df.apply(metric.formula_series, axis=1)
         return main_df
@@ -74,7 +76,12 @@ class FacebookTargetMarketDescriptiveTab(MarketDescriptiveTab, FacebookTargetDes
 
 
 class FacebookImageMarketDescriptiveTab(MarketDescriptiveTab, FacebookImageDescriptive):
-    ...
+    def show(self):
+        with (col := st.columns([1, 1])[0]):
+            st.info(
+                f"This analysis includes only images corresponding to top {FacebookImageDescriptive.n_ads_per_shop_and_month} image ads by spend for each shop and month."
+            )
+        super().show()
 
 
 class GoogleCampaignTypeMarketDescriptiveTab(MarketDescriptiveTab, GoogleCampaignTypeDescriptive):

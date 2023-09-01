@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,23 @@ def shop_custom_performance_test(shop_id: int):
     if not len(data_shop):
         st.warning("No data")
         return
+
+    _, col1, _ = st.columns([1, 4, 1])
+
+    min_date = data_shop.year_month.min().to_pydatetime()
+    max_date = data_shop.year_month.max().to_pydatetime()
+    default_min_date = max(min_date, max_date - relativedelta(months=24))
+
+    with col1:
+        start_date, end_date = st.select_slider(
+            label="Choose time period:",
+            value=(default_min_date, max_date),
+            key="a",
+            options=sorted(data_shop.year_month.unique().tolist()),
+            format_func=lambda datetime_: datetime_.strftime("%Y-%m"),
+        )
+
+        data_shop = data_shop[data_shop.year_month.between(start_date, end_date)]
 
     test_group1 = data_shop
 

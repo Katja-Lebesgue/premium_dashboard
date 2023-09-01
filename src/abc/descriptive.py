@@ -44,7 +44,7 @@ class Descriptive(ABC):
 
     s3_descriptive_folder = "descriptive"
 
-    main_df_index = ["year_month", "feature", "feature_value"]
+    main_df_index = ["shop_id", "year_month", "feature", "feature_value"]
 
     metric_columns = [
         "spend_USD",
@@ -62,7 +62,8 @@ class Descriptive(ABC):
     def end_date(self):
         # end_date should be the last day of the month so we always
         # only consider data from full months
-        today = date.today()
+        # TODO: remove timedelta
+        today = date.today() + timedelta(days=4)
         end_date_plus_one = date(year=today.year, month=today.month, day=1)
         return end_date_plus_one - timedelta(days=1)
 
@@ -85,10 +86,7 @@ class Descriptive(ABC):
         shop_descriptive_df = pd.DataFrame()
 
         if not len(shop_df):
-            logger.debug(f"{shop_id}: -")
             return shop_descriptive_df
-
-        logger.debug(f"{shop_id}: +")
 
         if len(
             (
@@ -118,7 +116,7 @@ class Descriptive(ABC):
         )
         level_column = [col for col in stacked_df.columns if "level" in str(col)][0]
         stacked_df.rename(columns={level_column: "feature", 0: "feature_value"}, inplace=True)
-        shop_descriptive_df = stacked_df.groupby(self.main_df_index + ["shop_id"])[self.metric_columns].sum()
+        shop_descriptive_df = stacked_df.groupby(self.main_df_index)[self.metric_columns].sum()
 
         return shop_descriptive_df
 
@@ -185,6 +183,7 @@ class FacebookImageDescriptive(Descriptive):
     descriptive_columns = ["color"]
     tag = "facebook_image"
     pie_columns = ["color"]
+    n_ads_per_shop_and_month = 5
 
     def get_shop_df(self, db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:
         return ping_image_urls_and_ad_performance(

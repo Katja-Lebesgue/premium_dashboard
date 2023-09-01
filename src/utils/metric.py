@@ -6,7 +6,7 @@ import pandas as pd
 
 class Metric(ABC):
     def __str__(self) -> str:
-        return type(self).__name__.lower()
+        return type(self).__name__.upper()
 
     @abstractproperty
     def unit(self) -> str:

@@ -19,7 +19,7 @@ class DescriptiveSaver(Descriptive):
     save_every_n_shops = 15
 
     def create_and_save_summary(self, end_date: date | None = None) -> pd.DataFrame:
-        main_df = self.read_df("main", end_date=end_date)
+        main_df = self.read_df(df_type=DescriptiveDF.main, end_date=end_date)
         main_df["n_shops"] = 1
         sum_by_shop_and_feature = main_df.groupby(["shop_id", "year_month", "feature"])[
             self.metric_columns
@@ -60,9 +60,6 @@ class DescriptiveSaver(Descriptive):
         df_type: str = DescriptiveDF.main,
         testing: bool = False,
     ) -> pd.DataFrame:
-        # end_date should be the last day of the month so we always
-        # only consider data from full months
-
         all_shops = crud.shop.get_nontest_shops(db=db)
         all_shop_ids = pd.Series([shop_.id for shop_ in all_shops], name="shop_id").sort_values()
 
@@ -78,7 +75,7 @@ class DescriptiveSaver(Descriptive):
             failed_shop_ids = pd.Series([], name="shop_id")
             undone_shop_ids = all_shop_ids
         else:
-            main_df = self.read_df(df_type=df_type, end_date=self.end_date)
+            main_df = self.read_df(df_type=df_type, end_date=self.end_date).set_index(self.main_df_index)
             done_shop_ids = self.read_df(df_type=DescriptiveDF.done_shop_ids, end_date=self.end_date)[
                 "shop_id"
             ]
@@ -96,12 +93,13 @@ class DescriptiveSaver(Descriptive):
         new_done_shop_ids = []
 
         if testing:
-            undone_shop_ids = [16038, 44301396]
+            undone_shop_ids = [16038, 44301396, 34810574]
 
         n_unsaved_shops = 0
-        for shop_id in tqdm(undone_shop_ids):
-            if n_unsaved_shops == self.save_every_n_shops and not testing:
-                self.save_df(df=main_df, df_type=df_type, index=False, end_date=self.end_date)
+        shop_loader = tqdm(undone_shop_ids)
+        for shop_id in shop_loader:
+            if n_unsaved_shops == self.save_every_n_shops:
+                self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
                 self.save_df(
                     df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
                     df_type=DescriptiveDF.done_shop_ids,
@@ -123,6 +121,8 @@ class DescriptiveSaver(Descriptive):
                     db=db, shop_id=shop_id, start_date=self.start_date, end_date=self.end_date
                 )
 
+                shop_loader.set_postfix({"shop_id": str(shop_id), "len": len(shop_descriptive_df)})
+
                 if len(shop_descriptive_df):
                     if not (len(main_df)):
                         main_df = shop_descriptive_df
@@ -135,20 +135,19 @@ class DescriptiveSaver(Descriptive):
                 logger.error(f"Error for shop id {shop_id}: \n {e}")
                 new_failed_shop_ids.append(shop_id)
 
-        if not testing:
-            self.save_df(df=main_df, df_type=df_type, index=False, end_date=self.end_date)
-            self.save_df(
-                df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
-                df_type=DescriptiveDF.done_shop_ids,
-                index=False,
-                end_date=self.end_date,
-            )
-            self.save_df(
-                df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
-                df_type=DescriptiveDF.failed_shop_ids,
-                index=False,
-                end_date=self.end_date,
-            )
+        self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
+        self.save_df(
+            df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
+            df_type=DescriptiveDF.done_shop_ids,
+            index=False,
+            end_date=self.end_date,
+        )
+        self.save_df(
+            df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
+            df_type=DescriptiveDF.failed_shop_ids,
+            index=False,
+            end_date=self.end_date,
+        )
 
         return main_df
 

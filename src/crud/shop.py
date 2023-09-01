@@ -19,7 +19,7 @@ from .base import CRUDBase
 
 class CRUDShop(CRUDBase[models.Shop, schemas.ShopCreate, schemas.ShopUpdate]):
     def ping_all(self, db: Session) -> pd.DataFrame:
-        query = db.query(self.model).filter(self.model.rapp_shop == false())
+        query = db.query(self.model)
         df = pd.read_sql(query.statement, db.bind)
         return df
 

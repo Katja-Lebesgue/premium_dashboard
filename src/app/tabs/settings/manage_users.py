@@ -10,7 +10,8 @@ from src.utils import *
 
 
 def manage_users():
-    users = crud.streamlit_user.ping_all_subusernames(db=db)
+    users = crud.streamlit_user.get_all_subusers(db=db)
+    user_id_name_dict = {user.id: user.username for user in users}
 
     # register user
     reg_user_form = st.form("Register user")
@@ -37,8 +38,8 @@ def manage_users():
     delete_user_form.subheader("Delete user")
     user_id = delete_user_form.selectbox(
         label="Select user",
-        options=users["id"],
-        format_func=lambda x: users.loc[users.id == x, "username"].item(),
+        options=user_id_name_dict.keys(),
+        format_func=lambda id: user_id_name_dict[id],
     )
 
     if delete_user_form.form_submit_button("Delete"):
@@ -50,8 +51,8 @@ def manage_users():
     reset_password_form.subheader("Reset password")
     user_id = reset_password_form.selectbox(
         label="Select user",
-        options=users["id"],
-        format_func=lambda x: users.loc[users.id == x, "username"].item(),
+        options=user_id_name_dict.keys(),
+        format_func=lambda id: user_id_name_dict[id],
     )
     new_password = reset_password_form.text_input("Password", type="password")
     new_password_repeat = reset_password_form.text_input("Repeat password", type="password")
