@@ -2,11 +2,16 @@ from typing import Callable
 from abc import abstractproperty, ABC
 import numpy as np
 import pandas as pd
+from src.utils.interval import MyInterval
 
 
 class Metric(ABC):
     def __str__(self) -> str:
         return type(self).__name__.upper()
+
+    @abstractproperty
+    def interval(self) -> MyInterval:
+        ...
 
     @abstractproperty
     def unit(self) -> str:
@@ -43,12 +48,14 @@ class CTR(Metric):
     unit = "%"
     num = "clicks"
     denom = "impr"
+    interval = MyInterval(0, 1)
 
 
 class CR(Metric):
     unit = "%"
     num = "purch"
     denom = "clicks"
+    interval = MyInterval(0, 1)
 
 
 class CPM(Metric):
@@ -56,6 +63,7 @@ class CPM(Metric):
     num = "spend_USD"
     denom = "impr"
     scalar = 1000
+    interval = MyInterval(0, 1000)
 
 
 ctr = CTR()

@@ -33,4 +33,4 @@ if __name__ == "__main__":
     facebook_target_descriptive_saver.create_and_save_summary()
     google_campaign_type_descriptive_saver.create_and_save_summary()
 
-    # facebook_image_descriptive_saver.save_everything(force_from_scratch=args.force_from_scratch)
+    facebook_image_descriptive_saver.save_everything(force_from_scratch=args.force_from_scratch)

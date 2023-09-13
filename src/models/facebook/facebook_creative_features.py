@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, ForeignKey, String, Boolean, Integer, Enum
+from sqlalchemy import BigInteger, Column, ForeignKey, String, Boolean, Integer, Enum, TIMESTAMP, func
 from sqlalchemy.dialects import postgresql, sqlite
 
 from src.database.base_class import Base
@@ -43,3 +43,11 @@ class FacebookCreativeFeatures(Base):
     target = Column(Enum(Target, native_enum=False))
     targets_english = Column(Boolean)
     targets_US = Column(Boolean)
+
+    # update metadata
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    last_updated = Column(
+        TIMESTAMP,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )

@@ -28,9 +28,7 @@ class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
         n_pixels: int = 1000,
         n_local_centroids: int = 5,
         n_global_centroids: int = 12,
-        n_ads_per_shop_and_month: int = 5,
     ):
-        self.n_ads_per_shop_and_month = n_ads_per_shop_and_month
         self.n_pixels = n_pixels
         self.n_local_centroids = n_local_centroids
         self.n_global_centroids = n_global_centroids

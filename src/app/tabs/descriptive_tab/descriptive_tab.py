@@ -200,7 +200,7 @@ class DescriptiveTab(Descriptive):
             if (n_groups := len(sum(partition, []))) > 1:
                 if (n_slices := len(partition)) == 1:
                     st.warning(
-                        f"There is no significant differnce in {get_frontend_name(selected_metric)} among the groups."
+                        f"There is no significant difference in {get_frontend_name(selected_metric)} among the groups."
                     )
                 else:
                     winners = partition[0]

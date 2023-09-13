@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import datetime, date
 
 from src.utils.enum import convert_enum_to_its_value
 
@@ -16,6 +17,8 @@ FRONTEND_NAMES_DICT = {
 
 def get_frontend_name(backend_name: Any) -> str:
     backend_name = convert_enum_to_its_value(backend_name)
+    if type(backend_name) in (date, datetime):
+        return backend_name.strftime("%Y-%m")
     return FRONTEND_NAMES_DICT.get(str(backend_name), str(backend_name).replace("_", " "))
 
 

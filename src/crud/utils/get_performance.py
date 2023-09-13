@@ -97,7 +97,7 @@ def get_performance(
         )
 
     if cast_to_date and monthly:
-        df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
+        df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m").date())
 
     return df
 

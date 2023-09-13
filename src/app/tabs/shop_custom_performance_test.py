@@ -17,6 +17,7 @@ from src.pingers import ping_facebook_creative_and_performance
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
 from src.app.frontend_names import get_frontend_name
 from uuid import uuid1
+from src.app.utils.filter_df import filter_df, FilterType
 
 
 def shop_custom_performance_test(shop_id: int):
@@ -33,39 +34,37 @@ def shop_custom_performance_test(shop_id: int):
 
     _, col1, _ = st.columns([1, 4, 1])
 
-    min_date = data_shop.year_month.min().to_pydatetime()
-    max_date = data_shop.year_month.max().to_pydatetime()
-    default_min_date = max(min_date, max_date - relativedelta(months=24))
+    # min_date = data_shop.year_month.min().to_pydatetime()
+    # max_date = data_shop.year_month.max().to_pydatetime()
+    # default_min_date = max(min_date, max_date - relativedelta(months=24))
 
-    with col1:
-        start_date, end_date = st.select_slider(
-            label="Choose time period:",
-            value=(default_min_date, max_date),
-            key="a",
-            options=sorted(data_shop.year_month.unique().tolist()),
-            format_func=lambda datetime_: datetime_.strftime("%Y-%m"),
-        )
+    # with col1:
+    #     start_date, end_date = st.select_slider(
+    #         label="Choose time period:",
+    #         value=(default_min_date, max_date),
+    #         key="a",
+    #         options=sorted(data_shop.year_month.unique().tolist()),
+    #         format_func=lambda datetime_: datetime_.strftime("%Y-%m"),
+    #     )
 
-        data_shop = data_shop[data_shop.year_month.between(start_date, end_date)]
+    #     data_shop = data_shop[data_shop.year_month.between(start_date, end_date)]
 
     test_group1 = data_shop
 
     test_group2 = data_shop.copy()
 
-    features = BOOLEAN_TEXT_FEATURES
-
     col1, col2 = st.columns(2)
 
     with col1:
         st.header("Group 1")
-        test_group1 = group_filtering(test_group1, "1")
-        test_group1 = feature_filtering(test_group1, features, "1")
+        test_group1 = filter_basic_features(test_group1, "1")
+        test_group1 = filter_text_features(test_group1, "1")
         st.info(f"Total of {test_group1.ad_id.nunique()} ads filtered.")
 
     with col2:
         st.header("Group 2")
-        test_group2 = group_filtering(test_group2, "2")
-        test_group2 = feature_filtering(test_group2, features, "2")
+        test_group2 = filter_basic_features(test_group2, "2")
+        test_group2 = filter_text_features(test_group2, "2")
         st.info(f"Total of {test_group2.ad_id.nunique()} ads filtered.")
 
     if len(test_group1) or len(test_group2):
@@ -80,54 +79,27 @@ def shop_custom_performance_test(shop_id: int):
     return
 
 
-def group_filtering(df: pd.DataFrame, id: str) -> pd.DataFrame:
-    st.subheader("Filter target and creative type")
-
-    # targeting = st.radio(
-    #     "Country targets",
-    #     tuple(targeting_dict.keys()),
-    #     format_func=get_frontend_name,
-    #     key=f"targeting_{id}",
-    #     index=2,
-    # )
-
-    # if targeting in ["targets_US", "targets_english"]:
-    #     df = df.loc[df[targeting] == True, :]
-
-    for group in custom_group_dict.keys():
-        filter = []
-
-        logger.debug(0)
-        with st.expander(f"{custom_group_dict[group]}"):
-            for target in df[group].unique():
-                check = st.checkbox(
-                    get_frontend_name(target), value=True, key=str(group) + str(id) + str(target)
-                )
-                if check:
-                    filter.append(target)
-
-        df = df[df[group].isin(filter)]
+def filter_basic_features(df: pd.DataFrame, group_id: str) -> pd.DataFrame:
+    st.subheader("Filter basic features")
+    default_min_date = df.year_month.max() - relativedelta(months=24)
+    df = filter_df(
+        df=df,
+        column_name="year_month",
+        filter_type=FilterType.slider,
+        selecter_id=group_id,
+        slider_default_lower_bound=default_min_date,
+    )
+    df = filter_df(df=df, column_name="target", filter_type=FilterType.checkbox, selecter_id=group_id)
+    df = filter_df(df=df, column_name="creative_type", filter_type=FilterType.checkbox, selecter_id=group_id)
 
     return df
 
 
-def feature_filtering(df: pd.DataFrame, features: list[str], id: str) -> pd.DataFrame:
+def filter_text_features(df: pd.DataFrame, group_id: str) -> pd.DataFrame:
     st.subheader("Filter text features")
 
-    for feature in features:
-        filter = []
-
-        with st.expander(get_frontend_name(feature)):
-            if df[feature].unique() is not None:
-                for value in df[feature].unique():
-                    check = st.checkbox(str(value), value=True, key=str(id) + str(value) + str(feature))
-                    if check:
-                        filter.append(value)
-
-                df = df[df[feature].isin(filter)]
-
-            else:
-                st.write("Nope")
+    for feature in BOOLEAN_TEXT_FEATURES:
+        df = filter_df(df=df, column_name=feature, filter_type=FilterType.checkbox, selecter_id=group_id)
 
     return df
 

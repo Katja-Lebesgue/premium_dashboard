@@ -17,6 +17,7 @@ from src.database.session import db
 from src.utils import big_number_human_format
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES, TextFeature
 from src.app.frontend_names import get_frontend_name
+from src.app.utils.filter_df import filter_df, FilterType
 from src.pingers import *
 
 
@@ -33,20 +34,14 @@ def shop_default_performance_tests(shop_id: int):
 
     col1, col2, col3 = st.columns([1, 1, 2])
 
-    min_date = data_shop.year_month.min().to_pydatetime()
-    max_date = data_shop.year_month.max().to_pydatetime()
-    default_min_date = max(min_date, max_date - relativedelta(months=24))
-
     with col1:
-        start_date, end_date = st.select_slider(
-            label="Choose time period:",
-            value=(default_min_date, max_date),
-            key="a",
-            options=sorted(data_shop.year_month.unique().tolist()),
-            format_func=lambda datetime_: datetime_.strftime("%Y-%m"),
+        default_min_date = data_shop.year_month.max() - relativedelta(months=24)
+        data_shop = filter_df(
+            df=data_shop,
+            column_name="year_month",
+            filter_type=FilterType.slider,
+            slider_default_lower_bound=default_min_date,
         )
-
-        data_shop = data_shop[data_shop.year_month.between(start_date, end_date)]
 
     with col2:
         # targeting = st.radio(
