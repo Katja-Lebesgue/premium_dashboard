@@ -23,6 +23,7 @@ facebook_shop_menu = MyOptionMenu(
             name="Default tests", icon="lightning-fill", activation_function=shop_default_performance_tests
         ),
         MyButton(name="Custom test", icon="lightbulb", activation_function=shop_custom_performance_test),
+        MyButton(name="Analytics", icon="zoom-in", activation_function=analytics_tab),
     ),
 )
 

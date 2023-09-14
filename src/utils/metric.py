@@ -48,14 +48,14 @@ class CTR(Metric):
     unit = "%"
     num = "clicks"
     denom = "impr"
-    interval = MyInterval(0, 1)
+    interval = MyInterval(0, 100)
 
 
 class CR(Metric):
     unit = "%"
     num = "purch"
     denom = "clicks"
-    interval = MyInterval(0, 1)
+    interval = MyInterval(0, 100)
 
 
 class CPM(Metric):
@@ -66,6 +66,14 @@ class CPM(Metric):
     interval = MyInterval(0, 1000)
 
 
+class CAC(Metric):
+    unit = "$"
+    num = "spend_USD"
+    denom = "purch"
+    interval = MyInterval(0, 10000)
+
+
 ctr = CTR()
 cr = CR()
 cpm = CPM()
+cac = CAC()

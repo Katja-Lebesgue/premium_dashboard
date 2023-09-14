@@ -1,1 +1,185 @@
+from dateutil.relativedelta import relativedelta
+
 import streamlit as st
+from streamlit_modal import Modal
+import streamlit.components.v1 as components
+import webbrowser
+
+from src.app.utils import *
+from src.database.session import db
+from src.pingers import ping_facebook_creative_target_and_performance
+from src.utils import *
+from src.models import Shop
+from src.app.utils import filter_df
+from src import crud
+from src.app.frontend_names import get_frontend_name
+from src.fb_api.get_preview_shareable_link import get_preview_shareable_link
+from src.models.enums.facebook import TextFeature, BOOLEAN_TEXT_FEATURES, TARGET_FEATURES, TextType
+
+metrics = (cac, ctr, cr, cpm)
+descriptive_columns = ["spend_USD", "impr", "purch", "purch_value_USD", "clicks"]
+
+ad_feature_columns = ["ad_id", "name", "creative_type", "target", "audience"]
+
+
+def get_ads_data(shop_id: int):
+    shop_df = ping_facebook_creative_target_and_performance(db=db, shop_id=shop_id, enum_to_value=True)
+    ad_names = crud.fb_ad.get_names(db=db, shop_id=shop_id)
+    ad_names_df = pd.DataFrame([row._asdict() for row in ad_names])
+    shop_df = shop_df.merge(ad_names_df, on=["ad_id", "account_id"])
+    return shop_df
+
+
+def analytics_tab(shop_id: int):
+    shop_df = st_cache_data(
+        _func=get_ads_data,
+        func_name=get_ads_data.__name__,
+        shop_id=shop_id,
+    )
+
+    if len(shop_df) == 0:
+        st.warning("No data.")
+        return
+
+    default_min_date = shop_df.year_month.max() - relativedelta(months=24)
+    shop_df = filter_df(
+        df=shop_df,
+        column_name="year_month",
+        filter_type=FilterType.slider,
+        slider_default_lower_bound=default_min_date,
+    )
+
+    aggregated_metrics = shop_df.groupby(["ad_id", "account_id"])[descriptive_columns].sum()
+
+    shop_df = aggregated_metrics.merge(
+        shop_df[
+            ["ad_id", "account_id", "creative_type", "name"]
+            + BOOLEAN_TEXT_FEATURES
+            + TARGET_FEATURES
+            + get_enum_values(TextType)
+        ],
+        on=["ad_id", "account_id"],
+    ).drop_duplicates(["ad_id", "account_id"])
+
+    for metric in metrics:
+        shop_df[str(metric)] = shop_df.apply(metric.formula_series, axis=1)
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        shop_df = filter_df(df=shop_df, column_name="audience", filter_type=FilterType.checkbox)
+    with col2:
+        shop_df = filter_df(df=shop_df, column_name="creative_type", filter_type=FilterType.checkbox)
+    with col3:
+        shop_df = filter_df(df=shop_df, column_name=TextFeature.discount, filter_type=FilterType.checkbox)
+
+    col4, col5 = st.columns([1, 2])
+
+    with col4:
+        with st.expander("Filter by metric"):
+            shop_df = filter_df(
+                df=shop_df,
+                column_name="spend_USD",
+                filter_type=FilterType.slider,
+                format_func=lambda num: f"${big_number_human_format(num)}",
+            )
+            shop_df = filter_df(
+                df=shop_df,
+                column_name=str(cac),
+                filter_type=FilterType.slider,
+                format_func=lambda num: f"${big_number_human_format(num)}",
+            )
+            shop_df = filter_df(
+                df=shop_df,
+                column_name=str(cpm),
+                filter_type=FilterType.slider,
+                format_func=lambda num: f"${big_number_human_format(num)}",
+            )
+
+    with col5:
+        with st.expander("Select columns"):
+            (
+                ad_features_st_col,
+                texts_st_col,
+                descriptive_st_col,
+                metrics_st_column,
+            ) = st.columns(4)
+            selected_columns = []
+            with ad_features_st_col:
+                st.write("Ad features")
+                selected_columns.extend(
+                    checkbox_menu(labels=ad_feature_columns, true_labels=["name"], key="ad_features")
+                )
+            with texts_st_col:
+                st.write("Ad copy")
+                selected_columns.extend(
+                    checkbox_menu(labels=get_enum_values(TextType), true_labels=[TextType.primary])
+                )
+            with descriptive_st_col:
+                st.write("Descriptive columns")
+                selected_columns.extend(
+                    checkbox_menu(labels=descriptive_columns, true_labels=["spend"], key="descriptive")
+                )
+            with metrics_st_column:
+                st.write("Metrics")
+                selected_columns.extend(checkbox_menu(labels=list(map(str, metrics)), key="metrics"))
+
+    shop_df[descriptive_columns + list(map(str, metrics))] = shop_df[
+        descriptive_columns + list(map(str, metrics))
+    ].applymap(lambda num: big_number_human_format(num=num, small_decimals=2))
+
+    st.dataframe(shop_df[selected_columns].style.hide(axis="index"), height=300)
+    open_download_modal = st.button("Export as CSV")
+
+    download_modal = Modal("Export as CSV", key="hop", padding=20, max_width=690)
+    if open_download_modal:
+        download_modal.open()
+
+    if download_modal.is_open():
+        with download_modal.container():
+            order_by_st_column, top_n_st_column = st.columns([1, 1])
+            with order_by_st_column:
+                order_column = st.selectbox(
+                    label="Order by",
+                    options=(str(cac), str(cpm), str(ctr), str(cr), "spend_USD"),
+                    format_func=get_frontend_name,
+                )
+                ascending = st.checkbox(label="Ascending", value=True)
+                shop_df = shop_df.sort_values(order_column, ascending=ascending)
+            with top_n_st_column:
+                n_ads = st.number_input(min_value=1, max_value=20, label="Number of top rows", value=5)
+                shop_df = shop_df.head(n_ads)
+                add_links_st_col, open_links_st_col = st.columns(2)
+                with add_links_st_col:
+                    add_links_button = st.button("Add preview links")
+                if add_links_button:
+                    if "preview_link" not in shop_df.columns:
+                        add_preview_links_to_df(df=shop_df, shop_id=shop_id)
+                        selected_columns.append("preview_link")
+                with open_links_st_col:
+                    open_links_button = st.button("Open preview links")
+                    if open_links_button:
+                        logger.debug("tu smo")
+                        if "preview_link" not in shop_df.columns:
+                            add_preview_links_to_df(df=shop_df, shop_id=shop_id)
+                            selected_columns.append("preview_link")
+                        for preview_link in shop_df.preview_link:
+                            st.write(preview_link)
+                            webbrowser.open_new_tab(preview_link)
+            shop_name = db.query(Shop.name).filter(Shop.id == shop_id).first().name
+            file_name = st.text_input(label="File name", value=f"top_{n_ads}_ads_for_{shop_name}.csv")
+            st.dataframe(shop_df[selected_columns], height=180)
+            st.download_button(
+                label="Download",
+                data=shop_df[selected_columns].to_csv(index=False).encode("utf-8"),
+                file_name=file_name,
+            )
+
+
+def add_preview_links_to_df(df: pd.DataFrame, shop_id: int):
+    access_token = crud.credentials.get_facebook_access_token_by_shop(db=db, shop_id=shop_id)
+    df["preview_link"] = df.ad_id.apply(
+        lambda ad_id: get_preview_shareable_link(ad_id=ad_id, access_token=access_token)
+    )
+
+    return df

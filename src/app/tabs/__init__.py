@@ -6,3 +6,4 @@ from .shop_custom_performance_test import shop_custom_performance_test
 from .shop_default_performance_tests import shop_default_performance_tests
 from .select_shop_and_load_data import select_shop_and_load_data
 from .all_platforms import all_platforms
+from .analytics import analytics_tab

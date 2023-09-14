@@ -37,6 +37,8 @@ jupyter = "^1.0.0"
 emojis = "^0.7.0"
 black = "^23.7.0"
 python-intervals = "^1.10.0.post1"
+streamlit-modal = "^0.1.0"
+facebook-business = "^17.0.4"
 
 
 [build-system]

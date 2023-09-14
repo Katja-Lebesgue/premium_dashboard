@@ -28,11 +28,12 @@ class TextFeature(str, Enum):
 
 class TargetFeature(str, Enum):
     target = "target"
-    age_range = "age_range"
-    number_of_custom_audiences = "number_of_custom_audiences"
-    number_of_countries = "number_of_countries"
-    targets_english = "targets_english"
-    targets_US = "targets_US"
+    age_range = "age_groups"
+    gender = "gender"
+    audience = "audience"
+
+
+TARGET_FEATURES = get_enum_values(TargetFeature)
 
 
 class CreativeType(str, Enum):

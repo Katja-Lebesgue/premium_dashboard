@@ -7,3 +7,4 @@ from .shopify import *
 from .streamlit import *
 from .tiktok import *
 from .crm import Crm
+from .credentials import Credentials

@@ -49,7 +49,7 @@ def filter_df(
             else:
                 slider_default_upper_bound = max_value
             lower_bound, upper_bound = st.select_slider(
-                options=options,
+                options=sorted(options),
                 value=(slider_default_lower_bound, slider_default_upper_bound),
                 **selector_kwargs,
             )

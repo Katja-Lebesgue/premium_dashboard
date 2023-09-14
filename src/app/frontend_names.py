@@ -1,7 +1,8 @@
 from typing import Any
 from datetime import datetime, date
+from numbers import Number
 
-from src.utils.enum import convert_enum_to_its_value
+from src.utils import *
 
 FRONTEND_NAMES_DICT = {
     "impr": "impressions",
@@ -12,6 +13,7 @@ FRONTEND_NAMES_DICT = {
     "spend_USD": "ad spend",
     "acquisition": "prospecting",
     "remarketing": "retargeting",
+    "year_month": "time period",
 }
 
 
@@ -19,6 +21,9 @@ def get_frontend_name(backend_name: Any) -> str:
     backend_name = convert_enum_to_its_value(backend_name)
     if type(backend_name) in (date, datetime):
         return backend_name.strftime("%Y-%m")
+
+    if isinstance(backend_name, Number):
+        return big_number_human_format(num=backend_name)
     return FRONTEND_NAMES_DICT.get(str(backend_name), str(backend_name).replace("_", " "))
 
 

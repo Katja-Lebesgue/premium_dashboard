@@ -5,3 +5,4 @@ from .media import *
 from .shop import Shop, ShopCreate, ShopUpdate
 from .shopify import *
 from .streamlit import *
+from .credentials import *

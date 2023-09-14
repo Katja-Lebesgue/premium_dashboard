@@ -16,6 +16,15 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
     def get(self, db: Session, shop_id: int, account_id: str, ad_id: str) -> FacebookAd | None:
         return db.query(self.model).get((shop_id, account_id, ad_id))
 
+    def get_names(self, db: Session, shop_id: int, ad_id: str | list[str] | None = None) -> list[FacebookAd]:
+        query = db.query(self.model.ad_id, self.model.account_id, self.model.name)
+        filters = [self.model.shop_id == shop_id]
+        if ad_id is not None:
+            ad_id = element_to_list(ad_id)
+            filters.append(self.model.account_id.in_(ad_id))
+
+        return query.filter(*filters).all()
+
     def query_ad_id(
         self,
         db: Session,

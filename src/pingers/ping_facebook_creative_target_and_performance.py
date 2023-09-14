@@ -8,7 +8,8 @@ from src import crud, utils
 from src.database.session import SessionLocal
 from src.feature_extractors import *
 from src.models import *
-from src.pingers.ping_facebook_creative_features import ping_facebook_creative
+from src.pingers.ping_facebook_creative_and_performance import ping_facebook_creative_and_performance
+from src.pingers.ping_target import ping_target
 
 
 def ping_facebook_creative_target_and_performance(
@@ -25,19 +26,21 @@ def ping_facebook_creative_target_and_performance(
         print("No filters in ping_facebook_creative_and_performance!")
         return None
 
-    creative = ping_facebook_creative(
+    creative_performance_df = ping_facebook_creative_and_performance(
         db=db,
         shop_id=shop_id,
         ad_id=ad_id,
         start_date=start_date,
         end_date=end_date,
+        monthly=monthly,
+        cast_to_date=cast_to_date,
         enum_to_value=enum_to_value,
     )
 
-    creative = creative.drop(columns=["target"])
+    if len(creative_performance_df) == 0:
+        return creative_performance_df
 
-    if len(creative) == 0:
-        return creative
+    creative_performance_df = creative_performance_df.drop(columns="target")
 
     target_df = ping_target(
         db=db,
@@ -48,22 +51,6 @@ def ping_facebook_creative_target_and_performance(
         enum_to_value=enum_to_value,
     )
 
-    if len(target_df) == 0:
-        return target_df
-
-    performance = crud.fb_daily_performance.get_performance(
-        db=db,
-        shop_id=shop_id,
-        ad_id=ad_id,
-        start_date=start_date,
-        end_date=end_date,
-        monthly=monthly,
-        cast_to_date=cast_to_date,
-    )
-
-    if len(performance) == 0:
-        return creative
-
-    df = creative.merge(target, on=["ad_id", "account_id", "shop_id"]).merge(performance)
+    df = creative_performance_df.merge(target_df, on=["adset_id", "account_id", "shop_id"])
 
     return df
