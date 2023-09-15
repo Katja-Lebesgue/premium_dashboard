@@ -41,7 +41,9 @@ def ad_analytics_tab(shop_id: int):
         st.warning("No data.")
         return
 
-    default_min_date = shop_df.year_month.max() - relativedelta(months=12)
+    min_date = shop_df.year_month.max() - relativedelta(months=24)
+    shop_df = shop_df[shop_df.year_month >= min_date]
+    default_min_date = shop_df.year_month.max() - relativedelta(months=3)
     shop_df = filter_df(
         df=shop_df,
         column_name="year_month",
