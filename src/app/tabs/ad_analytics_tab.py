@@ -30,7 +30,7 @@ def get_ads_data(shop_id: int):
     return shop_df
 
 
-def analytics_tab(shop_id: int):
+def ad_analytics_tab(shop_id: int):
     shop_df = st_cache_data(
         _func=get_ads_data,
         func_name=get_ads_data.__name__,
@@ -41,13 +41,17 @@ def analytics_tab(shop_id: int):
         st.warning("No data.")
         return
 
-    default_min_date = shop_df.year_month.max() - relativedelta(months=24)
+    default_min_date = shop_df.year_month.max() - relativedelta(months=12)
     shop_df = filter_df(
         df=shop_df,
         column_name="year_month",
         filter_type=FilterType.slider,
         slider_default_lower_bound=default_min_date,
     )
+
+    if not len(shop_df):
+        st.warning("Empty dataframe!")
+        return
 
     aggregated_metrics = shop_df.groupby(["ad_id", "account_id"])[descriptive_columns].sum()
 
@@ -73,7 +77,18 @@ def analytics_tab(shop_id: int):
     with col3:
         shop_df = filter_df(df=shop_df, column_name=TextFeature.discount, filter_type=FilterType.checkbox)
 
+    if not len(shop_df):
+        st.warning("Empty dataframe!")
+        return
+
     col4, col5 = st.columns([1, 2])
+
+    shop_df = shop_df[
+        (shop_df.spend_USD.notna())
+        & (shop_df[str(cac)].notna())
+        & (shop_df[str(cpm)].notna())
+        & (shop_df[str(ctr)].notna())
+    ]
 
     with col4:
         with st.expander("Filter by metric"):
@@ -95,40 +110,54 @@ def analytics_tab(shop_id: int):
                 filter_type=FilterType.slider,
                 format_func=lambda num: f"${big_number_human_format(num)}",
             )
+            shop_df = filter_df(
+                df=shop_df,
+                column_name=str(ctr),
+                filter_type=FilterType.slider,
+                format_func=lambda num: f"{big_number_human_format(num, small_decimals=2)}%",
+            )
+
+    if not len(shop_df):
+        st.warning("Empty dataframe!")
+        return
 
     with col5:
         with st.expander("Select columns"):
             (
                 ad_features_st_col,
-                texts_st_col,
                 descriptive_st_col,
                 metrics_st_column,
+                texts_st_col,
             ) = st.columns(4)
             selected_columns = []
             with ad_features_st_col:
                 st.write("Ad features")
                 selected_columns.extend(
-                    checkbox_menu(labels=ad_feature_columns, true_labels=["name"], key="ad_features")
+                    checkbox_menu(
+                        labels=ad_feature_columns, true_labels=["name", "creative_type"], key="ad_features"
+                    )
                 )
-            with texts_st_col:
-                st.write("Ad copy")
-                selected_columns.extend(
-                    checkbox_menu(labels=get_enum_values(TextType), true_labels=[TextType.primary])
-                )
+
             with descriptive_st_col:
                 st.write("Descriptive columns")
                 selected_columns.extend(
-                    checkbox_menu(labels=descriptive_columns, true_labels=["spend"], key="descriptive")
+                    checkbox_menu(labels=descriptive_columns, true_labels=["spend_USD"], key="descriptive")
                 )
             with metrics_st_column:
                 st.write("Metrics")
                 selected_columns.extend(checkbox_menu(labels=list(map(str, metrics)), key="metrics"))
 
+            with texts_st_col:
+                st.write("Ad copy")
+                selected_columns.extend(
+                    checkbox_menu(labels=get_enum_values(TextType), true_labels=[TextType.primary])
+                )
+
     shop_df[descriptive_columns + list(map(str, metrics))] = shop_df[
         descriptive_columns + list(map(str, metrics))
-    ].applymap(lambda num: big_number_human_format(num=num, small_decimals=2))
+    ].applymap(lambda num: round(num, ndigits=2))
 
-    st.dataframe(shop_df[selected_columns].style.hide(axis="index"), height=300)
+    st.dataframe(style_df(shop_df, selected_columns), height=300)
     open_download_modal = st.button("Export as CSV")
 
     download_modal = Modal("Export as CSV", key="hop", padding=20, max_width=690)
@@ -164,11 +193,10 @@ def analytics_tab(shop_id: int):
                             add_preview_links_to_df(df=shop_df, shop_id=shop_id)
                             selected_columns.append("preview_link")
                         for preview_link in shop_df.preview_link:
-                            st.write(preview_link)
                             webbrowser.open_new_tab(preview_link)
             shop_name = db.query(Shop.name).filter(Shop.id == shop_id).first().name
             file_name = st.text_input(label="File name", value=f"top_{n_ads}_ads_for_{shop_name}.csv")
-            st.dataframe(shop_df[selected_columns], height=180)
+            st.dataframe(style_df(shop_df, selected_columns), height=180)
             st.download_button(
                 label="Download",
                 data=shop_df[selected_columns].to_csv(index=False).encode("utf-8"),
@@ -183,3 +211,10 @@ def add_preview_links_to_df(df: pd.DataFrame, shop_id: int):
     )
 
     return df
+
+
+def style_df(df: pd.DataFrame, selected_columns: list[str]):
+    return df[selected_columns].style.format(
+        formatter=lambda num: big_number_human_format(num=num, small_decimals=2),
+        subset=list(set(selected_columns).intersection(descriptive_columns + list(map(str, metrics)))),
+    )

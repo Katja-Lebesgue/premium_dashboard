@@ -19,11 +19,11 @@ facebook_shop_menu = MyOptionMenu(
             icon="bullseye",
             activation_function=facebook_target_shop_descriptive_tab.show,
         ),
+        MyButton(name="Ad analytics", icon="zoom-in", activation_function=ad_analytics_tab),
         MyButton(
             name="Default tests", icon="lightning-fill", activation_function=shop_default_performance_tests
         ),
         MyButton(name="Custom test", icon="lightbulb", activation_function=shop_custom_performance_test),
-        MyButton(name="Analytics", icon="zoom-in", activation_function=analytics_tab),
     ),
 )
 

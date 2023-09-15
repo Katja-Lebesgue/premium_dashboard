@@ -22,7 +22,7 @@ def get_frontend_name(backend_name: Any) -> str:
     if type(backend_name) in (date, datetime):
         return backend_name.strftime("%Y-%m")
 
-    if isinstance(backend_name, Number):
+    if isinstance(backend_name, Number) and not isinstance(backend_name, bool):
         return big_number_human_format(num=backend_name)
     return FRONTEND_NAMES_DICT.get(str(backend_name), str(backend_name).replace("_", " "))
 
