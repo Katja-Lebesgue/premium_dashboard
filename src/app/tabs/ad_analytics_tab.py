@@ -195,7 +195,7 @@ def ad_analytics_tab(shop_id: int):
                             add_preview_links_to_df(df=shop_df, shop_id=shop_id)
                             selected_columns.append("preview_link")
                         for preview_link in shop_df.preview_link:
-                            webbrowser.open_new_tab(preview_link)
+                            webbrowser.open(preview_link)
             shop_name = db.query(Shop.name).filter(Shop.id == shop_id).first().name
             file_name = st.text_input(label="File name", value=f"top_{n_ads}_ads_for_{shop_name}.csv")
             st.dataframe(style_df(shop_df, selected_columns), height=180)
