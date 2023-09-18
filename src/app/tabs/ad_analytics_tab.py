@@ -31,6 +31,11 @@ def get_ads_data(shop_id: int):
 
 
 def ad_analytics_tab(shop_id: int):
+    aha = st.button(label="open")
+    if aha:
+        webbrowser.open(
+            "https://discuss.streamlit.io/t/a-new-tab-doesnt-open-up-in-my-web-browser-if-i-run-the-streamlit-python-script/285/25"
+        )
     shop_df = st_cache_data(
         _func=get_ads_data,
         func_name=get_ads_data.__name__,
