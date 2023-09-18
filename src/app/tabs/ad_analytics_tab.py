@@ -2,6 +2,7 @@ from dateutil.relativedelta import relativedelta
 
 import streamlit as st
 from streamlit_modal import Modal
+from streamlit.components.v1 import html
 import streamlit.components.v1 as components
 import webbrowser
 
@@ -30,12 +31,21 @@ def get_ads_data(shop_id: int):
     return shop_df
 
 
+from streamlit.components.v1 import html
+
+
+def open_page(url):
+    open_script = """
+        <script type="text/javascript">
+            window.open('%s', '_blank').focus();
+        </script>
+    """ % (
+        url
+    )
+    html(open_script)
+
+
 def ad_analytics_tab(shop_id: int):
-    aha = st.button(label="open")
-    if aha:
-        webbrowser.open(
-            "https://discuss.streamlit.io/t/a-new-tab-doesnt-open-up-in-my-web-browser-if-i-run-the-streamlit-python-script/285/25"
-        )
     shop_df = st_cache_data(
         _func=get_ads_data,
         func_name=get_ads_data.__name__,
@@ -205,7 +215,8 @@ def ad_analytics_tab(shop_id: int):
                             add_preview_links_to_df(df=shop_df, shop_id=shop_id)
                             selected_columns.append("preview_link")
                         for preview_link in shop_df.preview_link:
-                            webbrowser.open(preview_link)
+                            # webbrowser.open(preview_link)
+                            open_page(preview_link)
             shop_name = db.query(Shop.name).filter(Shop.id == shop_id).first().name
             file_name = st.text_input(label="File name", value=f"top_{n_ads}_ads_for_{shop_name}.csv")
             st.dataframe(style_df(shop_df, selected_columns), height=180)
