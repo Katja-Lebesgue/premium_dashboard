@@ -210,13 +210,9 @@ def ad_analytics_tab(shop_id: int):
                 with open_links_st_col:
                     open_links_button = st.button("Open preview links")
                     if open_links_button:
-                        logger.debug("tu smo")
                         if "preview_link" not in shop_df.columns:
                             add_preview_links_to_df(df=shop_df, shop_id=shop_id)
                             selected_columns.append("preview_link")
-                        for preview_link in shop_df.preview_link:
-                            # webbrowser.open(preview_link)
-                            open_page(preview_link)
             shop_name = db.query(Shop.name).filter(Shop.id == shop_id).first().name
             file_name = st.text_input(label="File name", value=f"top_{n_ads}_ads_for_{shop_name}.csv")
             st.dataframe(style_df(shop_df, selected_columns), height=180)
@@ -225,6 +221,9 @@ def ad_analytics_tab(shop_id: int):
                 data=shop_df[selected_columns].to_csv(index=False).encode("utf-8"),
                 file_name=file_name,
             )
+            if open_links_button:
+                for preview_link in shop_df.preview_link:
+                    open_page(preview_link)
 
 
 def add_preview_links_to_df(df: pd.DataFrame, shop_id: int):
