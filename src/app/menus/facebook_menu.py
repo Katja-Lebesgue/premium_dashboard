@@ -69,4 +69,5 @@ facebook_menu = MyOptionMenu(
         MyButton(name="Shop", icon="shop", activation_function=shop_button_activation),
         MyButton(name="Market", icon="globe", activation_function=facebook_market_menu.show),
     ),
+    default_index=1,
 )

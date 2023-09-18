@@ -178,7 +178,12 @@ def ad_analytics_tab(shop_id: int):
                 ascending = st.checkbox(label="Ascending", value=True)
                 shop_df = shop_df.sort_values(order_column, ascending=ascending)
             with top_n_st_column:
-                n_ads = st.number_input(min_value=1, max_value=20, label="Number of top rows", value=5)
+                n_ads = st.number_input(
+                    min_value=1,
+                    max_value=min(20, len(shop_df)),
+                    label="Number of top rows",
+                    value=min(5, len(shop_df)),
+                )
                 shop_df = shop_df.head(n_ads)
                 add_links_st_col, open_links_st_col = st.columns(2)
                 with add_links_st_col:
