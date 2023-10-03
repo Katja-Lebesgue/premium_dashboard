@@ -136,9 +136,9 @@ class DescriptiveTab(Descriptive):
             ].sum()
 
             if show_relative_option:
-                bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
+                relative_bar_height = st.toggle(label="Relative bar height", value=True)
 
-                if bar_height == "Relative":
+                if relative_bar_height is True:
                     metric_by_month = feature_df.groupby("year_month")[selected_metric].sum()
                     metric_by_month_and_value = metric_by_month_and_value / metric_by_month
 
