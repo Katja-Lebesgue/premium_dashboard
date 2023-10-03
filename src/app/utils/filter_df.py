@@ -23,6 +23,7 @@ def filter_df(
     add_expander_for_checkbox: bool = True,
     slider_default_lower_bound: Any | None = None,
     slider_default_upper_bound: Any | None = None,
+    **kwargs,
 ):
     if frontend_column_name is None:
         frontend_column_name = column_name
@@ -34,7 +35,7 @@ def filter_df(
         "label": label,
         "key": column_name + "_" + selecter_id,
         "format_func": format_func,
-    }
+    } | kwargs
 
     match filter_type:
         case FilterType.slider:

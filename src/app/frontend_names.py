@@ -35,3 +35,10 @@ def list_to_str(l: list) -> str:
         return l[0]
 
     return ", ".join(l[:-1]) + " and " + l[-1]
+
+
+n_days_to_period_dict = {7: "week", 30: "month", 365: "year"}
+
+
+def n_days_to_period(n_days: int):
+    return n_days_to_period_dict.get(n_days, f"{n_days} days")

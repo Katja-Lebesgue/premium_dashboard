@@ -1,5 +1,6 @@
 import webbrowser
 
+from datetime import timedelta
 import streamlit as st
 import streamlit.components.v1 as components
 from dateutil.relativedelta import relativedelta
@@ -7,14 +8,13 @@ from streamlit.components.v1 import html
 from streamlit_modal import Modal
 
 from src import crud
-from src.app.frontend_names import get_frontend_name
+from src.app.frontend_names import get_frontend_name, n_days_to_period
 from src.app.utils import *
 from src.app.utils import filter_df
 from src.database.session import db
 from src.fb_api.get_preview_shareable_link import get_preview_shareable_link
 from src.models import Shop
-from src.models.enums.facebook import (BOOLEAN_TEXT_FEATURES, TARGET_FEATURES,
-                                       TextFeature, TextType)
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES, TARGET_FEATURES, TextFeature, TextType
 from src.pingers import ping_facebook_creative_target_and_performance
 from src.utils import *
 
@@ -24,21 +24,18 @@ descriptive_columns = ["spend_USD", "impr", "purch", "purch_value_USD", "clicks"
 ad_feature_columns = ["ad_id", "name", "creative_type", "target", "audience"]
 
 
-def get_ads_data(shop_id: int):
+def get_ads_data(shop_id: int) -> pd.DataFrame:
     shop_df = ping_facebook_creative_target_and_performance(
         db=db,
         shop_id=shop_id,
         enum_to_value=True,
         period=Period.date,
-        start_date=date.today() - relativedelta(years=2),
+        start_date=date.today() - relativedelta(years=1),
     )
     ad_names = crud.fb_ad.get_names(db=db, shop_id=shop_id)
     ad_names_df = pd.DataFrame([row._asdict() for row in ad_names])
     shop_df = shop_df.merge(ad_names_df, on=["ad_id", "account_id"])
     return shop_df
-
-
-from streamlit.components.v1 import html
 
 
 def open_page(url):
@@ -63,15 +60,24 @@ def ad_analytics_tab(shop_id: int):
         st.warning("No data.")
         return
 
-    min_date = shop_df.year_month.max() - relativedelta(months=24)
-    shop_df = shop_df[shop_df.year_month >= min_date]
-    default_min_date = shop_df.year_month.max() - relativedelta(months=3)
-    shop_df = filter_df(
-        df=shop_df,
-        column_name="year_month",
-        filter_type=FilterType.slider,
-        slider_default_lower_bound=default_min_date,
-    )
+    date_presets_column, date_slider_columm = st.columns([1, 2])
+
+    with date_presets_column:
+        days_in_past = st.radio(
+            label="Date presets:",
+            options=[7, 14, 30, 90, 365],
+            format_func=lambda n_days: f"Last {n_days_to_period(n_days)}",
+        )
+        default_min_date = shop_df.date.max() - timedelta(days=days_in_past)
+
+    with date_slider_columm:
+        shop_df = filter_df(
+            df=shop_df,
+            column_name="date",
+            filter_type=FilterType.slider,
+            slider_default_lower_bound=default_min_date,
+            format_func=lambda dt: dt.strftime("%y-%m-%d"),
+        )
 
     if not len(shop_df):
         st.warning("Empty dataframe!")
@@ -141,8 +147,6 @@ def ad_analytics_tab(shop_id: int):
                 format_func=lambda num: f"{big_number_human_format(num, small_decimals=2)}%",
             )
 
-    st.dataframe(shop_df)
-
     if not len(shop_df):
         st.warning("Empty dataframe!")
         return
@@ -186,7 +190,7 @@ def ad_analytics_tab(shop_id: int):
     st.dataframe(style_df(shop_df, selected_columns), height=300)
     open_download_modal = st.button("Export as CSV")
 
-    download_modal = Modal("Export as CSV", key="hop", padding=20, max_width=690)
+    download_modal = Modal("Export as CSV", key="hop", padding=20, max_width=710)
     if open_download_modal:
         download_modal.open()
 
