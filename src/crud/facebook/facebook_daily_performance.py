@@ -12,7 +12,7 @@ from src.crud.base import CRUDBase
 from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.utils import element_to_list
+from src.utils import element_to_list, Period
 
 
 class CRUDFacebookDailyPerformance(
@@ -30,7 +30,7 @@ class CRUDFacebookDailyPerformance(
         ad_id: str | list[str] = None,
         start_date: str = None,
         end_date: str = date.today().strftime("%Y-%m-%d"),
-        monthly: bool = True,
+        period: Period = Period.year_month,
         cast_to_date: bool = False,
     ) -> pd.DataFrame:
         df = get_performance(
@@ -41,7 +41,7 @@ class CRUDFacebookDailyPerformance(
             ad_id=ad_id,
             start_date=start_date,
             end_date=end_date,
-            monthly=monthly,
+            period=period,
             cast_to_date=cast_to_date,
         )
         df = df.rename(columns={"adgroup_id_": "adset_id"})

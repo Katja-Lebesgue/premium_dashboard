@@ -3,14 +3,12 @@ from datetime import date, datetime
 from sqlalchemy import func
 from sqlalchemy.orm import Session, DeclarativeMeta
 
-from loguru import logger
 import pandas as pd
 import numpy as np
 
-
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.utils import element_to_list
+from src.utils import *
 
 
 column_label_dict = {
@@ -32,7 +30,7 @@ def get_performance(
     ad_id: str | list[str] = None,
     start_date: str = None,
     end_date: str = date.today().strftime("%Y-%m-%d"),
-    monthly: bool = True,
+    period: Period = Period.year_month,
     cast_to_date: bool = False,
     extra_column_names: list[str] = [],
 ) -> pd.DataFrame:
@@ -50,14 +48,16 @@ def get_performance(
 
     columns = group_columns + performance_columns
 
-    if monthly:
-        year_month_col = func.concat(
+    if period == Period.year_month:
+        period_col = func.concat(
             func.extract("year", performance_model.date_start),
             "-",
             func.to_char(func.extract("month", performance_model.date_start), "fm00"),
         )
-        columns.append(year_month_col.label("year_month"))
-        group_columns.append(year_month_col)
+    if period == Period.date:
+        period_col = performance_model.date_start
+    columns.append(period_col.label(f"{period}"))
+    group_columns.append(period_col)
 
     query = db.query(*columns)
 
@@ -96,8 +96,8 @@ def get_performance(
             lambda df_: df_[column] / conversion_rates_dict.get(df_["account_id"], np.inf), axis=1
         )
 
-    if cast_to_date and monthly:
-        df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m").date())
+    if cast_to_date and period == Period.year_month:
+        df[f"{period}"] = df[f"{period}"].apply(lambda x: datetime.strptime(x, "%Y-%m").date())
 
     return df
 
