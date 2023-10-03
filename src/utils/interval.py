@@ -1,5 +1,5 @@
-from numbers import Number
 from enum import Enum
+from numbers import Number
 
 # TODO: finish normalisation implementation
 

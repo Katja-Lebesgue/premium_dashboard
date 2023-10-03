@@ -1,18 +1,18 @@
 import os
 from abc import abstractproperty
-import streamlit as st
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from typing import Literal
 
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+from plotly.subplots import make_subplots
 from scipy.stats import kruskal
 
 from src.abc.descriptive import Descriptive, DescriptiveDF
-from src.models.enums.facebook import TextFeature
 from src.app.frontend_names import get_frontend_name, list_to_str
-from src.utils import *
+from src.models.enums.facebook import TextFeature
 from src.statistical_tests import perform_test_on_df
+from src.utils import *
 
 metrics = [cr, ctr, cpm]
 

@@ -1,8 +1,10 @@
 import os
-from loguru import logger
-from src.utils.s3.utils import s3_client, list_objects_from_prefix
-from src.utils.common import print_dict
+
 import botocore
+from loguru import logger
+
+from src.utils.common import print_dict
+from src.utils.s3.utils import list_objects_from_prefix, s3_client
 
 
 def copy_on_s3(

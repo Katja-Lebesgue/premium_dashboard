@@ -1,8 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, ForeignKey, Sequence, String, JSON
+from sqlalchemy import (JSON, BigInteger, Boolean, Column, DateTime, Enum,
+                        ForeignKey, Sequence, String)
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.orm import relationship
+
 from src.database.base_class import Base
 from src.models import enums
 

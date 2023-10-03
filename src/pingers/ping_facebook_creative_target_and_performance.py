@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from src.feature_extractors import *
 from src.models import *
-from src.pingers.ping_facebook_creative_and_performance import ping_facebook_creative_and_performance
+from src.pingers.ping_facebook_creative_and_performance import \
+    ping_facebook_creative_and_performance
 from src.pingers.ping_target import ping_target
 from src.utils import *
 

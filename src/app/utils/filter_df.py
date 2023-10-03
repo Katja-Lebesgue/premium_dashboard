@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Callable, Any
+from typing import Any, Callable
 
 import pandas as pd
 import streamlit as st

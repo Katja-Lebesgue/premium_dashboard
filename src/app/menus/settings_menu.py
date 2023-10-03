@@ -1,6 +1,7 @@
-from src.app.menus.my_option_menu import MyOptionMenu, MyButton
-from src.app.tabs.settings import manage_users, manage_user_privileges, reset_password
 from src.app.authenticate import is_admin
+from src.app.menus.my_option_menu import MyButton, MyOptionMenu
+from src.app.tabs.settings import (manage_user_privileges, manage_users,
+                                   reset_password)
 
 admin_settings_menu = MyOptionMenu(
     title="Settings",

@@ -2,8 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from src import crud, models, schemas
 
+from src import crud, models, schemas
 from src.crud.base import CRUDBase
 from src.models import enums
 from src.models.credentials import Credentials

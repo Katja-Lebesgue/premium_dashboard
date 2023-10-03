@@ -1,7 +1,7 @@
 import streamlit as st
 
-from src.app.authenticate import is_admin
 from src import crud
+from src.app.authenticate import is_admin
 from src.database.session import db
 
 

@@ -1,10 +1,10 @@
 import streamlit as st
 
-from src.app.menus.my_option_menu import MyOptionMenu, MyButton
-from src.app.menus.google_menu import google_menu
-from src.app.menus.facebook_menu import facebook_menu
-from src.app.menus.settings_menu import admin_settings_menu, user_settings_menu
 from src.app.authenticate import is_admin
+from src.app.menus.facebook_menu import facebook_menu
+from src.app.menus.google_menu import google_menu
+from src.app.menus.my_option_menu import MyButton, MyOptionMenu
+from src.app.menus.settings_menu import admin_settings_menu, user_settings_menu
 from src.app.tabs import *
 
 

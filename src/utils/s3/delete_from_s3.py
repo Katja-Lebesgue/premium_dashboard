@@ -1,5 +1,6 @@
 from loguru import logger
-from src.utils.s3.utils import s3_resource, add_global_s3_folder
+
+from src.utils.s3.utils import add_global_s3_folder, s3_resource
 
 
 def delete_from_s3(

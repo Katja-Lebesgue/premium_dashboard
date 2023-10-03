@@ -1,5 +1,5 @@
-from datetime import date, datetime, timedelta
 import re
+from datetime import date, datetime, timedelta
 
 
 def to_date(x):

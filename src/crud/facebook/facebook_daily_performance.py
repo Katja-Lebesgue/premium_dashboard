@@ -1,11 +1,10 @@
 from datetime import date
 
-from sqlalchemy.orm import Session
 import pandas as pd
+from sqlalchemy.orm import Session
 
-
-from src.crud.utils import get_performance
 from src.crud.base import CRUDBase
+from src.crud.utils import get_performance
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
 from src.utils import *

@@ -4,10 +4,11 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from src.crud.base import CRUDBase
+from src.crud.utils import get_performance
 from src.models import *
 from src.models import GoogleDailyPerformance
-from src.schemas.google import GoogleDailyPerformanceCreate, GoogleDailyPerformanceUpdate
-from src.crud.utils import get_performance
+from src.schemas.google import (GoogleDailyPerformanceCreate,
+                                GoogleDailyPerformanceUpdate)
 from src.utils import *
 
 

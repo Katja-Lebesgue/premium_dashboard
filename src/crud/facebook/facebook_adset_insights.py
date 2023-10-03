@@ -9,12 +9,11 @@ from sqlalchemy.sql.expression import literal
 from tqdm import tqdm
 
 from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
+from src.crud.currency_exchange_rate import \
+    currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_adset_insights import (
-    FacebookAdsetInsightsCreate,
-    FacebookAdsetInsightsUpdate,
-)
+    FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate)
 from src.utils import element_to_list
 
 

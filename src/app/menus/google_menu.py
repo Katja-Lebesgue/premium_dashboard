@@ -1,12 +1,10 @@
 import streamlit as st
 
-from src.app.menus.my_option_menu import MyOptionMenu, MyButton
+from src.app.menus.my_option_menu import MyButton, MyOptionMenu
+from src.app.menus.utils import select_shop
 from src.app.tabs.descriptive_tab import (
     google_campaign_type_market_descriptive_tab,
-    google_campaign_type_shop_descriptive_tab,
-)
-from src.app.menus.utils import select_shop
-
+    google_campaign_type_shop_descriptive_tab)
 
 google_shop_menu = MyOptionMenu(
     title="Shop",

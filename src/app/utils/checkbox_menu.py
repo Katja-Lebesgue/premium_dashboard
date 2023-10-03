@@ -1,4 +1,5 @@
 import streamlit as st
+
 from src.app.frontend_names import get_frontend_name
 
 

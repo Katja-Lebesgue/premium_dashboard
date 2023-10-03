@@ -1,12 +1,13 @@
-from abc import ABC, abstractproperty, abstractmethod
-from src.database.session import db
-from sqlalchemy.orm import Session
-from dateutil.relativedelta import relativedelta
+from abc import ABC, abstractmethod, abstractproperty
 
-from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
+from dateutil.relativedelta import relativedelta
+from sqlalchemy.orm import Session
+
 from src import crud
-from src.utils import *
+from src.database.session import db
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
 from src.pingers import *
+from src.utils import *
 
 
 class DescriptiveDF(str, Enum):

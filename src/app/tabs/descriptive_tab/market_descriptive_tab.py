@@ -1,11 +1,9 @@
 import streamlit as st
 
-
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
-from src.abc.descriptive import DescriptiveDF
 from src.abc.descriptive import *
+from src.abc.descriptive import DescriptiveDF
 from src.app.frontend_names import get_frontend_name
-
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.utils import *
 
 metrics = [cr, ctr, cpm]

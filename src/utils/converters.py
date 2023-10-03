@@ -1,10 +1,8 @@
-import numpy as np
 import math
-
-
 import os
 
 import bcrypt
+import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()

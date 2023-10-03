@@ -1,7 +1,9 @@
+from abc import ABC, abstractproperty
 from typing import Callable
-from abc import abstractproperty, ABC
+
 import numpy as np
 import pandas as pd
+
 from src.utils.interval import MyInterval
 
 

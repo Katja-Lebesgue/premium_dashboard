@@ -3,8 +3,8 @@ import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
-from src.utils import *
 from src.app.frontend_names import *
+from src.utils import *
 
 load_dotenv()
 

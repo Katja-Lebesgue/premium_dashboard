@@ -1,5 +1,6 @@
-import pandas as pd
 from ast import literal_eval
+
+import pandas as pd
 
 dtypes = {"ad_id": str, "shop_id": str, "account_id": str, "target": str}
 

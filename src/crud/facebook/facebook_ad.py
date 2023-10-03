@@ -7,7 +7,8 @@ from sqlalchemy.orm.query import Query
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ad import FacebookAd
-from src.models.facebook.facebook_daily_performance import FacebookDailyPerformance
+from src.models.facebook.facebook_daily_performance import \
+    FacebookDailyPerformance
 from src.schemas.facebook.facebook_ad import FacebookAdCreate, FacebookAdUpdate
 from src.utils import element_to_list
 

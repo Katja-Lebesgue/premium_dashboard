@@ -13,7 +13,6 @@ from tqdm import tqdm
 from metadata.globals import *
 from src.models import AdCreativeFeatures
 from src.pingers import ping_facebook_creative_and_performance
-
 from src.statistical_tests import *
 from src.utils import *
 

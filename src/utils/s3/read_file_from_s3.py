@@ -2,12 +2,12 @@ import json
 import os
 
 import cv2
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from src.utils.s3.utils import s3_client, add_global_s3_folder
-from src.utils.pd import read_csv_and_eval
 from src.utils.image.my_image import MyImage
+from src.utils.pd import read_csv_and_eval
+from src.utils.s3.utils import add_global_s3_folder, s3_client
 
 
 def read_csv_from_s3(

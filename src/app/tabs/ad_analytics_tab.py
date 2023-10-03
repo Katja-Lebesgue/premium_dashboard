@@ -1,21 +1,22 @@
-from dateutil.relativedelta import relativedelta
-
-import streamlit as st
-from streamlit_modal import Modal
-from streamlit.components.v1 import html
-import streamlit.components.v1 as components
 import webbrowser
 
-from src.app.utils import *
-from src.database.session import db
-from src.pingers import ping_facebook_creative_target_and_performance
-from src.utils import *
-from src.models import Shop
-from src.app.utils import filter_df
+import streamlit as st
+import streamlit.components.v1 as components
+from dateutil.relativedelta import relativedelta
+from streamlit.components.v1 import html
+from streamlit_modal import Modal
+
 from src import crud
 from src.app.frontend_names import get_frontend_name
+from src.app.utils import *
+from src.app.utils import filter_df
+from src.database.session import db
 from src.fb_api.get_preview_shareable_link import get_preview_shareable_link
-from src.models.enums.facebook import TextFeature, BOOLEAN_TEXT_FEATURES, TARGET_FEATURES, TextType
+from src.models import Shop
+from src.models.enums.facebook import (BOOLEAN_TEXT_FEATURES, TARGET_FEATURES,
+                                       TextFeature, TextType)
+from src.pingers import ping_facebook_creative_target_and_performance
+from src.utils import *
 
 metrics = (cac, ctr, cr, cpm)
 descriptive_columns = ["spend_USD", "impr", "purch", "purch_value_USD", "clicks"]
@@ -24,7 +25,13 @@ ad_feature_columns = ["ad_id", "name", "creative_type", "target", "audience"]
 
 
 def get_ads_data(shop_id: int):
-    shop_df = ping_facebook_creative_target_and_performance(db=db, shop_id=shop_id, enum_to_value=True)
+    shop_df = ping_facebook_creative_target_and_performance(
+        db=db,
+        shop_id=shop_id,
+        enum_to_value=True,
+        period=Period.date,
+        start_date=date.today() - relativedelta(years=2),
+    )
     ad_names = crud.fb_ad.get_names(db=db, shop_id=shop_id)
     ad_names_df = pd.DataFrame([row._asdict() for row in ad_names])
     shop_df = shop_df.merge(ad_names_df, on=["ad_id", "account_id"])
@@ -133,6 +140,8 @@ def ad_analytics_tab(shop_id: int):
                 filter_type=FilterType.slider,
                 format_func=lambda num: f"{big_number_human_format(num, small_decimals=2)}%",
             )
+
+    st.dataframe(shop_df)
 
     if not len(shop_df):
         st.warning("Empty dataframe!")

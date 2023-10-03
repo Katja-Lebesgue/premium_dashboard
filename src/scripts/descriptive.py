@@ -2,13 +2,12 @@ import sys
 
 sys.path.append("./.")
 
+from argparse import ArgumentParser
 from datetime import date
 
-from argparse import ArgumentParser
-
-from src.utils import *
 from src.database.session import db
 from src.services import *
+from src.utils import *
 
 if __name__ == "__main__":
     parser = ArgumentParser()

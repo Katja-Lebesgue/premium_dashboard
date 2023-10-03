@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, BigInteger, String, Boolean, Float, Date, TIMESTAMP
+from sqlalchemy import (TIMESTAMP, BigInteger, Boolean, Column, Date, Float,
+                        Integer, String)
 
 from src.database.base_class import Base
 

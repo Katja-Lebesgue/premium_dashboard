@@ -1,13 +1,15 @@
 from datetime import date
 from enum import Enum
 
+import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
-import numpy as np
+
 from src.feature_extractors import *
 from src.models import *
 from src.models.enums.facebook import Target
-from src.utils import element_to_list, convert_enum_to_its_value, MyInterval, recursively_apply_func
+from src.utils import (MyInterval, convert_enum_to_its_value, element_to_list,
+                       recursively_apply_func)
 
 
 class Audience(str, Enum):

@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
 
+import pandas as pd
 from sqlalchemy import func, orm
 from sqlalchemy.orm import Session
-import pandas as pd
 
 from src import models, schemas
 from src.crud.base import CRUDBase

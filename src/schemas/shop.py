@@ -1,8 +1,8 @@
 from datetime import date, datetime
 
 from pydantic import EmailStr, Field
-from src.models.enums import EcommercePlatform
 
+from src.models.enums import EcommercePlatform
 from src.schemas.api_model import APIModel
 from src.schemas.base import OrmBase
 

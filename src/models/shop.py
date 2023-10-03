@@ -1,26 +1,15 @@
 from datetime import datetime, timedelta
 from typing import Any
 
-from sqlalchemy import (
-    BigInteger,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Sequence,
-    String,
-    cast,
-    func,
-)
+from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Enum,
+                        ForeignKey, Sequence, String, cast, func)
 from sqlalchemy.dialects import sqlite
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.dynamic import AppenderQuery
-from sqlalchemy.dialects.postgresql import JSONB
-from src.models.enums import EcommercePlatform
 
 from src.database.base_class import Base
+from src.models.enums import EcommercePlatform
 
 
 class Shop(Base):

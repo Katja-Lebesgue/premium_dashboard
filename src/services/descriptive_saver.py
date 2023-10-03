@@ -1,18 +1,17 @@
-from datetime import date
-from dateutil.relativedelta import relativedelta
 import os
-from abc import ABC, abstractmethod, abstractproperty
-
-from loguru import logger
-
-from tqdm import tqdm
-from sqlalchemy.orm import Session
 import re
+from abc import ABC, abstractmethod, abstractproperty
+from datetime import date
 
-from src.abc.descriptive import Descriptive, DescriptiveDF
+from dateutil.relativedelta import relativedelta
+from loguru import logger
+from sqlalchemy.orm import Session
+from tqdm import tqdm
+
 from src import crud
-from src.utils import *
 from src.abc.descriptive import *
+from src.abc.descriptive import Descriptive, DescriptiveDF
+from src.utils import *
 
 
 class DescriptiveSaver(Descriptive):

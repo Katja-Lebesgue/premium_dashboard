@@ -1,8 +1,9 @@
-from typing import Callable, Iterable
 import inspect
+from typing import Callable, Iterable
 
 import streamlit as st
 from streamlit_option_menu import option_menu
+
 from src.app.frontend_names import get_frontend_name
 
 

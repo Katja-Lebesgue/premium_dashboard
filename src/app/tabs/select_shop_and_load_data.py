@@ -12,8 +12,8 @@ import streamlit as st
 from loguru import logger
 from sqlalchemy.orm import Session
 
-from src.app.authenticate import is_admin
 from src import crud
+from src.app.authenticate import is_admin
 from src.database.session import SessionLocal
 from src.models import *
 from src.pingers import *
