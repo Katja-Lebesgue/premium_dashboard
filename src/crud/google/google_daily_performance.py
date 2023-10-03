@@ -19,8 +19,8 @@ class CRUDGoogleDailyPerformance(
         db: Session,
         shop_id: str | list[str] = None,
         ad_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
         period: Period = Period.year_month,
         cast_to_date: bool = False,
     ) -> pd.DataFrame:

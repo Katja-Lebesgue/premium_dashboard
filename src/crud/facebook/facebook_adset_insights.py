@@ -88,8 +88,8 @@ class CRUDFacebookAdsetInsights(
         self,
         db: Session,
         shop_id: int | list[int] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
     ) -> Query:
         currency_subquery = crud_currency_exchange_rate.query_current_rates(db=db).subquery()
 

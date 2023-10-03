@@ -1,7 +1,6 @@
 from datetime import date
 from enum import Enum
 
-from loguru import logger
 import pandas as pd
 from sqlalchemy.orm import Session
 import numpy as np
@@ -41,8 +40,8 @@ def ping_target(
     db: Session,
     ad_id: str | list[str] = None,
     shop_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):

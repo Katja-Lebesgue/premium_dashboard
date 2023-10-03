@@ -21,8 +21,8 @@ def ping_ads_insights_by_platform(
     add_platform_prefix: bool = False,
     monthly: bool = True,
     shop_id: int | list[int] | None = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     add_currency: bool = True,
     conversion_json: dict | None = None,
 ) -> pd.DataFrame:
@@ -63,10 +63,7 @@ def ping_ads_insights_by_platform(
         query = query.filter(model.shop_id.in_(shop_id))
 
     if start_date is not None:
-        query = query.filter(
-            model.date >= start_date,
-            model.date <= end_date,
-        )
+        query = query.filter(model.date.between(start_date, end_date))
 
     if add_currency:
         query = query.join(
@@ -105,8 +102,8 @@ def ping_ads_insights_all_platforms(
     columns: str | list[str] = ["spend"],
     monthly: bool = True,
     shop_id: int | list[int] | None = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     get_industry: bool = False,
     convert_to_USD_bool: bool = True,
 ) -> pd.DataFrame:

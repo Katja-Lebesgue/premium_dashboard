@@ -29,8 +29,8 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
         self,
         db: Session,
         shop_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
     ) -> Query:
         query = db.query(FacebookAd.ad_id)
 
@@ -51,8 +51,8 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
     def query_shop_id(
         self,
         db: Session,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
     ) -> pd.DataFrame:
         query = db.query(FacebookAd.shop_id)
         if start_date is not None:

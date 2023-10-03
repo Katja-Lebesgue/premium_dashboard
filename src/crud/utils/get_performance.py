@@ -28,12 +28,17 @@ def get_performance(
     db: Session,
     shop_id: str | list[str],
     ad_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     period: Period = Period.year_month,
     cast_to_date: bool = False,
     extra_column_names: list[str] = [],
 ) -> pd.DataFrame:
+    if shop_id is None and ad_id is None:
+        raise ValueError("Both shop_id and ad_id is None!")
+
+    start_date, end_date = to_date(start_date), to_date(end_date)
+
     extra_columns = [getattr(performance_model, column) for column in extra_column_names]
     group_columns = [
         performance_model.ad_id,
@@ -61,24 +66,20 @@ def get_performance(
 
     query = db.query(*columns)
 
+    filters = []
+
     if ad_id is not None:
         ad_id = element_to_list(ad_id)
-        query = query.filter(performance_model.ad_id.in_(ad_id))
+        filters.append(performance_model.ad_id.in_(ad_id))
 
     if shop_id is not None:
         shop_id = element_to_list(shop_id)
-        query = query.filter(performance_model.shop_id.in_(shop_id))
+        filters.append(performance_model.shop_id.in_(shop_id))
 
     if start_date is not None:
-        query = query.filter(
-            performance_model.date_start >= start_date,
-            performance_model.date_start <= end_date,
-        )
+        filters.append(performance_model.date_start.between(start_date, end_date))
 
-    query = query.group_by(*group_columns)
-
-    query = query.distinct()
-
+    query = query.filter(*filters).group_by(*group_columns)
     df = pd.read_sql(query.statement, db.bind)
 
     if not len(df):

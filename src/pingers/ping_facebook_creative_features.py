@@ -11,8 +11,8 @@ def ping_facebook_creative(
     db: Session,
     shop_id: int | list[int],
     ad_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):

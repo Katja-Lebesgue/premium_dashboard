@@ -77,7 +77,7 @@ def save_global_feature_tests_to_s3(
         logger.debug(f"shop_id: {shop_id}")
 
         data_shop = ping_facebook_creative_and_performance(
-            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, monthly=False
+            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, period=Period.all
         )
 
         if shop_iter % 10 == 5:

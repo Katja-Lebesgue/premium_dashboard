@@ -1,18 +1,14 @@
-from datetime import date, timedelta
+from datetime import date
 
-from loguru import logger
-from sqlalchemy import and_, case, func
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.query import Query
 import pandas as pd
 
 
 from src.crud.utils import get_performance
 from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.utils import element_to_list, Period
+from src.utils import *
 
 
 class CRUDFacebookDailyPerformance(
@@ -28,8 +24,8 @@ class CRUDFacebookDailyPerformance(
         db: Session,
         shop_id: str | list[str] = None,
         ad_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
         period: Period = Period.year_month,
         cast_to_date: bool = False,
     ) -> pd.DataFrame:
