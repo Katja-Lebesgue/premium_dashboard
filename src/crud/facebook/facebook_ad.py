@@ -25,44 +25,6 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
 
         return query.filter(*filters).all()
 
-    def query_ad_id(
-        self,
-        db: Session,
-        shop_id: str | list[str] = None,
-        start_date: date | str | None = None,
-        end_date: date | str = date.today(),
-    ) -> Query:
-        query = db.query(FacebookAd.ad_id)
-
-        if start_date is not None:
-            query = query.join(FacebookDailyPerformance).filter(
-                FacebookDailyPerformance.date_start >= start_date,
-                FacebookDailyPerformance.date_start <= end_date,
-            )
-
-        if shop_id is not None:
-            shop_id = element_to_list(shop_id)
-            query = query.filter(FacebookAd.shop_id.in_(shop_id))
-
-        query = query.distinct()
-
-        return query
-
-    def query_shop_id(
-        self,
-        db: Session,
-        start_date: date | str | None = None,
-        end_date: date | str = date.today(),
-    ) -> pd.DataFrame:
-        query = db.query(FacebookAd.shop_id)
-        if start_date is not None:
-            query = query.join(FacebookDailyPerformance).filter(
-                FacebookDailyPerformance.date_start >= start_date,
-                FacebookDailyPerformance.date_start <= end_date,
-            )
-        query = query.distinct()
-        return query
-
     def query_raw_creative_data(
         self,
         db: Session,
