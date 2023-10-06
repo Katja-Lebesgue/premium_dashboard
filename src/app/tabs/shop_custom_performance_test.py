@@ -85,7 +85,7 @@ def filter_basic_features(df: pd.DataFrame, group_id: str) -> pd.DataFrame:
     df = filter_df(
         df=df,
         column_name="year_month",
-        filter_type=FilterType.slider,
+        filter_type=FilterType.select_slider,
         selecter_id=group_id,
         slider_default_lower_bound=default_min_date,
     )

@@ -39,7 +39,7 @@ def shop_default_performance_tests(shop_id: int):
         data_shop = filter_df(
             df=data_shop,
             column_name="year_month",
-            filter_type=FilterType.slider,
+            filter_type=FilterType.select_slider,
             slider_default_lower_bound=default_min_date,
         )
 

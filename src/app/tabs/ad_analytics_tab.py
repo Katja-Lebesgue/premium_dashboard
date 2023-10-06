@@ -77,6 +77,7 @@ def ad_analytics_tab(shop_id: int):
             filter_type=FilterType.slider,
             slider_default_lower_bound=default_min_date,
             format_func=lambda dt: dt.strftime("%y-%m-%d"),
+            step=timedelta(days=1),
         )
 
     if not len(shop_df):
@@ -125,25 +126,25 @@ def ad_analytics_tab(shop_id: int):
             shop_df = filter_df(
                 df=shop_df,
                 column_name="spend_USD",
-                filter_type=FilterType.slider,
+                filter_type=FilterType.select_slider,
                 format_func=lambda num: f"${big_number_human_format(num)}",
             )
             shop_df = filter_df(
                 df=shop_df,
                 column_name=str(cac),
-                filter_type=FilterType.slider,
+                filter_type=FilterType.select_slider,
                 format_func=lambda num: f"${big_number_human_format(num)}",
             )
             shop_df = filter_df(
                 df=shop_df,
                 column_name=str(cpm),
-                filter_type=FilterType.slider,
+                filter_type=FilterType.select_slider,
                 format_func=lambda num: f"${big_number_human_format(num)}",
             )
             shop_df = filter_df(
                 df=shop_df,
                 column_name=str(ctr),
-                filter_type=FilterType.slider,
+                filter_type=FilterType.select_slider,
                 format_func=lambda num: f"{big_number_human_format(num, small_decimals=2)}%",
             )
 
