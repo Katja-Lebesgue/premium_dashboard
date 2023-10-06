@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from src.feature_extractors import *
 from src.models import *
 from src.models.enums.facebook import Target
-from src.utils import (MyInterval, convert_enum_to_its_value, element_to_list,
-                       recursively_apply_func)
+from src.utils import MyInterval, convert_enum_to_its_value, element_to_list, recursively_apply_func
+from src.utils import *
 
 
 class Audience(str, Enum):
@@ -76,7 +76,7 @@ def ping_target(
     if len(filters):
         query = query.filter(*filters)
 
-    df = pd.read_sql(query.distinct(FacebookAdset.adset_id).statement, db.bind)
+    df = read_query_into_df(db=db, query=query.distinct(FacebookAdset.adset_id))
 
     if len(df) == 0:
         return df

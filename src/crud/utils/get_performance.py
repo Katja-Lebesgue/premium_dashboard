@@ -78,7 +78,7 @@ def get_performance(
         filters.append(performance_model.date_start.between(start_date, end_date))
 
     query = query.filter(*filters).group_by(*group_columns)
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     if not len(df):
         return df

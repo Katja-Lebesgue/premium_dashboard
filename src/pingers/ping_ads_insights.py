@@ -10,7 +10,7 @@ from src import crud
 from src.models import *
 from src.models.enums.EPlatform import PLATFORMS
 from src.pingers.ping_crm import ping_crm
-from src.utils import convert_to_USD, element_to_list
+from src.utils import convert_to_USD, element_to_list, read_query_into_df
 
 
 def ping_ads_insights_by_platform(
@@ -77,7 +77,7 @@ def ping_ads_insights_by_platform(
     query = query.distinct()
 
     logger.debug(f"db type: {type(db)}")
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     if conversion_json is not None:
         columns = [f"{prefix}{col}" for col in columns]

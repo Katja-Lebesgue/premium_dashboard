@@ -37,7 +37,7 @@ def save_global_promotion_tests_to_s3(
     done_shop_ids_path = folder + done_shop_ids_csv_name + ".csv"
 
     shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
-    all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
+    all_shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"]
 
     idx_cols = [
         "shop_id",

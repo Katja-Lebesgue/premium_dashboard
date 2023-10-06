@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from src import models, schemas
 from src.crud.base import CRUDBase
 from src.models import *
+from src.utils import *
 
 
 class CRUDImage(
@@ -66,7 +67,7 @@ class CRUDImage(
             .filter(FacebookAd.shop_id == shop_id, url_subquery.c.freshness_rank == 1)
         )
 
-        return pd.read_sql(fb_ad_query.statement, db.bind).assign(shop_id=shop_id)
+        return read_query_into_df(query=fb_ad_query, db=db).assign(shop_id=shop_id)
 
 
 image = CRUDImage(models.Image)

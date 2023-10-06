@@ -33,6 +33,6 @@ def ping_shops(
 
     query = query.distinct()
 
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     return df

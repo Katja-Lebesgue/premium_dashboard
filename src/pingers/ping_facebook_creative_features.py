@@ -64,7 +64,7 @@ def ping_facebook_creative(
 
     query = query.distinct(FacebookCreativeFeatures.ad_id, FacebookCreativeFeatures.shop_id)
 
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     if enum_to_value:
         df = df.applymap(convert_enum_to_its_value)

@@ -108,11 +108,10 @@ class DescriptiveSaver(Descriptive):
                 n_unsaved_shops = 0
 
             try:
+                shop_loader.set_postfix({"shop_id": str(shop_id)})
                 shop_descriptive_df = self.get_shop_descriptive_df(
                     db=db, shop_id=shop_id, start_date=self.start_date, end_date=self.end_date
                 )
-
-                shop_loader.set_postfix({"shop_id": str(shop_id), "len": len(shop_descriptive_df)})
 
                 if len(shop_descriptive_df):
                     if not (len(main_df)):

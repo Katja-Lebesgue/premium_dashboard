@@ -1,6 +1,7 @@
 from ast import literal_eval
 
 import pandas as pd
+from sqlalchemy.orm import Query, Session
 
 dtypes = {"ad_id": str, "shop_id": str, "account_id": str, "target": str}
 
@@ -22,3 +23,12 @@ def eval_but_leave_string_if_you_cant(text: str):
         out = text
 
     return out
+
+
+def read_query_into_df(db: Session, query: Query, chunk_size: int = 5000) -> pd.DataFrame:
+    n_rows = query.count()
+    df = pd.DataFrame()
+    for offset in range(0, n_rows + 1, chunk_size):
+        new_df = pd.read_sql(query.offset(offset).limit(chunk_size).statement, db.bind)
+        df = pd.concat([df, new_df], axis=0)
+    return df

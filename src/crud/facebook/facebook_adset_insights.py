@@ -9,12 +9,13 @@ from sqlalchemy.sql.expression import literal
 from tqdm import tqdm
 
 from src.crud.base import CRUDBase
-from src.crud.currency_exchange_rate import \
-    currency_exchange_rate as crud_currency_exchange_rate
+from src.crud.currency_exchange_rate import currency_exchange_rate as crud_currency_exchange_rate
 from src.models import *
 from src.schemas.facebook.facebook_adset_insights import (
-    FacebookAdsetInsightsCreate, FacebookAdsetInsightsUpdate)
-from src.utils import element_to_list
+    FacebookAdsetInsightsCreate,
+    FacebookAdsetInsightsUpdate,
+)
+from src.utils import element_to_list, read_query_into_df
 
 
 class CRUDFacebookAdsetInsights(
@@ -34,7 +35,7 @@ class CRUDFacebookAdsetInsights(
         fas = FacebookAdset
         fai = self.model
         shop_ids_query = db.query(fas.shop_id).distinct()
-        shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"].tolist()
+        shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"].tolist()
 
         group_cols = [
             fdp.shop_id,
