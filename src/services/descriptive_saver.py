@@ -57,9 +57,11 @@ class DescriptiveSaver(Descriptive):
         force_from_scratch: bool = False,
         repeat_for_failed: bool = False,
         df_type: str = DescriptiveDF.main,
+        save_to_s3: bool = True,
         testing: bool = False,
     ) -> pd.DataFrame:
         all_shops = crud.shop.get_nontest_shops(db=db)
+        logger.info(f"Total of {len(all_shops)} nontest shops.")
         all_shop_ids = pd.Series([shop_.id for shop_ in all_shops], name="shop_id").sort_values()
 
         list_of_objects_on_s3 = list_objects_from_prefix(
@@ -70,14 +72,12 @@ class DescriptiveSaver(Descriptive):
 
         if from_scratch:
             main_df = pd.DataFrame()
-            done_shop_ids = pd.Series([], name="shop_id")
             failed_shop_ids = pd.Series([], name="shop_id")
             undone_shop_ids = all_shop_ids
         else:
-            main_df = self.read_df(df_type=df_type, end_date=self.end_date).set_index(self.main_df_index)
-            done_shop_ids = self.read_df(df_type=DescriptiveDF.done_shop_ids, end_date=self.end_date)[
-                "shop_id"
-            ]
+            main_df = self.read_df(df_type=df_type, end_date=self.end_date)
+            done_shop_ids = main_df.shop_id.unique().tolist()
+            main_df = main_df.set_index(self.main_df_index)
             failed_shop_ids = self.read_df(df_type=DescriptiveDF.failed_shop_ids, end_date=self.end_date)[
                 "shop_id"
             ]
@@ -89,22 +89,15 @@ class DescriptiveSaver(Descriptive):
             undone_shop_ids = pd.concat([failed_shop_ids, undone_shop_ids])
 
         new_failed_shop_ids = []
-        new_done_shop_ids = []
 
         if testing:
-            undone_shop_ids = [16038, 44301396, 34810574]
+            undone_shop_ids = [16038, 44301396, 34810574, 96200, 2]
 
         n_unsaved_shops = 0
         shop_loader = tqdm(undone_shop_ids)
         for shop_id in shop_loader:
-            if n_unsaved_shops == self.save_every_n_shops:
+            if save_to_s3 and n_unsaved_shops == self.save_every_n_shops:
                 self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
-                self.save_df(
-                    df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
-                    df_type=DescriptiveDF.done_shop_ids,
-                    index=False,
-                    end_date=self.end_date,
-                )
                 self.save_df(
                     df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
                     df_type=DescriptiveDF.failed_shop_ids,
@@ -112,7 +105,6 @@ class DescriptiveSaver(Descriptive):
                     end_date=self.end_date,
                 )
                 new_failed_shop_ids = []
-                new_done_shop_ids = []
                 n_unsaved_shops = 0
 
             try:
@@ -129,24 +121,18 @@ class DescriptiveSaver(Descriptive):
                         # main_df = main_df.add(shop_descriptive_df, fill_value=0)
                         main_df = pd.concat([main_df, shop_descriptive_df], axis=0)
                 n_unsaved_shops += 1
-                new_done_shop_ids.append(shop_id)
             except Exception as e:
                 logger.error(f"Error for shop id {shop_id}: \n {e}")
                 new_failed_shop_ids.append(shop_id)
 
-        self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
-        self.save_df(
-            df=pd.concat([done_shop_ids, pd.Series(new_done_shop_ids, name="shop_id")]),
-            df_type=DescriptiveDF.done_shop_ids,
-            index=False,
-            end_date=self.end_date,
-        )
-        self.save_df(
-            df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
-            df_type=DescriptiveDF.failed_shop_ids,
-            index=False,
-            end_date=self.end_date,
-        )
+        if save_to_s3:
+            self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
+            self.save_df(
+                df=pd.concat([failed_shop_ids, pd.Series(new_failed_shop_ids, name="shop_id")]),
+                df_type=DescriptiveDF.failed_shop_ids,
+                index=False,
+                end_date=self.end_date,
+            )
 
         return main_df
 
