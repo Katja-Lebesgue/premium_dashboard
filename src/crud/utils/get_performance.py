@@ -59,8 +59,10 @@ def get_performance(
         )
     if period == Period.date:
         period_col = performance_model.date_start
-    columns.append(period_col.label(f"{period}"))
-    group_columns.append(period_col)
+
+    if period != Period.all:
+        columns.append(period_col.label(f"{period}"))
+        group_columns.append(period_col)
 
     query = db.query(*columns)
 
@@ -78,6 +80,7 @@ def get_performance(
         filters.append(performance_model.date_start.between(start_date, end_date))
 
     query = query.filter(*filters).group_by(*group_columns)
+
     df = read_query_into_df(db=db, query=query)
 
     if not len(df):
