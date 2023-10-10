@@ -1,14 +1,15 @@
 from datetime import date
 from enum import Enum
 
-from loguru import logger
+import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
-import numpy as np
+
 from src.feature_extractors import *
 from src.models import *
 from src.models.enums.facebook import Target
-from src.utils import element_to_list, convert_enum_to_its_value, MyInterval, recursively_apply_func
+from src.utils import MyInterval, convert_enum_to_its_value, element_to_list, recursively_apply_func
+from src.utils import *
 
 
 class Audience(str, Enum):
@@ -41,8 +42,8 @@ def ping_target(
     db: Session,
     ad_id: str | list[str] = None,
     shop_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
     enum_to_value: bool = False,
 ) -> pd.DataFrame:
     if all([x is None for x in [ad_id, shop_id, start_date]]):
@@ -75,7 +76,7 @@ def ping_target(
     if len(filters):
         query = query.filter(*filters)
 
-    df = pd.read_sql(query.distinct(FacebookAdset.adset_id).statement, db.bind)
+    df = read_query_into_df(db=db, query=query.distinct(FacebookAdset.adset_id))
 
     if len(df) == 0:
         return df

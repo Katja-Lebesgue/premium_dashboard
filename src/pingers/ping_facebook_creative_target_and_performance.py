@@ -1,24 +1,23 @@
-from datetime import date, datetime
+from datetime import date
 
 import pandas as pd
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from src import crud, utils
-from src.database.session import SessionLocal
 from src.feature_extractors import *
 from src.models import *
-from src.pingers.ping_facebook_creative_and_performance import ping_facebook_creative_and_performance
+from src.pingers.ping_facebook_creative_and_performance import \
+    ping_facebook_creative_and_performance
 from src.pingers.ping_target import ping_target
+from src.utils import *
 
 
 def ping_facebook_creative_target_and_performance(
     db: Session,
     ad_id: str | list[str] = None,
     shop_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
-    monthly: bool = True,
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
+    period: Period = Period.year_month,
     cast_to_date: bool = True,
     enum_to_value: bool = False,
 ) -> pd.DataFrame:
@@ -32,7 +31,7 @@ def ping_facebook_creative_target_and_performance(
         ad_id=ad_id,
         start_date=start_date,
         end_date=end_date,
-        monthly=monthly,
+        period=period,
         cast_to_date=cast_to_date,
         enum_to_value=enum_to_value,
     )

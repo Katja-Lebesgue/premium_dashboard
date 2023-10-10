@@ -1,12 +1,9 @@
 import streamlit as st
 
-
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.abc.descriptive import *
 from src.app.frontend_names import get_frontend_name
-
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.utils import *
-
 
 analysis_type_help = (
     "Select which kind of analysis you want to see. This select box changes the content"

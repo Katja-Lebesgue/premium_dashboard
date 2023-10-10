@@ -72,8 +72,8 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
         self,
         db: Session,
         shop_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
     ) -> Query:
         columns = [
             ShopifyOrder.shop_id,
@@ -88,8 +88,7 @@ class CRUDShopifyOrder(CRUDBase[models.ShopifyOrder, schemas.ShopifyOrderCreate,
 
         if start_date is not None:
             query = query.filter(
-                ShopifyOrder.created_at >= start_date,
-                ShopifyOrder.created_at <= end_date,
+                ShopifyOrder.created_at.between(start_date, end_date),
             )
 
         query = query.group_by(ShopifyOrder.shop_id)

@@ -1,9 +1,8 @@
 import streamlit as st
 
-from src.app.menus.my_option_menu import MyOptionMenu, MyButton
-from src.app.tabs import *
+from src.app.menus.my_option_menu import MyButton, MyOptionMenu
 from src.app.menus.utils import select_shop
-
+from src.app.tabs import *
 
 facebook_shop_menu = MyOptionMenu(
     title="Shop",

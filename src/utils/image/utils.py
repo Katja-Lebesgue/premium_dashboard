@@ -1,5 +1,5 @@
-import requests
 import numpy as np
+import requests
 from matplotlib import pyplot as plt
 
 from src.utils.image.my_image import MyImage

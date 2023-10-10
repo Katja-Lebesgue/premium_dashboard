@@ -1,14 +1,14 @@
 from datetime import date
 
-from src.models import FacebookDailyPerformance
 from sqlalchemy.orm import Session
+
 from src.crud.base import CRUDBase
+from src.models import FacebookDailyPerformance
 from src.models.enums.facebook.creative_features import CreativeType
-from src.models.facebook.facebook_creative_features import FacebookCreativeFeatures
+from src.models.facebook.facebook_creative_features import \
+    FacebookCreativeFeatures
 from src.schemas.facebook.facebook_creative_features import (
-    FacebookCreativeFeaturesCreate,
-    FacebookCreativeFeaturesUpdate,
-)
+    FacebookCreativeFeaturesCreate, FacebookCreativeFeaturesUpdate)
 
 
 class CRUDFacebookCreativeFeatures(

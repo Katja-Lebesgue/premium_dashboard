@@ -1,4 +1,5 @@
-from sqlalchemy import BigInteger, Column, ForeignKey, String, Boolean, Integer, Enum, TIMESTAMP, func
+from sqlalchemy import (TIMESTAMP, BigInteger, Boolean, Column, Enum,
+                        ForeignKey, Integer, String, func)
 from sqlalchemy.dialects import postgresql, sqlite
 
 from src.database.base_class import Base

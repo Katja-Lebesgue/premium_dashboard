@@ -4,6 +4,7 @@ from sqlalchemy import and_
 from src import crud
 from src.database.session import *
 from src.models import *
+from src.utils import *
 
 
 def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop_id: str = None):
@@ -19,6 +20,6 @@ def ping_raw_creative_and_target(session=SessionLocal(), ad_id: str = None, shop
         ),
     ).add_columns(target_query)
 
-    df = pd.read_sql(query.statement, session.bind)
+    df = read_query_into_df(db=db, query=query)
 
     return df

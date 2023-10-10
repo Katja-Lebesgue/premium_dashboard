@@ -1,18 +1,18 @@
 import os
 from abc import abstractproperty
-import streamlit as st
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from typing import Literal
 
+import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
+from plotly.subplots import make_subplots
 from scipy.stats import kruskal
 
 from src.abc.descriptive import Descriptive, DescriptiveDF
-from src.models.enums.facebook import TextFeature
 from src.app.frontend_names import get_frontend_name, list_to_str
-from src.utils import *
+from src.models.enums.facebook import TextFeature
 from src.statistical_tests import perform_test_on_df
+from src.utils import *
 
 metrics = [cr, ctr, cpm]
 
@@ -136,9 +136,9 @@ class DescriptiveTab(Descriptive):
             ].sum()
 
             if show_relative_option:
-                bar_height = st.select_slider("Adjust bar height", ("Absolute", "Relative"), value="Relative")
+                relative_bar_height = st.toggle(label="Relative bar height", value=True)
 
-                if bar_height == "Relative":
+                if relative_bar_height is True:
                     metric_by_month = feature_df.groupby("year_month")[selected_metric].sum()
                     metric_by_month_and_value = metric_by_month_and_value / metric_by_month
 

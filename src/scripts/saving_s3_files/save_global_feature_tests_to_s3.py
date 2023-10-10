@@ -13,7 +13,6 @@ from tqdm import tqdm
 from metadata.globals import *
 from src.models import AdCreativeFeatures
 from src.pingers import ping_facebook_creative_and_performance
-
 from src.statistical_tests import *
 from src.utils import *
 
@@ -41,7 +40,7 @@ def save_global_feature_tests_to_s3(
     done_shop_ids_path = folder + done_shop_ids_csv_name + ".csv"
 
     shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
-    all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
+    all_shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"]
 
     idx_cols = [
         "shop_id",
@@ -77,7 +76,7 @@ def save_global_feature_tests_to_s3(
         logger.debug(f"shop_id: {shop_id}")
 
         data_shop = ping_facebook_creative_and_performance(
-            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, monthly=False
+            db=db, shop_id=shop_id, start_date=start_date, end_date=end_date, period=Period.all
         )
 
         if shop_iter % 10 == 5:

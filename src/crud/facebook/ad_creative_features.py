@@ -7,7 +7,8 @@ from sqlalchemy.orm import Query, Session
 from src.crud.base import CRUDBase
 from src.models import FacebookDailyPerformance
 from src.models.facebook.ad_creative_features import AdCreativeFeatures
-from src.schemas.facebook.ad_creative_features import AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate
+from src.schemas.facebook.ad_creative_features import (
+    AdCreativeFeaturesCreate, AdCreativeFeaturesUpdate)
 from src.utils import element_to_list
 
 

@@ -3,8 +3,8 @@ from sqlalchemy.dialects import sqlite
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
-from src.models.enums.facebook.adset import Target
 from src.database.base_class import Base
+from src.models.enums.facebook.adset import Target
 
 
 class FacebookAdset(Base):

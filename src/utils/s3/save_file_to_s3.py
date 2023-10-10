@@ -2,11 +2,11 @@ import json
 from io import StringIO
 
 import cv2
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from src.utils.image.my_image import MyImage
-from src.utils.s3.utils import s3_client, add_global_s3_folder
+from src.utils.s3.utils import add_global_s3_folder, s3_client
 
 
 def save_csv_to_s3(

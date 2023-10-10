@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from src.models import enums
 from src.schemas.api_model import APIModel
 

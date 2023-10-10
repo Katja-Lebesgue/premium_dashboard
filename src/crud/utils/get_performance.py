@@ -1,17 +1,13 @@
 from datetime import date, datetime
 
-from sqlalchemy import func
-from sqlalchemy.orm import Session, DeclarativeMeta
-
-from loguru import logger
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+from sqlalchemy import func
+from sqlalchemy.orm import DeclarativeMeta, Session
 
 from src.models import *
 from src.schemas.facebook.facebook_daily_performance import *
-from src.utils import element_to_list
-
+from src.utils import *
 
 column_label_dict = {
     "spend": "spend",
@@ -30,12 +26,17 @@ def get_performance(
     db: Session,
     shop_id: str | list[str],
     ad_id: str | list[str] = None,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
-    monthly: bool = True,
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
+    period: Period = Period.year_month,
     cast_to_date: bool = False,
     extra_column_names: list[str] = [],
 ) -> pd.DataFrame:
+    if shop_id is None and ad_id is None:
+        raise ValueError("Both shop_id and ad_id is None!")
+
+    start_date, end_date = to_date(start_date), to_date(end_date)
+
     extra_columns = [getattr(performance_model, column) for column in extra_column_names]
     group_columns = [
         performance_model.ad_id,
@@ -50,36 +51,37 @@ def get_performance(
 
     columns = group_columns + performance_columns
 
-    if monthly:
-        year_month_col = func.concat(
+    if period == Period.year_month:
+        period_col = func.concat(
             func.extract("year", performance_model.date_start),
             "-",
             func.to_char(func.extract("month", performance_model.date_start), "fm00"),
         )
-        columns.append(year_month_col.label("year_month"))
-        group_columns.append(year_month_col)
+    if period == Period.date:
+        period_col = performance_model.date_start
+
+    if period != Period.all:
+        columns.append(period_col.label(f"{period}"))
+        group_columns.append(period_col)
 
     query = db.query(*columns)
 
+    filters = []
+
     if ad_id is not None:
         ad_id = element_to_list(ad_id)
-        query = query.filter(performance_model.ad_id.in_(ad_id))
+        filters.append(performance_model.ad_id.in_(ad_id))
 
     if shop_id is not None:
         shop_id = element_to_list(shop_id)
-        query = query.filter(performance_model.shop_id.in_(shop_id))
+        filters.append(performance_model.shop_id.in_(shop_id))
 
     if start_date is not None:
-        query = query.filter(
-            performance_model.date_start >= start_date,
-            performance_model.date_start <= end_date,
-        )
+        filters.append(performance_model.date_start.between(start_date, end_date))
 
-    query = query.group_by(*group_columns)
+    query = query.filter(*filters).group_by(*group_columns)
 
-    query = query.distinct()
-
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     if not len(df):
         return df
@@ -96,8 +98,8 @@ def get_performance(
             lambda df_: df_[column] / conversion_rates_dict.get(df_["account_id"], np.inf), axis=1
         )
 
-    if cast_to_date and monthly:
-        df["year_month"] = df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m").date())
+    if cast_to_date and period == Period.year_month:
+        df[f"{period}"] = df[f"{period}"].apply(lambda x: datetime.strptime(x, "%Y-%m").date())
 
     return df
 

@@ -1,7 +1,9 @@
+from abc import ABC, abstractproperty
 from typing import Callable
-from abc import abstractproperty, ABC
+
 import numpy as np
 import pandas as pd
+
 from src.utils.interval import MyInterval
 
 
@@ -73,7 +75,15 @@ class CAC(Metric):
     interval = MyInterval(0, 10000)
 
 
+class ROAS(Metric):
+    unit = "%"
+    num = "purch_USD"
+    denom = "spend_USD"
+    interval = MyInterval(0, 10000)
+
+
 ctr = CTR()
 cr = CR()
 cpm = CPM()
 cac = CAC()
+roas = ROAS()

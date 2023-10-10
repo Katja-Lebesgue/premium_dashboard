@@ -16,8 +16,8 @@ from src.utils import *
 def ping_shops(
     db: Session,
     model=FacebookAd,
-    start_date: str = None,
-    end_date: str = date.today().strftime("%Y-%m-%d"),
+    start_date: date | str | None = None,
+    end_date: date | str = date.today(),
 ) -> pd.DataFrame:
     if start_date is not None:
         model = FacebookDailyPerformance
@@ -33,6 +33,6 @@ def ping_shops(
 
     query = query.distinct()
 
-    df = pd.read_sql(query.statement, db.bind)
+    df = read_query_into_df(db=db, query=query)
 
     return df

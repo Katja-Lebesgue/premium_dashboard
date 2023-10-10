@@ -1,15 +1,15 @@
 from datetime import date
 
 import pandas as pd
-from sqlalchemy import and_, func
-from sqlalchemy.orm import Query, Session
-from sqlalchemy.sql.expression import literal
+from sqlalchemy.orm import Session
 
 from src.crud.base import CRUDBase
+from src.crud.utils import get_performance
 from src.models import *
 from src.models import GoogleDailyPerformance
-from src.schemas.google import GoogleDailyPerformanceCreate, GoogleDailyPerformanceUpdate
-from src.crud.utils import get_performance
+from src.schemas.google import (GoogleDailyPerformanceCreate,
+                                GoogleDailyPerformanceUpdate)
+from src.utils import *
 
 
 class CRUDGoogleDailyPerformance(
@@ -20,9 +20,9 @@ class CRUDGoogleDailyPerformance(
         db: Session,
         shop_id: str | list[str] = None,
         ad_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
-        monthly: bool = True,
+        start_date: date | str | None = None,
+        end_date: date | str = date.today(),
+        period: Period = Period.year_month,
         cast_to_date: bool = False,
     ) -> pd.DataFrame:
         df = get_performance(
@@ -33,7 +33,7 @@ class CRUDGoogleDailyPerformance(
             ad_id=ad_id,
             start_date=start_date,
             end_date=end_date,
-            monthly=monthly,
+            period=period,
             cast_to_date=cast_to_date,
             extra_column_names=["type"],
         )

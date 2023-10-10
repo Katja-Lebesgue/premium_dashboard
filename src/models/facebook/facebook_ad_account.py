@@ -1,7 +1,8 @@
 from datetime import date, datetime
 
 import pytz
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Sequence, SmallInteger, String
+from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey,
+                        Sequence, SmallInteger, String)
 from sqlalchemy.dialects import sqlite
 from sqlalchemy.orm import relationship, synonym
 

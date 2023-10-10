@@ -1,16 +1,16 @@
-from abc import ABC, abstractproperty, abstractmethod
-from src.database.session import db
-from sqlalchemy.orm import Session
-from dateutil.relativedelta import relativedelta
+from abc import ABC, abstractmethod, abstractproperty
 
-from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
+from dateutil.relativedelta import relativedelta
+from sqlalchemy.orm import Session
+
 from src import crud
-from src.utils import *
+from src.database.session import db
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
 from src.pingers import *
+from src.utils import *
 
 
 class DescriptiveDF(str, Enum):
-    done_shop_ids = "done_shop_ids"
     failed_shop_ids = "failed_shop_ids"
     main = "main"
     summary = "summary"
@@ -55,7 +55,7 @@ class Descriptive(ABC):
         "n_ads",
     ]
 
-    n_months = 24
+    n_months = 48
     performance_df_name = DescriptiveDF.main
 
     @property
@@ -63,7 +63,7 @@ class Descriptive(ABC):
         # end_date should be the last day of the month so we always
         # only consider data from full months
         # TODO: remove timedelta
-        today = date.today() + timedelta(days=4)
+        today = date.today()
         end_date_plus_one = date(year=today.year, month=today.month, day=1)
         return end_date_plus_one - timedelta(days=1)
 

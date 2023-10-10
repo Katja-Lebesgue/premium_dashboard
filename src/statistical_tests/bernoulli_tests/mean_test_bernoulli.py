@@ -1,11 +1,14 @@
 import numpy as np
 import pandas as pd
 
-
-from src.statistical_tests.bernoulli_tests.ttest_bernoulli import ttest_bernoulli
-from src.statistical_tests.bernoulli_tests.levene_bernoulli import levene_bernoulli
-from src.statistical_tests.bernoulli_tests.f_oneway_bernoulli import f_oneway_bernoulli
-from src.statistical_tests.bernoulli_tests.chi2_contingency_bernoulli import chi2_contingency_bernoulli
+from src.statistical_tests.bernoulli_tests.chi2_contingency_bernoulli import \
+    chi2_contingency_bernoulli
+from src.statistical_tests.bernoulli_tests.f_oneway_bernoulli import \
+    f_oneway_bernoulli
+from src.statistical_tests.bernoulli_tests.levene_bernoulli import \
+    levene_bernoulli
+from src.statistical_tests.bernoulli_tests.ttest_bernoulli import \
+    ttest_bernoulli
 from src.statistical_tests.get_binomial_sample import *
 from src.utils import nan_to_none, none_to_unknown
 

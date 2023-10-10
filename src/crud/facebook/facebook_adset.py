@@ -3,7 +3,8 @@ from sqlalchemy.orm.query import Query
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_adset import FacebookAdset
-from src.schemas.facebook.facebook_adset import FacebookAdsetCreate, FacebookAdsetUpdate
+from src.schemas.facebook.facebook_adset import (FacebookAdsetCreate,
+                                                 FacebookAdsetUpdate)
 from src.utils import element_to_list
 
 

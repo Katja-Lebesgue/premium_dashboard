@@ -7,7 +7,8 @@ from sqlalchemy.orm.query import Query
 
 from src.crud.base import CRUDBase
 from src.models.facebook.facebook_ad import FacebookAd
-from src.models.facebook.facebook_daily_performance import FacebookDailyPerformance
+from src.models.facebook.facebook_daily_performance import \
+    FacebookDailyPerformance
 from src.schemas.facebook.facebook_ad import FacebookAdCreate, FacebookAdUpdate
 from src.utils import element_to_list
 
@@ -24,44 +25,6 @@ class CRUDFacebookAd(CRUDBase[FacebookAd, FacebookAdCreate, FacebookAdUpdate]):
             filters.append(self.model.account_id.in_(ad_id))
 
         return query.filter(*filters).all()
-
-    def query_ad_id(
-        self,
-        db: Session,
-        shop_id: str | list[str] = None,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
-    ) -> Query:
-        query = db.query(FacebookAd.ad_id)
-
-        if start_date is not None:
-            query = query.join(FacebookDailyPerformance).filter(
-                FacebookDailyPerformance.date_start >= start_date,
-                FacebookDailyPerformance.date_start <= end_date,
-            )
-
-        if shop_id is not None:
-            shop_id = element_to_list(shop_id)
-            query = query.filter(FacebookAd.shop_id.in_(shop_id))
-
-        query = query.distinct()
-
-        return query
-
-    def query_shop_id(
-        self,
-        db: Session,
-        start_date: str = None,
-        end_date: str = date.today().strftime("%Y-%m-%d"),
-    ) -> pd.DataFrame:
-        query = db.query(FacebookAd.shop_id)
-        if start_date is not None:
-            query = query.join(FacebookDailyPerformance).filter(
-                FacebookDailyPerformance.date_start >= start_date,
-                FacebookDailyPerformance.date_start <= end_date,
-            )
-        query = query.distinct()
-        return query
 
     def query_raw_creative_data(
         self,

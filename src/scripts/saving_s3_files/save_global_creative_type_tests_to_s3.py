@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from src.pingers import *
-
 from src.statistical_tests import *
 from src.statistical_tests.bernoulli_tests import *
 from src.statistical_tests.proportion_test import proportion_test, proportion_test_cr, proportion_test_ctr
@@ -48,7 +47,7 @@ def save_global_creative_type_tests_to_s3(
     done_shop_ids_path = folder + done_shop_ids_csv_name + ".csv"
 
     shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
-    all_shop_ids = pd.read_sql(shop_ids_query.statement, db.bind)["shop_id"]
+    all_shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"]
 
     idx_cols = ["shop_id", "target", "promotion"]
 

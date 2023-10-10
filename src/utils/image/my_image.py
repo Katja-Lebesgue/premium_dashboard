@@ -1,9 +1,10 @@
-import numpy as np
+from collections import Counter
+
 import cv2
+import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.neighbors import NearestNeighbors
-from collections import Counter
 
 
 class MyNN(NearestNeighbors):

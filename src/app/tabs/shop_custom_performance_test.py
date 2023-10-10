@@ -1,23 +1,23 @@
 import os
 import re
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from uuid import uuid1
 
 import numpy as np
 import pandas as pd
 import streamlit as st
+from dateutil.relativedelta import relativedelta
 
+from src.app.frontend_names import get_frontend_name
+from src.app.utils import *
 from src.app.utils.css import *
+from src.app.utils.filter_df import FilterType, filter_df
 from src.app.utils.labels_and_values import *
+from src.database.session import db
+from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
+from src.pingers import ping_facebook_creative_and_performance
 from src.statistical_tests.proportion_test import *
 from src.utils import *
-from src.app.utils import *
-from src.database.session import db
-from src.pingers import ping_facebook_creative_and_performance
-from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
-from src.app.frontend_names import get_frontend_name
-from uuid import uuid1
-from src.app.utils.filter_df import filter_df, FilterType
 
 
 def shop_custom_performance_test(shop_id: int):
@@ -85,7 +85,7 @@ def filter_basic_features(df: pd.DataFrame, group_id: str) -> pd.DataFrame:
     df = filter_df(
         df=df,
         column_name="year_month",
-        filter_type=FilterType.slider,
+        filter_type=FilterType.select_slider,
         selecter_id=group_id,
         slider_default_lower_bound=default_min_date,
     )

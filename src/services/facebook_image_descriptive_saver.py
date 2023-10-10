@@ -1,17 +1,16 @@
+import uuid
 from datetime import date, datetime
 
 import pandas as pd
 from loguru import logger
 from sqlalchemy.orm import Session
 from tqdm import tqdm
-import uuid
 
-from src.models import *
-from src.utils import *
-from src.database.session import db
-from src.services.descriptive_saver import DescriptiveSaver
 from src.abc.descriptive import *
-from sqlalchemy.orm import Session
+from src.database.session import db
+from src.models import *
+from src.services.descriptive_saver import DescriptiveSaver
+from src.utils import *
 
 
 class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
