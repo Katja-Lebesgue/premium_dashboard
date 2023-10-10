@@ -16,6 +16,7 @@ from src.utils import *
 
 class DescriptiveSaver(Descriptive):
     save_every_n_shops = 15
+    skip_shop_ids = []
 
     def create_and_save_summary(self, end_date: date | None = None) -> pd.DataFrame:
         main_df = self.read_df(df_type=DescriptiveDF.main, end_date=end_date)
@@ -62,7 +63,9 @@ class DescriptiveSaver(Descriptive):
     ) -> pd.DataFrame:
         all_shops = crud.shop.get_nontest_shops(db=db)
         logger.info(f"Total of {len(all_shops)} nontest shops.")
-        all_shop_ids = pd.Series([shop_.id for shop_ in all_shops], name="shop_id").sort_values()
+        all_shop_ids = pd.Series(
+            [shop_.id for shop_ in all_shops if shop_.id not in self.skip_shop_ids], name="shop_id"
+        ).sort_values()
 
         list_of_objects_on_s3 = list_objects_from_prefix(
             prefix=self.get_df_path(df_type=df_type, end_date=self.end_date)
@@ -83,6 +86,7 @@ class DescriptiveSaver(Descriptive):
             ]
             logger.debug(f"{failed_shop_ids = }")
             max_done_shop_id = max(done_shop_ids)
+            logger.info(f"{max_done_shop_id = }")
             undone_shop_ids = all_shop_ids[all_shop_ids > max_done_shop_id]
 
         if repeat_for_failed:
@@ -95,6 +99,7 @@ class DescriptiveSaver(Descriptive):
 
         n_unsaved_shops = 0
         shop_loader = tqdm(undone_shop_ids)
+
         for shop_id in shop_loader:
             if save_to_s3 and n_unsaved_shops == self.save_every_n_shops:
                 self.save_df(df=main_df, df_type=df_type, index=True, end_date=self.end_date)
@@ -150,7 +155,7 @@ class FacebookTargetDescriptiveSaver(DescriptiveSaver, FacebookTargetDescriptive
 
 
 class GoogleCampaignTypeDescriptiveSaver(DescriptiveSaver, GoogleCampaignTypeDescriptive):
-    ...
+    skip_shop_ids = [42787782]
 
 
 facebook_creative_descriptive_saver = FacebookCreativeDescriptiveSaver()
