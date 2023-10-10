@@ -75,7 +75,15 @@ class CAC(Metric):
     interval = MyInterval(0, 10000)
 
 
+class ROAS(Metric):
+    unit = "%"
+    num = "purch_USD"
+    denom = "spend_USD"
+    interval = MyInterval(0, 10000)
+
+
 ctr = CTR()
 cr = CR()
 cpm = CPM()
 cac = CAC()
+roas = ROAS()
