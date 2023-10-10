@@ -77,7 +77,7 @@ class CAC(Metric):
 
 class ROAS(Metric):
     unit = "%"
-    num = "purch_USD"
+    num = "purch_value_USD"
     denom = "spend_USD"
     interval = MyInterval(0, 10000)
 
