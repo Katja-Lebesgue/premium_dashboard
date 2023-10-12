@@ -11,11 +11,19 @@ from src.database.session import db
 from src.models.enums.EPlatform import PLATFORMS, EPlatform
 from src.pingers import ping_ads_insights_all_platforms
 from src.utils import *
+from src.app.utils import filter_df, FilterType
 
 
 def all_platforms():
     st.markdown(hide_dataframe_row_index, unsafe_allow_html=True)
     df = st_ping_ads_insights(get_industry=True, columns=["spend", "revenue"])
+
+    df = filter_df(
+        df=df,
+        column_name="year_month",
+        filter_type=FilterType.select_slider,
+        format_func=lambda date_time: date_time.strftime("%Y-%m"),
+    )
 
     try:
         df.to_csv(f"{os.getenv('GLOBAL_PATH_TO_REPO')}/data/ads_insights.csv", index=False)
@@ -155,7 +163,7 @@ def display_platform_table(df: pd.DataFrame):
 def display_combinations_table(df: pd.DataFrame):
     df = df.groupby(["shop_id", "industry"]).sum(numeric_only=True).copy()
 
-    table = pd.DataFrame(columns=["combination", "shops", "budget_split"])
+    table = pd.DataFrame(columns=["combination", "shops", "total_spend", "budget_split"])
     platform_combinations = get_all_subsets(PLATFORMS)
 
     # backend
@@ -178,6 +186,7 @@ def display_combinations_table(df: pd.DataFrame):
         formatter={
             "combination": format_combination_column,
             "shops": lambda x: "{:,.2f}%".format(x * 100),
+            "total_spend": lambda x: big_number_human_format(x),
             "budget_split": lambda x: "-".join([str(round(y * 100)) for y in x]) if len(x) > 1 else "-",
         },
     )
@@ -218,6 +227,7 @@ def get_data_by_platform_combination(df: pd.DataFrame, combination: list, platfo
     result = {
         "combination": combination,
         "shops": len(filtered) / len(df),
+        "total_spend": filtered.total_spend.sum(),
         "budget_split": list(mean_ratio) + [1 - mean_ratio.sum()],
     }
     return result
