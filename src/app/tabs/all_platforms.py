@@ -23,6 +23,7 @@ def all_platforms():
         column_name="year_month",
         filter_type=FilterType.select_slider,
         format_func=lambda date_time: date_time.strftime("%Y-%m"),
+        slider_default_lower_bound=datetime(year=2015, month=1, day=1),
     )
 
     try:
