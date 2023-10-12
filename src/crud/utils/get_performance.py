@@ -63,6 +63,8 @@ def get_performance(
     if period != Period.all:
         columns.append(period_col.label(f"{period}"))
         group_columns.append(period_col)
+    else:
+        columns.append(func.count(performance_model.ad_id).label("days_active"))
 
     query = db.query(*columns)
 
@@ -70,6 +72,7 @@ def get_performance(
 
     if ad_id is not None:
         ad_id = element_to_list(ad_id)
+
         filters.append(performance_model.ad_id.in_(ad_id))
 
     if shop_id is not None:
@@ -89,13 +92,16 @@ def get_performance(
     metric_columns = list(column_label_dict.values())
     df[metric_columns] = df[metric_columns].fillna(0)
 
-    conversion_rates_dict = get_conversion_rates_dict(db=db, account_model=account_model, shop_id=shop_id)
-    df = df[df.account_id.isin(conversion_rates_dict.keys())]
+    account_ids = df.account_id.unique().tolist()
+    conversion_rates_dict = get_conversion_rates_dict(
+        db=db, account_model=account_model, account_id=account_ids
+    )
+    df = df[df.apply(lambda row: (row.shop_id, row.account_id) in conversion_rates_dict.keys(), axis=1)]
     if not len(df):
         return df
     for column in money_columns:
         df[f"{column}_USD"] = df.apply(
-            lambda df_: df_[column] / conversion_rates_dict.get(df_["account_id"], np.inf), axis=1
+            lambda row: row[column] / conversion_rates_dict.get((row.shop_id, row.account_id), np.inf), axis=1
         )
 
     if cast_to_date and period == Period.year_month:
@@ -104,8 +110,10 @@ def get_performance(
     return df
 
 
-def get_conversion_rates_dict(db: Session, account_model: DeclarativeMeta, shop_id: int | list[int]) -> dict:
-    shop_id = element_to_list(shop_id)
+def get_conversion_rates_dict(
+    db: Session, account_model: DeclarativeMeta, account_id: str | list[str]
+) -> dict:
+    account_id = element_to_list(account_id)
     conversion_rates_subquery = (
         db.query(
             CurrencyExchangeRate.code,
@@ -119,11 +127,12 @@ def get_conversion_rates_dict(db: Session, account_model: DeclarativeMeta, shop_
     query = (
         db.query(
             account_model.channel_account_id,
+            account_model.shop_id,
             account_model.currency,
             conversion_rates_subquery.c.rate_from_usd,
         )
         .join(conversion_rates_subquery, conversion_rates_subquery.c.code == account_model.currency)
-        .filter(account_model.shop_id.in_(shop_id), conversion_rates_subquery.c.date_rank == 1)
+        .filter(account_model.channel_account_id.in_(account_id), conversion_rates_subquery.c.date_rank == 1)
     )
 
-    return {row.channel_account_id: row.rate_from_usd for row in query.all()}
+    return {(row.shop_id, row.channel_account_id): row.rate_from_usd for row in query.all()}

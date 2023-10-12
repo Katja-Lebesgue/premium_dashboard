@@ -1,10 +1,12 @@
 from abc import ABC, abstractproperty
 from typing import Callable
+from numbers import Number
 
 import numpy as np
 import pandas as pd
 
 from src.utils.interval import MyInterval
+from src.utils.converters import big_number_human_format
 
 
 class Metric(ABC):
@@ -44,6 +46,14 @@ class Metric(ABC):
     @property
     def formula_series(self):
         return lambda s: self.scalar * s[self.num] / s[self.denom] if s[self.denom] > 0 else np.nan
+
+    def format(self, value: Number, big_decimals: int = 2, small_decimals: int = 0):
+        formatted_value = big_number_human_format(
+            num=value, big_decimals=big_decimals, small_decimals=small_decimals
+        )
+        if self.unit in ("%",):
+            return f"{formatted_value}{self.unit}"
+        return f"{self.unit}{formatted_value}"
 
 
 class CTR(Metric):

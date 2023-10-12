@@ -30,9 +30,10 @@ class CRUDCredentials(CRUDBase[models.Credentials, schemas.CredentialsCreate, sc
 
         subquery = subquery.filter(Credentials.shop_id == shop_id)
         subquery = subquery.subquery()
-        access_token = db.query(subquery).filter(subquery.c.rnk == 1).first().access_token
-
-        return access_token
+        access_token_row = db.query(subquery).filter(subquery.c.rnk == 1).first()
+        if access_token_row is not None:
+            return access_token_row.access_token
+        return None
 
 
 credentials = CRUDCredentials(models.Credentials)

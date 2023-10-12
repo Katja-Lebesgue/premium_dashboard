@@ -69,7 +69,10 @@ def ping_target(
 
     if ad_id is not None:
         ad_id = element_to_list(ad_id)
-        filters.append(FacebookAdset.ad_id.in_(ad_id))
+        adset_ids_query = db.query(FacebookAd.adset_id).filter(FacebookAd.ad_id.in_(ad_id))
+        adset_ids_df = read_query_into_df(db=db, query=adset_ids_query)
+        adset_ids = adset_ids_df.adset_id.tolist()
+        filters.append(FacebookAdset.adset_id.in_(adset_ids))
     if shop_id is not None:
         shop_id = element_to_list(shop_id)
         filters.append(FacebookAdset.shop_id.in_(shop_id))
@@ -88,6 +91,7 @@ def ping_target(
 
     df["gender"] = df.targeting.apply(lambda x: deduce_gender(x))
     df["age_groups"] = df.targeting.apply(lambda x: get_agegroups(x))
+    df["countries"] = df.targeting.apply(lambda d: d.get("geo_locations", {}).get("countries", []))
 
     if enum_to_value:
         df = df.applymap(lambda x: recursively_apply_func(obj=x, func=convert_enum_to_its_value))

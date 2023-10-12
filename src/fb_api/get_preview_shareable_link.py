@@ -1,5 +1,7 @@
 import os
 
+
+from loguru import logger
 import pandas as pd
 from dotenv import load_dotenv
 from facebook_business.adobjects.ad import Ad
@@ -27,12 +29,16 @@ def get_preview_shareable_link(
     FacebookAdsApi.init(access_token=access_token, api_version="v17.0")
 
     request = Ad(ad_id)
-    request_fb = request.api_get(
-        fields=[
-            Ad.Field.name,
-            Ad.Field.preview_shareable_link,
-            Ad.Field.conversion_domain,
-        ]
-    )
+    try:
+        request_fb = request.api_get(
+            fields=[
+                Ad.Field.name,
+                Ad.Field.preview_shareable_link,
+                Ad.Field.conversion_domain,
+            ]
+        )
+    except Exception:
+        logger.error("Facebook API limit!")
+        request_fb = {}
 
-    return request_fb["preview_shareable_link"]
+    return request_fb.get("preview_shareable_link", "")

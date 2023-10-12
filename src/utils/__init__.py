@@ -11,3 +11,4 @@ from .nlp import *
 from .pd import *
 from .s3 import *
 from .timing import *
+from .interval import *
