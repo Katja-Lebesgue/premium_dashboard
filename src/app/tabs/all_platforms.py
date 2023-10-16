@@ -72,7 +72,7 @@ def all_platforms():
         if industry != "all":
             df = df[df.industry == industry]
 
-        st.info(f"Total of {df.shop_id.nunique()} shops selected.")
+        st.info(f"Total of {df.shop_id.nunique() * 7} shops selected.")
 
     with col_breakdown2:
         display_platform_table(df=df)
