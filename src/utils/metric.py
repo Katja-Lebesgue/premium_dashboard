@@ -1,9 +1,12 @@
 from abc import ABC, abstractproperty
 from typing import Callable
 from numbers import Number
+from typing import Any
 
+from loguru import logger
 import numpy as np
 import pandas as pd
+
 
 from src.utils.interval import MyInterval
 from src.utils.converters import big_number_human_format
@@ -52,8 +55,13 @@ class Metric(ABC):
             num=value, big_decimals=big_decimals, small_decimals=small_decimals
         )
         if self.unit in ("%",):
-            return f"{formatted_value}{self.unit}"
-        return f"{self.unit}{formatted_value}"
+            res = f"{formatted_value}{self.unit}"
+        else:
+            res = f"{self.unit}{formatted_value}"
+        return res
+
+    def format_ticker(self, num: Number, pos: Any) -> str:
+        return self.format(value=num, small_decimals=0, big_decimals=0)
 
 
 class CTR(Metric):
