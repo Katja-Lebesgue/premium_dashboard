@@ -12,6 +12,7 @@ from src.abc.descriptive import Descriptive, DescriptiveDF
 from src.app.frontend_names import get_frontend_name, list_to_str
 from src.models.enums.facebook import TextFeature
 from src.statistical_tests import perform_test_on_df
+from src.app.utils import filter_df, FilterType
 from src.utils import *
 
 metrics = [cr, ctr, cpm]
@@ -168,7 +169,16 @@ class DescriptiveTab(Descriptive):
             st.plotly_chart(fig)
 
     def benchmarks(self, main_df: pd.DataFrame) -> None:
+        main_df = filter_df(
+            df=main_df,
+            column_name="year_month",
+            filter_type=FilterType.select_slider,
+            format_func=lambda date_time: date_time.strftime("%Y-%m"),
+            slider_default_lower_bound=datetime(year=2015, month=1, day=1),
+        )
+
         col1, col2 = st.columns([1, 3])
+
         with col1:
             selected_feature = st.selectbox(
                 "Select feature",
