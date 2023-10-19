@@ -3,10 +3,8 @@ import streamlit as st
 from src.abc.descriptive import *
 from src.abc.descriptive import DescriptiveDF
 from src.app.frontend_names import get_frontend_name
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab, metrics
 from src.utils import *
-
-metrics = [cr, ctr, cpm]
 
 
 class MarketDescriptiveTab(DescriptiveTab):
@@ -62,6 +60,7 @@ class MarketDescriptiveTab(DescriptiveTab):
         main_df["feature_value"] = main_df.feature_value.apply(get_frontend_name)
         for metric in metrics:
             main_df[str(metric)] = main_df.apply(metric.formula_series, axis=1)
+        logger.debug(main_df.columns)
         return main_df
 
 

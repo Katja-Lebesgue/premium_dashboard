@@ -15,7 +15,7 @@ from src.statistical_tests import perform_test_on_df
 from src.app.utils import filter_df, FilterType
 from src.utils import *
 
-metrics = [cr, ctr, cpm]
+metrics = (cr, ctr, cpm, roas)
 
 
 class DescriptiveTab(Descriptive):

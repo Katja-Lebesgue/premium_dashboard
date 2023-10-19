@@ -2,7 +2,7 @@ import streamlit as st
 
 from src.abc.descriptive import *
 from src.app.frontend_names import get_frontend_name
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab, metrics
 from src.utils import *
 
 analysis_type_help = (
@@ -13,8 +13,6 @@ analysis_type_help = (
     " correspond to the average metric by shop, i.e. how much an average shop spent in"
     " June 2023."
 )
-
-metrics = [cr, ctr, cpm]
 
 
 class ShopDescriptiveTab(DescriptiveTab):
