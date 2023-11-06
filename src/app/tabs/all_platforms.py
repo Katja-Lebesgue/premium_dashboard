@@ -87,7 +87,7 @@ def st_ping_ads_insights(**kwargs):
 
 
 def display_spend_statistics(df: pd.DataFrame, bins=list[float]):
-    st.header(f"Total marketing budget: {big_number_human_format(df.total_spend.sum())}")
+    st.header(f"Total marketing budget: ${big_number_human_format(df.total_spend.sum())}")
     df = df.groupby(["shop_id", "industry"]).mean(numeric_only=True).reset_index()
     col_budget1, col_budget2 = st.columns(2)
 

@@ -77,8 +77,12 @@ class Descriptive(ABC):
     db = db
 
     def get_shop_descriptive_df(
-        self, db: Session, shop_id: int, start_date: date, end_date: date
+        self, db: Session, shop_id: int, start_date: date | None = None, end_date: date | None = None
     ) -> pd.DataFrame:
+        if start_date is None:
+            start_date = self.start_date
+        if end_date is None:
+            end_date = self.end_date
         shop_df = self.get_shop_df(db=db, shop_id=shop_id, start_date=start_date, end_date=end_date)
         if "shop_id" not in shop_df.columns:
             shop_df["shop_id"] = shop_id

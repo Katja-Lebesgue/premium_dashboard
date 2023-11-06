@@ -60,8 +60,8 @@ class Metric(ABC):
             res = f"{self.unit}{formatted_value}"
         return res
 
-    def format_ticker(self, num: Number, pos: Any) -> str:
-        return self.format(value=num, small_decimals=0, big_decimals=0)
+    def format_ticker(self, num: Number, pos: Any, small_decimals: int = 2, big_decimals: int = 2) -> str:
+        return self.format(value=num, small_decimals=small_decimals, big_decimals=big_decimals)
 
 
 class CTR(Metric):

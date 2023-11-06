@@ -3,5 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/premium_dashboard.dockerfile
+    ports:
+      - 8501:8501
     volumes:
       - .:/app
