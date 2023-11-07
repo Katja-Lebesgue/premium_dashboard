@@ -21,4 +21,9 @@ authenticator = authenticate()
 
 if st.session_state["authentication_status"]:
     authenticator.logout("Logout", "sidebar")
+    with st.sidebar:
+        clear_cache_and_rerun_button = st.button("Reset")
+        if clear_cache_and_rerun_button:
+            st.experimental_memo.clear()
+            st.rerun()
     get_main_menu().show(authenticator=authenticator)
