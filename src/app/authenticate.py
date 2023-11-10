@@ -49,11 +49,7 @@ def authenticate():
 
 # @st.cache_data
 def get_username_config():
-    try:
-        user_data = db.query(StreamlitUser).all()
-    except PendingRollbackError:
-        db.rollback()
-        user_data = db.query(StreamlitUser).all()
+    user_data = db.query(StreamlitUser).all()
     list_of_dicts = [row.__dict__ for row in user_data]
     result = {}
     for dic in list_of_dicts:

@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
+from src.database.session import db
 
 load_dotenv()
 
@@ -27,3 +28,5 @@ if st.session_state["authentication_status"]:
             st.experimental_memo.clear()
             st.rerun()
     get_main_menu().show(authenticator=authenticator)
+
+db.close()
