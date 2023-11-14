@@ -279,31 +279,37 @@ class DescriptiveTab(Descriptive):
 
             st.plotly_chart(fig)
 
-        significance_table = pd.DataFrame(columns=["metric", "feature", "higher"])
-        for feature, metric in itertools.product(self.descriptive_columns, metrics):
-            feature_df = main_df[main_df.feature == feature]
-            feature_df = feature_df[
-                feature_df[metric.denom] > max(100, feature_df[metric.denom].quantile(0.25))
-            ]
+        generate_table_button = st.button("Compute significance table")
 
-            partition, _ = perform_test_on_df(
-                df=feature_df,
-                group_column="feature_value",
-                metric_column=str(metric),
-                test_func=kruskal,
-                test_func_kwargs={"nan_policy": "omit"},
-                pd_feature_func="median",
-            )
+        if generate_table_button:
+            significance_table = pd.DataFrame(columns=["metric", "feature", "higher"])
+            for feature, metric in itertools.product(self.descriptive_columns, metrics):
+                feature_df = main_df[main_df.feature == feature]
+                feature_df = feature_df[
+                    feature_df[metric.denom] > max(100, feature_df[metric.denom].quantile(0.25))
+                ]
+                try:
+                    partition, _ = perform_test_on_df(
+                        df=feature_df,
+                        group_column="feature_value",
+                        metric_column=str(metric),
+                        test_func=kruskal,
+                        test_func_kwargs={"nan_policy": "omit"},
+                        pd_feature_func="median",
+                    )
 
-            if len(partition) > 1:
-                significance_table.loc[len(significance_table)] = {
-                    "feature": get_frontend_name(feature),
-                    "metric": get_frontend_name(metric),
-                    "higher": partition[0],
-                }
+                except Exception:
+                    continue
 
-        st.write("Statistically significant relationships")
-        st.dataframe(significance_table.set_index("metric", drop=True).sort_index(), width=600)
+                if len(partition) > 1:
+                    significance_table.loc[len(significance_table)] = {
+                        "feature": get_frontend_name(feature),
+                        "metric": get_frontend_name(metric),
+                        "higher": partition[0],
+                    }
+
+            st.write("Statistically significant relationships")
+            st.dataframe(significance_table.set_index("metric", drop=True).sort_index(), width=600)
 
 
 def add_pie_subplot(
