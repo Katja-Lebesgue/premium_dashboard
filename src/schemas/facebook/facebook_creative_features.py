@@ -15,16 +15,18 @@ class FacebookCreativeFeaturesBase(APIModel):
     starts_with_question: bool
     urgency: bool
     emoji: bool
-    emojis_list: list
+    emojis_list: list[str]
     hashtag: bool
     fact_words: bool
     link: bool
     percentage: bool
     free_shipping: bool
     discount: bool
+    discount_list: list[int]
     prices: bool
     cta: bool
     weasel_words: bool
+    buttton_cta_list: list[str]
 
     # target features
     target: str

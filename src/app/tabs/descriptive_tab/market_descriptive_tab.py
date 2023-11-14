@@ -60,7 +60,6 @@ class MarketDescriptiveTab(DescriptiveTab):
         main_df["feature_value"] = main_df.feature_value.apply(get_frontend_name)
         for metric in metrics:
             main_df[str(metric)] = main_df.apply(metric.formula_series, axis=1)
-        logger.debug(main_df.columns)
         return main_df
 
 

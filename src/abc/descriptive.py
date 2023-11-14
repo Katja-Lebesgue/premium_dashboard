@@ -120,7 +120,7 @@ class Descriptive(ABC):
         )
         level_column = [col for col in stacked_df.columns if "level" in str(col)][0]
         stacked_df.rename(columns={level_column: "feature", 0: "feature_value"}, inplace=True)
-        shop_descriptive_df = stacked_df.groupby(self.main_df_index)[self.metric_columns].sum()
+        shop_descriptive_df = stacked_df.groupby(self.main_df_index, dropna=False)[self.metric_columns].sum()
 
         return shop_descriptive_df
 
@@ -140,8 +140,9 @@ class Descriptive(ABC):
 
 
 class FacebookCreativeDescriptive(Descriptive):
-    descriptive_columns = BOOLEAN_TEXT_FEATURES + ["creative_type", "target"]
+    descriptive_columns = BOOLEAN_TEXT_FEATURES + ["creative_type", "target", "discount_list"]
     pie_columns = ["creative_type", "discount", "target"]
+    explode_descriptive_columns = ["discount_list"]
     tag = "facebook_creative"
 
     def get_shop_df(self, db: Session, shop_id: int, start_date: date, end_date: date) -> pd.DataFrame:

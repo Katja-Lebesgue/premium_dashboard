@@ -1,5 +1,4 @@
-from sqlalchemy import (TIMESTAMP, BigInteger, Boolean, Column, Enum,
-                        ForeignKey, Integer, String, func)
+from sqlalchemy import BigInteger, Column, ForeignKey, String, Boolean, Integer, Enum, TIMESTAMP, func
 from sqlalchemy.dialects import postgresql, sqlite
 
 from src.database.base_class import Base
@@ -24,6 +23,7 @@ class FacebookCreativeFeatures(Base):
     # text features
     cta = Column(Boolean)
     discount = Column(Boolean)
+    discount_list = Column(postgresql.ARRAY(Integer).with_variant(sqlite.JSON, "sqlite"), server_default="{}")
     emoji = Column(Boolean)
     emoji_list = Column(postgresql.ARRAY(String).with_variant(sqlite.JSON, "sqlite"), server_default="{}")
     free_shipping = Column(Boolean)
@@ -36,6 +36,9 @@ class FacebookCreativeFeatures(Base):
     urgency = Column(Boolean)
     user_addressing = Column(Boolean)
     weasel_words = Column(Boolean)
+    button_cta_list = Column(
+        postgresql.ARRAY(String).with_variant(sqlite.JSON, "sqlite"), server_default="{}"
+    )
 
     # target features
     age_range = Column(Integer)

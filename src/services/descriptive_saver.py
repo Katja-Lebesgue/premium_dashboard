@@ -21,20 +21,33 @@ class DescriptiveSaver(Descriptive):
     def create_and_save_summary(self, end_date: date | None = None) -> pd.DataFrame:
         main_df = self.read_df(df_type=DescriptiveDF.main, end_date=end_date)
         main_df["n_shops"] = 1
+
+        absolute_sum_by_shop_and_value = main_df.set_index(
+            ["shop_id", "year_month", "feature", "feature_value"]
+        )[self.metric_columns + ["n_shops"]]
+
+        # absolute monthly sums
+        absolute_sum_by_value = main_df.groupby(["year_month", "feature", "feature_value"]).sum()[
+            self.metric_columns + ["n_shops"]
+        ]
+
+        # get df of relative values by shop
         sum_by_shop_and_feature = main_df.groupby(["shop_id", "year_month", "feature"])[
             self.metric_columns
         ].sum()
-        grouped_by_shop_and_value = main_df.groupby(["shop_id", "year_month", "feature", "feature_value"])
 
-        absolute_sum_by_shop_and_value = grouped_by_shop_and_value[self.metric_columns + ["n_shops"]].sum()
         relative_sum_by_shop_and_value = (
             absolute_sum_by_shop_and_value[self.metric_columns] / sum_by_shop_and_feature
         )
+
+        # get df of relative sums without shop
         relative_sum_by_value = (
             relative_sum_by_shop_and_value.reset_index()
             .groupby(["year_month", "feature", "feature_value"])[self.metric_columns]
             .sum()
         )
+
+        # normalize them by dividing by numnber of shops per month per feature
         n_shops_by_month_and_feature = (
             relative_sum_by_value.reset_index().groupby(["year_month", "feature"])[self.metric_columns].sum()
         )
@@ -42,11 +55,8 @@ class DescriptiveSaver(Descriptive):
         normalised_relative_sum_by_value.rename(
             columns={col: col + "_by_shop" for col in self.metric_columns}, inplace=True
         )
-        absolute_sum_by_value = (
-            absolute_sum_by_shop_and_value.reset_index()
-            .groupby(["year_month", "feature", "feature_value"])
-            .sum()
-        )
+
+        # join the two to get the final result
         summary_df = absolute_sum_by_value.join(normalised_relative_sum_by_value)
         self.save_df(df=summary_df, df_type=DescriptiveDF.summary, end_date=end_date, index=True)
         return summary_df
@@ -96,6 +106,7 @@ class DescriptiveSaver(Descriptive):
 
         if testing:
             undone_shop_ids = [16038, 44301396, 34810574, 96200, 2]
+            # undone_shop_ids = [16038]
 
         n_unsaved_shops = 0
         shop_loader = tqdm(undone_shop_ids)
@@ -122,7 +133,6 @@ class DescriptiveSaver(Descriptive):
                     if not (len(main_df)):
                         main_df = shop_descriptive_df
                     else:
-                        # main_df = main_df.add(shop_descriptive_df, fill_value=0)
                         main_df = pd.concat([main_df, shop_descriptive_df], axis=0)
                 n_unsaved_shops += 1
             except Exception as e:

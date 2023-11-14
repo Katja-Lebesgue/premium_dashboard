@@ -1,6 +1,7 @@
 import os
 from abc import abstractproperty
 from typing import Literal
+import itertools
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -36,6 +37,7 @@ class DescriptiveTab(Descriptive):
         add_title: bool = True,
         func: Literal["mean", "sum"] = "sum",
     ) -> None:
+        st.subheader("Recent trends")
         last_n_months_series = (
             summary_df.year_month.drop_duplicates().nlargest(n=self.last_n_months).sort_values()
         )
@@ -46,7 +48,7 @@ class DescriptiveTab(Descriptive):
         with col1:
             selected_metric = st.radio(
                 "Select metric",
-                options=self.available_metrics,
+                options=self.metric_columns,
                 format_func=get_frontend_name,
             )
 
@@ -117,11 +119,16 @@ class DescriptiveTab(Descriptive):
     def descriptive_features_through_time(
         self, summary_df: pd.DataFrame, show_relative_option: bool = True
     ) -> None:
+        st.subheader("Features through time")
         col1, col2 = st.columns([1, 3])
         with col1:
             selected_feature = st.selectbox(
                 "Select feature",
-                options=self.descriptive_columns,
+                options=[
+                    feature
+                    for feature in self.descriptive_columns
+                    if feature in set(summary_df.feature.unique())
+                ],
                 format_func=get_frontend_name,
             )
 
@@ -155,7 +162,6 @@ class DescriptiveTab(Descriptive):
                 x="year_month",
                 y=selected_metric,
                 color="feature_value",
-                title="Features through time",
                 **extra_bar_kwargs,
             )
 
@@ -169,20 +175,24 @@ class DescriptiveTab(Descriptive):
             st.plotly_chart(fig)
 
     def benchmarks(self, main_df: pd.DataFrame) -> None:
-        main_df = filter_df(
-            df=main_df,
-            column_name="year_month",
-            filter_type=FilterType.select_slider,
-            format_func=lambda date_time: date_time.strftime("%Y-%m"),
-            slider_default_lower_bound=datetime(year=2015, month=1, day=1),
-        )
-
+        st.subheader("Tests")
         col1, col2 = st.columns([1, 3])
 
         with col1:
+            main_df = filter_df(
+                df=main_df,
+                column_name="year_month",
+                filter_type=FilterType.select_slider,
+                format_func=lambda date_time: date_time.strftime("%Y-%m"),
+                slider_default_lower_bound=datetime(year=2015, month=1, day=1),
+            )
             selected_feature = st.selectbox(
                 "Select feature",
-                options=self.descriptive_columns,
+                options=[
+                    feature
+                    for feature in self.descriptive_columns
+                    if feature in set(main_df.feature.unique())
+                ],
                 format_func=get_frontend_name,
                 key="time_feature",
             )
@@ -264,11 +274,36 @@ class DescriptiveTab(Descriptive):
                 if boxplot_idx < n_groups:
                     fig.add_vline(x=boxplot_idx - 0.5, line_width=3, line_dash="dash", line_color="green")
             fig.update_layout(
-                title={"text": "Benchmarks"},
                 yaxis_title=f"{selected_metric} ({selected_metric.unit})",
             )
 
             st.plotly_chart(fig)
+
+        significance_table = pd.DataFrame(columns=["metric", "feature", "higher"])
+        for feature, metric in itertools.product(self.descriptive_columns, metrics):
+            feature_df = main_df[main_df.feature == feature]
+            feature_df = feature_df[
+                feature_df[metric.denom] > max(100, feature_df[metric.denom].quantile(0.25))
+            ]
+
+            partition, _ = perform_test_on_df(
+                df=feature_df,
+                group_column="feature_value",
+                metric_column=str(metric),
+                test_func=kruskal,
+                test_func_kwargs={"nan_policy": "omit"},
+                pd_feature_func="median",
+            )
+
+            if len(partition) > 1:
+                significance_table.loc[len(significance_table)] = {
+                    "feature": get_frontend_name(feature),
+                    "metric": get_frontend_name(metric),
+                    "higher": partition[0],
+                }
+
+        st.write("Statistically significant relationships")
+        st.dataframe(significance_table.set_index("metric", drop=True).sort_index(), width=600)
 
 
 def add_pie_subplot(
