@@ -242,7 +242,6 @@ class DescriptiveTab(Descriptive):
                     st.success(message)
 
         with col2:
-            st.write(feature_df[str(selected_metric)].describe())
             fig = go.Figure()
             boxplot_idx = 0
             for slice in partition:
