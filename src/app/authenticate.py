@@ -51,7 +51,7 @@ def authenticate():
 def get_username_config():
     try:
         user_data = db.query(StreamlitUser).all()
-    except PendingRollbackError:
+    except Exception:
         db.rollback()
         user_data = db.query(StreamlitUser).all()
     list_of_dicts = [row.__dict__ for row in user_data]

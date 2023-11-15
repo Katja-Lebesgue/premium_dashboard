@@ -19,6 +19,8 @@ column_label_dict = {
 
 money_columns = ("spend", "purch_value")
 
+performance_columns = ["spend_USD", "purch_value_USD", "purch", "clicks", "impr"]
+
 
 def get_performance(
     performance_model: DeclarativeMeta,
