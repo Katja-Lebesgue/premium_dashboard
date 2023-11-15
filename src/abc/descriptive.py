@@ -46,6 +46,8 @@ class Descriptive(ABC):
 
     main_df_index = ["shop_id", "year_month", "feature", "feature_value"]
 
+    metrics = (cr, ctr, cpm, cac, roas)
+
     metric_columns = [
         "spend_USD",
         "impr",

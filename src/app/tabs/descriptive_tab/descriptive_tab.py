@@ -16,8 +16,6 @@ from src.statistical_tests import perform_test_on_df
 from src.app.utils import filter_df, FilterType
 from src.utils import *
 
-metrics = (cr, ctr, cpm, roas)
-
 
 class DescriptiveTab(Descriptive):
     @abstractproperty
@@ -186,6 +184,18 @@ class DescriptiveTab(Descriptive):
                 format_func=lambda date_time: date_time.strftime("%Y-%m"),
                 slider_default_lower_bound=datetime(year=2015, month=1, day=1),
             )
+
+            selected_metric = st.selectbox(
+                "Select metric",
+                options=self.metrics,
+                format_func=lambda x: get_frontend_name(str(x)),
+                key="time_metric",
+            )
+
+            main_df = main_df[
+                main_df[str(selected_metric)].apply(lambda value: value in selected_metric.interval)
+            ]
+
             selected_feature = st.selectbox(
                 "Select feature",
                 options=[
@@ -195,12 +205,6 @@ class DescriptiveTab(Descriptive):
                 ],
                 format_func=get_frontend_name,
                 key="time_feature",
-            )
-            selected_metric = st.selectbox(
-                "Select metric",
-                options=metrics,
-                format_func=lambda x: get_frontend_name(str(x)),
-                key="time_metric",
             )
 
             feature_df = main_df[main_df.feature == selected_feature]
@@ -238,6 +242,7 @@ class DescriptiveTab(Descriptive):
                     st.success(message)
 
         with col2:
+            st.write(feature_df[str(selected_metric)].describe())
             fig = go.Figure()
             boxplot_idx = 0
             for slice in partition:
@@ -245,6 +250,7 @@ class DescriptiveTab(Descriptive):
                     extra_box_kwargs = {}
                     if "color" in selected_feature:
                         extra_box_kwargs = extra_box_kwargs | {"fillcolor": value, "line": {"color": value}}
+
                     fig.add_trace(
                         go.Box(
                             y=feature_df.loc[feature_df.feature_value == value, str(selected_metric)],
@@ -255,6 +261,7 @@ class DescriptiveTab(Descriptive):
                         )
                     )
 
+                    # write sample size on boxplot
                     fig.add_annotation(
                         x=get_frontend_name(value),
                         y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].max(),
@@ -262,6 +269,7 @@ class DescriptiveTab(Descriptive):
                         yshift=20,
                         showarrow=False,
                     )
+                    # write median on boxplot
                     fig.add_annotation(
                         x=get_frontend_name(value),
                         y=feature_df[feature_df["feature_value"] == value][str(selected_metric)].median(),
@@ -283,7 +291,7 @@ class DescriptiveTab(Descriptive):
 
         if generate_table_button:
             significance_table = pd.DataFrame(columns=["metric", "feature", "higher"])
-            for feature, metric in itertools.product(self.descriptive_columns, metrics):
+            for feature, metric in itertools.product(self.descriptive_columns, self.metrics):
                 feature_df = main_df[main_df.feature == feature]
                 feature_df = feature_df[
                     feature_df[metric.denom] > max(100, feature_df[metric.denom].quantile(0.25))

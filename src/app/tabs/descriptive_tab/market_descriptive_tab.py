@@ -3,7 +3,7 @@ import streamlit as st
 from src.abc.descriptive import *
 from src.abc.descriptive import DescriptiveDF
 from src.app.frontend_names import get_frontend_name
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab, metrics
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.utils import *
 
 
@@ -58,7 +58,7 @@ class MarketDescriptiveTab(DescriptiveTab):
         main_df = _self.read_df(df_type=df_type, end_date=end_date)
         main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         main_df["feature_value"] = main_df.feature_value.apply(get_frontend_name)
-        for metric in metrics:
+        for metric in _self.metrics:
             main_df[str(metric)] = main_df.apply(metric.formula_series, axis=1)
         return main_df
 

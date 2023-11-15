@@ -2,7 +2,7 @@ import streamlit as st
 
 from src.abc.descriptive import *
 from src.app.frontend_names import get_frontend_name
-from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab, metrics
+from src.app.tabs.descriptive_tab.descriptive_tab import DescriptiveTab
 from src.utils import *
 
 analysis_type_help = (
@@ -39,7 +39,7 @@ class ShopDescriptiveTab(DescriptiveTab):
             return summary_df
         summary_df["year_month"] = summary_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         summary_df["feature_value"] = summary_df.feature_value.apply(get_frontend_name)
-        for metric in metrics:
+        for metric in _self.metrics:
             summary_df[str(metric)] = summary_df.apply(metric.formula_series, axis=1)
         return summary_df
 
