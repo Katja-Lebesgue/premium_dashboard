@@ -7,3 +7,4 @@ from .shopify_product import ProductStatus
 from .task_status import TaskStatus
 from .task_type import TaskType
 from .facebook import *
+from .crm import Industry

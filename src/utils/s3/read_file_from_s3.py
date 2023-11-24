@@ -4,6 +4,7 @@ import os
 import cv2
 import numpy as np
 import pandas as pd
+from loguru import logger
 
 from src.utils.image.my_image import MyImage
 from src.utils.pd import read_csv_and_eval
@@ -19,6 +20,8 @@ def read_csv_from_s3(
 ):
     if add_global_folder:
         path = add_global_s3_folder(path)
+
+    logger.debug(f"path: {path}")
 
     object = client.get_object(Bucket=bucket, Key=path)
 

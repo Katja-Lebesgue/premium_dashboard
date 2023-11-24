@@ -2,6 +2,7 @@ import os
 import string
 import sys
 from io import StringIO
+from dateutil.relativedelta import relativedelta
 
 import nltk
 import pandas as pd
@@ -13,25 +14,54 @@ from loguru import logger
 from matplotlib import pyplot as plt
 from nltk.tokenize.casual import TweetTokenizer
 from wordcloud import WordCloud
+from src.models import Crm
+from src import crud
+from src.models.enums.facebook import TextType
+from src.models.enums import Industry
 
+from src.database.session import db
 from src.app.utils.cache_functions import st_read_csv_from_s3
-from src.feature_extractors.EText import EText
 from src.utils import *
+from src.app.frontend_names import get_frontend_name
 
 load_dotenv()
 
+sentiment_metrics = ("compound", "neg", "neu", "pos", "subjectivity")
+
+
+@st.cache_data
+def ping_text_samples(text_type: TextType, sample_size: int = 5_000, n_months: int = 3) -> pd.DataFrame:
+    today = date.today()
+    df = pd.DataFrame()
+    for industry in list(Industry):
+        industry_data = crud.fb_creative_features.get_text_sample(
+            db=db,
+            sample_size=sample_size,
+            start_date=today - relativedelta(months=n_months),
+            end_date=today,
+            industry=industry,
+            text_type=text_type,
+        )
+        industry_df = pd.DataFrame(industry_data)
+        df = pd.concat([df, industry_df], axis=0)
+    test_shop_ids = [shop_.id for shop_ in crud.shop.get_test_shops(db=db)]
+    # df = df[~df.shop_id.isin(test_shop_ids)]
+    df = df.rename(columns={"industry_enum": "industry"})
+
+    return df
+
 
 def text_analysis():
-    df = st_read_csv_from_s3("prljavo/texts_2022.csv")
-    df = df.copy()
+    # df = st_read_csv_from_s3("prljavo/texts_2022.csv").copy()
     col, _ = st.columns([1, 2])
     with col:
-        text_col = st.selectbox(label="Text position", options=get_enum_values(EText))
-    sbs, sentiment_columns = get_samples_by_shop(df=df, text_col=text_col)
+        text_col = st.selectbox(label="Text position", options=list(TextType), format_func=get_frontend_name)
+    df = ping_text_samples(text_type=text_col).copy()
+    sbs = get_samples_by_shop(df=df, text_col=text_col)
 
     st.subheader("Style")
     # wc & ec
-    emoji_cloud = EmojiCloud(font_path=f"{os.getenv('GLOBAL_PATH_TO_REPO')}/src/utils/Symbola.otf")
+    emoji_cloud = EmojiCloud()
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("#")
@@ -64,7 +94,7 @@ def text_analysis():
     st.subheader("Sentiment")
     col1, _ = st.columns([1, 3])
     with col1:
-        sentiment_type = st.selectbox(label="Select sentiment type", options=sentiment_columns)
+        sentiment_type = st.selectbox(label="Select sentiment type", options=sentiment_metrics)
     fig = plt.figure()
     sns.boxplot(data=sbs, y="industry", x=sentiment_type, showfliers=False)
     st.pyplot(fig)
@@ -83,31 +113,28 @@ def text_analysis():
     text_length_through_time(df=text_length_df, text_col=text_col)
 
 
-@st.cache_data
+# @st.cache_data
 def get_samples_by_shop(df: pd.DataFrame, text_col: str) -> pd.DataFrame:
     df = df[df[text_col].apply(lambda x: len(x) > 0)]
-    df[f"concatinated_{text_col}"] = df[text_col].apply(lambda x: " ".join(x))
+    df = df.explode(text_col).drop_duplicates(text_col)[[text_col, "industry", "shop_id"]]
 
-    sbs = df.groupby("shop_id").sample(30, replace=True).drop_duplicates(subset=f"concatinated_{text_col}")
+    df["language"] = df[text_col].apply(lambda text: detect_language(text))
+    # df = df[df.language == "en"]
+    # take max 5 unique ads from shop
+    df = df.groupby("shop_id").apply(lambda df: df.iloc[:30, :])
 
     tokenizer = TweetTokenizer()
-    sbs["word_tokens"] = sbs[text_col].apply(
-        lambda x: [word.lower() for word in tokenizer.tokenize(x[0]) if word not in string.punctuation]
+    df["word_tokens"] = df[text_col].apply(
+        lambda text: [word.lower() for word in tokenizer.tokenize(text) if word not in string.punctuation]
     )
-    sbs["concatinated_tokens"] = sbs.word_tokens.apply(lambda x: " ".join(x))
-
-    # remove lebesgue ads
-    lebesgue_shop_ids = sbs.loc[
-        sbs.word_tokens.apply(lambda tokens: "lebesgue" in tokens), "shop_id"
-    ].unique()
-    sbs = sbs[~sbs.shop_id.isin(lebesgue_shop_ids)]
+    df["concatinated_tokens"] = df.word_tokens.apply(lambda x: " ".join(x))
 
     # word count and sentiment
-    sbs["word_count"] = sbs.word_tokens.apply(len)
-    sentiment = sbs[text_col].apply(lambda x: get_sentiment(x[0])).apply(pd.Series)
-    sbs = sbs.join(sentiment)
+    df["word_count"] = df.word_tokens.apply(len)
+    sentiment = df[text_col].apply(lambda x: get_sentiment(x)).apply(pd.Series)
+    df = df.join(sentiment)
 
-    return sbs, sentiment.columns
+    return df
 
 
 def display_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
@@ -120,7 +147,7 @@ def display_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
 
 @st.cache_data
 def get_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
-    full = " ".join(df[f"concatinated_{text_col}"].tolist())
+    full = " ".join(df[text_col].tolist())
     wc = WordCloud().generate_from_text(full)
     ec = _emoji_cloud.generate(full)
     logger.debug("Opet wc!")

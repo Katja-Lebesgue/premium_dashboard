@@ -9,13 +9,15 @@ from tqdm import tqdm
 from src.abc.descriptive import *
 from src.database.session import db
 from src.models import *
-from src.services.descriptive_saver import DescriptiveSaver
 from src.utils import *
 
 
-class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
+class FacebookImageDescriptiveSaver(FacebookImageDescriptive):
     save_every_n_shops = 15
     save_every_n_rows = 500
+
+    def get_raw_shop_df(*args) -> pd.DataFrame:
+        return pd.DataFrame()
 
     @property
     def s3_image_folder(self):
@@ -44,8 +46,8 @@ class FacebookImageDescriptiveSaver(DescriptiveSaver, FacebookImageDescriptive):
         self.create_and_save_main()
         self.create_and_save_summary()
 
-    def create_and_save_performance(self, **kwargs) -> None:
-        super().create_and_save_main(df_type=FacebookImageDescriptiveDF.performance, **kwargs)
+    def create_and_save_performance(self, **kwargs) -> pd.DataFrame:
+        return self.save_for_all_shops(df_type=FacebookImageDescriptiveDF.performance, **kwargs)
 
     def filter_and_save_top_n_ads_per_shop_and_month_by_spend(
         self,

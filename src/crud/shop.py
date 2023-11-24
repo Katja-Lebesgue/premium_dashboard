@@ -23,5 +23,10 @@ class CRUDShop(CRUDBase[models.Shop, schemas.ShopCreate, schemas.ShopUpdate]):
         filters = [self.model.name.contains(phrase) for phrase in test_shop_phrases]
         return db.query(self.model).filter(not_(or_(*filters))).all()
 
+    def get_test_shops(self, db: Session) -> list[models.Shop]:
+        test_shop_phrases = ("anci", "tatjana", "nikola", "test")
+        filters = [self.model.name.contains(phrase) for phrase in test_shop_phrases]
+        return db.query(self.model).filter(or_(*filters)).all()
+
 
 shop = CRUDShop(models.Shop)

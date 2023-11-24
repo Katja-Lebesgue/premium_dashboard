@@ -36,6 +36,7 @@ class EmojiCloud:
         self.emoji_probability = None
 
     def initialize_wordcloud(self):
+        print(self.font_path)
         return WordCloud(
             font_path=self.font_path,
             width=2000,

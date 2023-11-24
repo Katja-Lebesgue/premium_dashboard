@@ -1,5 +1,6 @@
 import re
 from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 def to_date(x):
@@ -12,6 +13,10 @@ def to_date(x):
 
 def get_last_day_of_the_previous_month(dt: date) -> date:
     return date(year=dt.year, month=dt.month, day=1) - timedelta(days=1)
+
+
+def get_last_day_of_this_month(dt: date) -> date:
+    return dt + relativedelta(months=1) - relativedelta(days=1)
 
 
 def extract_dates_from_str(text: str) -> list[str]:

@@ -1,7 +1,8 @@
-from sqlalchemy import (TIMESTAMP, BigInteger, Boolean, Column, Date, Float,
-                        Integer, String)
+from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Column, Date, Float, Integer, String, func, case
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from src.database.base_class import Base
+from src.models.enums import Industry
 
 
 class Crm(Base):
@@ -31,3 +32,16 @@ class Crm(Base):
     reply_received = Column(String)
     notes = Column(String)
     is_paying_or_appsumo = Column(String(3), nullable=False)
+
+    @hybrid_property
+    def industry_enum(self) -> Industry:
+        if not len(self.industry):
+            return Industry.unknown
+        return Industry(self.industry.lower().replace(" ", "_"))
+
+    @industry_enum.expression
+    def industry_enum(cls):
+        return case(
+            [(func.length(cls.industry) == 0, "unknown")],
+            else_=func.lower(func.replace(cls.industry, " ", "_")),
+        )

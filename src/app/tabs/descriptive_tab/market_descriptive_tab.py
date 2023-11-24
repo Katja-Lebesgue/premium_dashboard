@@ -55,7 +55,8 @@ class MarketDescriptiveTab(DescriptiveTab):
     @st.cache_data
     def get_most_recent_df(_self, cache_id: str, df_type: DescriptiveDF):
         end_date = max(_self.get_available_dates(df_type=df_type))
-        main_df = _self.read_df(df_type=df_type, end_date=end_date)
+        st.write(end_date)
+        main_df = _self.read_df(df_type=df_type, df_id=end_date)
         main_df["year_month"] = main_df.year_month.apply(lambda x: datetime.strptime(x, "%Y-%m"))
         main_df["feature_value"] = main_df.feature_value.apply(get_frontend_name)
         for metric in _self.metrics:

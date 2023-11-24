@@ -31,9 +31,7 @@ class ShopDescriptiveTab(DescriptiveTab):
 
     @st.cache_data
     def get_summary_df(_self, shop_id: int, cache_id: str) -> pd.DataFrame:
-        summary_df = _self.get_shop_descriptive_df(
-            db=_self.db, shop_id=shop_id, start_date=_self.start_date, end_date=_self.end_date
-        ).reset_index()
+        summary_df = _self.get_shop_df(db=_self.db, shop_id=shop_id).reset_index()
         if not len(summary_df):
             st.warning("No data.")
             return summary_df
