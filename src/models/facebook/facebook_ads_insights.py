@@ -29,4 +29,9 @@ class FacebookAdsInsights(Base):
     revenue = synonym("purchases_conversion_value")
     shop = relationship("Shop", back_populates="facebook_ads_insights")
 
+    # synonyms
+    clicks_ = synonym("link_clicks")
+    purch_ = synonym("purchases")
+    purch_value_ = synonym("purchases_conversion_value")
+
     platform = EPlatform.facebook

@@ -69,7 +69,7 @@ class Descriptive(ABC, S3ReaderWriter):
         # end_date should be the last day of the month so we always
         # only consider data from full months
         # TODO: remove timedelta
-        today = date.today() + relativedelta(months=1)
+        today = date.today()
         end_date_plus_one = date(year=today.year, month=today.month, day=1)
         return end_date_plus_one - timedelta(days=1)
 
@@ -190,11 +190,6 @@ class Descriptive(ABC, S3ReaderWriter):
             save_to_s3=save_to_s3,
             testing=testing,
         )
-
-    def get_available_dates(self, df_type: DescriptiveDF) -> list[date]:
-        all_objects = list_objects_from_prefix(prefix=self.s3_folder)
-        list_of_objects = [obj for obj in all_objects if df_type in obj]
-        return [to_date(date_str) for date_str in extract_dates_from_str(" ".join(list_of_objects))]
 
 
 class FacebookCreativeDescriptive(Descriptive):

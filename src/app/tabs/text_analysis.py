@@ -45,7 +45,7 @@ def ping_text_samples(text_type: TextType, sample_size: int = 5_000, n_months: i
         industry_df = pd.DataFrame(industry_data)
         df = pd.concat([df, industry_df], axis=0)
     test_shop_ids = [shop_.id for shop_ in crud.shop.get_test_shops(db=db)]
-    # df = df[~df.shop_id.isin(test_shop_ids)]
+    df = df[~df.shop_id.isin(test_shop_ids)]
     df = df.rename(columns={"industry_enum": "industry"})
 
     return df
@@ -150,7 +150,6 @@ def get_word_and_emoji_cloud(df: pd.DataFrame, text_col: str, _emoji_cloud):
     full = " ".join(df[text_col].tolist())
     wc = WordCloud().generate_from_text(full)
     ec = _emoji_cloud.generate(full)
-    logger.debug("Opet wc!")
     return wc, ec
 
 

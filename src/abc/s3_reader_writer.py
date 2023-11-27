@@ -117,3 +117,8 @@ class S3ReaderWriter:
 
     def get_shop_df(**kwargs) -> pd.DataFrame:
         ...
+
+    def get_available_dates(self, df_type: str) -> list[date]:
+        all_objects = list_objects_from_prefix(prefix=self.s3_folder)
+        list_of_objects = [obj for obj in all_objects if df_type in obj]
+        return [to_date(date_str) for date_str in extract_dates_from_str(" ".join(list_of_objects))]

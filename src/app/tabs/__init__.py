@@ -1,5 +1,4 @@
 from .ad_analytics_tab import ad_analytics_tab
-from .all_platforms import all_platforms
 from .descriptive_tab import *
 from .market_performance_tests import market_performance_tests
 from .select_shop_and_load_data import select_shop_and_load_data

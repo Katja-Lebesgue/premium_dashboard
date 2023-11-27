@@ -21,7 +21,8 @@ class FacebookImageDescriptiveSaver(FacebookImageDescriptive):
 
     @property
     def s3_image_folder(self):
-        return os.path.join(self.s3_descriptive_folder, self.tag, "images")
+        # TODO: mozda ne radi
+        return os.path.join(self.s3_descriptive_folder, ".", "images")
 
     def __init__(
         self,

@@ -22,4 +22,9 @@ class TikTokAdsInsights(Base):
 
     shop = relationship("Shop", back_populates="tiktok_ads_insights")
 
+    # synonyms
+    clicks_ = synonym("clicks")
+    purch_ = synonym("complete_payment")
+    purch_value_ = synonym("total_complete_payment_rate")
+
     platform = EPlatform.tiktok

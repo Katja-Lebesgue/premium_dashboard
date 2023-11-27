@@ -6,7 +6,6 @@ from src.models.google.google_base import GoogleBase
 
 
 class GoogleAdsInsights(GoogleBase):
-
     shop_id = Column(BigInteger, ForeignKey("shop.id"), primary_key=True)
     google_account_id = Column(BigInteger, primary_key=True)
     date = Column(Date, primary_key=True)
@@ -18,8 +17,13 @@ class GoogleAdsInsights(GoogleBase):
     conversions_purchase = Column(Numeric)
     total_purchase_value = Column(Numeric)
     spend = Column(Numeric)
-    revenue = synonym("total_purchase_value")
 
     shop = relationship("Shop", back_populates="google_ads_insights")
 
     platform = EPlatform.google
+
+    # synonyms
+    adgroup_id_ = synonym("adgroup_id")
+    clicks_ = synonym("clicks")
+    purch_ = synonym("conversions")
+    purch_value_ = synonym("total_purchase_value")

@@ -20,7 +20,11 @@ def get_main_menu():
         title="Main menu",
         icon="menu-app",
         buttons=(
-            MyButton(name="All channels", icon="arrows-fullscreen", activation_function=all_platforms),
+            MyButton(
+                name="All channels",
+                icon="arrows-fullscreen",
+                activation_function=all_platforms_descriptive_tab.show,
+            ),
             MyButton(name="Google", icon="google", activation_function=google_menu.show),
             MyButton(name="Facebook", icon="facebook", activation_function=facebook_menu.show),
             MyButton(name="Settings", icon="gear", activation_function=get_settings_menu().show),

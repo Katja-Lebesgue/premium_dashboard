@@ -49,7 +49,9 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
     stat, p, stat_levene, p_levene = [np.nan for i in range(4)]
 
     samples_dict = {
-        none_to_unknown(group): list(sample) for group, sample in samples_dict.items() if len(sample)
+        none_to_unknown(group): [unit for unit in sample if unit is not None and not np.isnan(unit)]
+        for group, sample in samples_dict.items()
+        if len(sample)
     }
 
     samples_list = list(samples_dict.values())
@@ -103,6 +105,6 @@ def mean_test(samples_dict: dict, convert_nan_to_none: bool = False) -> dict:
     }
 
     for group in samples_dict.keys():
-        result[group] = {"mean": np.mean(samples_dict[group]), "size": len(samples_dict[group])}
+        result[group] = {"mean": np.nanmean(samples_dict[group]), "size": len(samples_dict[group])}
 
     return result

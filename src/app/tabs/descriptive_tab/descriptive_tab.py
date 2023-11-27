@@ -18,9 +18,8 @@ from src.utils import *
 
 
 class DescriptiveTab(Descriptive):
-    @abstractproperty
     def available_metrics(self) -> list[str]:
-        ...
+        return []
 
     @abstractproperty
     def show(self, **kwargs) -> None:
@@ -208,6 +207,7 @@ class DescriptiveTab(Descriptive):
             )
 
             feature_df = main_df[main_df.feature == selected_feature]
+
             feature_df = feature_df[
                 feature_df[selected_metric.denom] > max(100, feature_df[selected_metric.denom].quantile(0.25))
             ]
