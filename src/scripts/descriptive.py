@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from datetime import date
 
 from src.database.session import db
-from src.abc.descriptive import *
+from src.interfaces.descriptive import *
 from src.utils import *
 
 if __name__ == "__main__":

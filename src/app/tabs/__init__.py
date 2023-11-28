@@ -5,4 +5,4 @@ from .select_shop_and_load_data import select_shop_and_load_data
 from .settings import *
 from .shop_custom_performance_test import shop_custom_performance_test
 from .shop_default_performance_tests import shop_default_performance_tests
-from .text_analysis import text_analysis
+from .text_analysis_tab import text_analysis_tab

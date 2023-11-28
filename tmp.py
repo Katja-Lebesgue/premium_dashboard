@@ -8,7 +8,7 @@ from src.database.session import SessionLocal
 from src.pingers import *
 from src.utils import *
 from src import crud
-from src.abc.descriptive import DescriptiveDF
+from src.interfaces.descriptive import DescriptiveDF
 from src.crud.utils.get_performance import get_performance, get_conversion_rates_dict
 
 db = SessionLocal()

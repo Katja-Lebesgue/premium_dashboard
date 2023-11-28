@@ -43,7 +43,7 @@ facebook_market_menu = MyOptionMenu(
         MyButton(
             name="Text",
             icon="cursor-text",
-            activation_function=text_analysis,
+            activation_function=text_analysis_tab.show,
         ),
         MyButton(
             name="Image",

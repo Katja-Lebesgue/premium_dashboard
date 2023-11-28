@@ -1,5 +1,5 @@
 from datetime import date
-from src.abc import S3ReaderWriter
+from src.interfaces import S3ReaderWriter
 from src.pingers import ping_facebook_creative_target_and_performance
 from src.utils import *
 from src import crud

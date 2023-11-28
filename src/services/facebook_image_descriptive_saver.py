@@ -6,7 +6,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
-from src.abc.descriptive import *
+from src.interfaces.descriptive import *
 from src.database.session import db
 from src.models import *
 from src.utils import *

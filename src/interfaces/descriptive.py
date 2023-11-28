@@ -8,7 +8,7 @@ from src.database.session import db
 from src.models.enums.facebook import BOOLEAN_TEXT_FEATURES
 from src.pingers import *
 from src.utils import *
-from src.abc.s3_reader_writer import S3ReaderWriter
+from src.interfaces.s3_reader_writer import S3ReaderWriter
 
 
 class DescriptiveDF(str, Enum):
