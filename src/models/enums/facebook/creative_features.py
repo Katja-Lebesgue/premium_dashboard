@@ -38,6 +38,7 @@ class TargetFeature(str, Enum):
     number_of_countries = "number_of_countries"
     targets_english = "targets_english"
     targets_US = "targets_US"
+    audience = "audience"
 
 
 class CreativeType(str, Enum):
