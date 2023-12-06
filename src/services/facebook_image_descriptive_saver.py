@@ -16,7 +16,7 @@ class FacebookImageDescriptiveSaver(FacebookImageDescriptive):
     save_every_n_shops = 15
     save_every_n_rows = 500
 
-    def get_raw_shop_df(*args) -> pd.DataFrame:
+    def get_raw_shop_df(self, *args, **kwargs) -> pd.DataFrame:
         return pd.DataFrame()
 
     @property

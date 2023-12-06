@@ -55,7 +55,7 @@ class CRUDImage(
         url_query = db.query(
             Image.image_hash,
             Image.url,
-            func.rank()
+            func.row_number()
             .over(order_by=Image.created_at.desc(), partition_by=Image.image_hash)
             .label("freshness_rank"),
         ).filter(Image.shop_id == shop_id)

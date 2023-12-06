@@ -16,15 +16,15 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--testing", action="store_true", default=False)
     args = parser.parse_args()
 
-    facebook_creative_descriptive.save_for_all_shops(
-        db=db, force_from_scratch=args.force_from_scratch, testing=args.testing
-    )
-    facebook_creative_descriptive.create_and_save_summary()
+    # facebook_creative_descriptive.save_for_all_shops(
+    #     db=db, force_from_scratch=args.force_from_scratch, testing=args.testing
+    # )
+    # facebook_creative_descriptive.create_and_save_summary()
 
-    facebook_target_descriptive.save_for_all_shops(
-        db=db, force_from_scratch=args.force_from_scratch, testing=args.testing
-    )
-    facebook_target_descriptive.create_and_save_summary()
+    # facebook_target_descriptive.save_for_all_shops(
+    #     db=db, force_from_scratch=args.force_from_scratch, testing=args.testing
+    # )
+    # facebook_target_descriptive.create_and_save_summary()
 
     google_campaign_type_descriptive.save_for_all_shops(
         db=db, force_from_scratch=args.force_from_scratch, testing=args.testing

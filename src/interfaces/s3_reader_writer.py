@@ -49,7 +49,7 @@ class S3ReaderWriter:
 
         if testing:
             all_shop_ids = sorted([16038, 44301396, 34810574, 96200, 2])
-            all_shop_ids = sorted([16038, 96200])
+            # all_shop_ids = sorted([16038, 96200])
 
         if not force_from_scratch:
             list_of_objects_on_s3 = list_objects_from_prefix(
@@ -103,6 +103,7 @@ class S3ReaderWriter:
             except Exception as e:
                 logger.error(f"Error for shop id {shop_id}: \n {e}")
                 new_failed_shop_ids.append(shop_id)
+                db.rollback()
         logger.debug(f"{len(main_df) = }")
         if save_to_s3:
             self.save_df(df=main_df, df_type=df_type, df_id=df_id, index=False)
