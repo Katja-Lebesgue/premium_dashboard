@@ -21,11 +21,9 @@ class S3ReaderWriter:
         return os.path.join(self.s3_folder, f"{df_type}_{df_id}.csv")
 
     def read_df(self, df_type: str, df_id: str):
-        logger.debug(f"####: {self.get_df_path(df_type=df_type, df_id=df_id)}")
         return read_csv_from_s3(path=self.get_df_path(df_type=df_type, df_id=df_id))
 
     def save_df(self, df: pd.DataFrame, index: bool = True, **kwargs):
-        logger.debug(f"aha: {kwargs}")
         return save_csv_to_s3(df=df, path=self.get_df_path(**kwargs), index=index)
 
     def save_for_all_shops(

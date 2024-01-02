@@ -69,7 +69,7 @@ class Descriptive(ABC, S3ReaderWriter):
         # end_date should be the last day of the month so we always
         # only consider data from full months
         # TODO: remove timedelta
-        today = date.today()
+        today = date.today() + timedelta(2)
         end_date_plus_one = date(year=today.year, month=today.month, day=1)
         return end_date_plus_one - timedelta(days=1)
 
