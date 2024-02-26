@@ -14,6 +14,7 @@ from src.models import Credentials
 
 load_dotenv()
 
+"bla"
 
 def get_preview_shareable_link(
     ad_id: str, access_token: str | None, shop_id: int | None = None, db: Session | None = None
