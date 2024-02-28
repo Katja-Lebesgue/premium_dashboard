@@ -5,8 +5,7 @@ import extra_streamlit_components as stx
 import jwt
 import streamlit as st
 
-from .exceptions import (CredentialsError, ForgotError, RegisterError,
-                         ResetError, UpdateError)
+from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 from .hasher import Hasher
 from .utils import generate_random_pw
 
@@ -18,7 +17,12 @@ class Authenticate:
     """
 
     def __init__(
-        self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int = 30, preauthorized: list = None
+        self,
+        credentials: dict,
+        cookie_name: str,
+        key: str,
+        cookie_expiry_days: int = 30,
+        preauthorized: list = None,
     ):
         """
         Create a new instance of "Authenticate".
@@ -37,7 +41,9 @@ class Authenticate:
             The list of emails of unregistered users authorized to register.
         """
         self.credentials = credentials
-        self.credentials["usernames"] = {key.lower(): value for key, value in credentials["usernames"].items()}
+        self.credentials["usernames"] = {
+            key.lower(): value for key, value in credentials["usernames"].items()
+        }
         self.cookie_name = cookie_name
         self.key = key
         self.cookie_expiry_days = cookie_expiry_days
@@ -63,7 +69,11 @@ class Authenticate:
             The JWT cookie for passwordless reauthentication.
         """
         return jwt.encode(
-            {"name": st.session_state["name"], "username": st.session_state["username"], "exp_date": self.exp_date},
+            {
+                "name": st.session_state["name"],
+                "username": st.session_state["username"],
+                "exp_date": self.exp_date,
+            },
             self.key,
             algorithm="HS256",
         )
@@ -184,10 +194,14 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
+        from loguru import logger
+
         if location not in ["main", "sidebar"]:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state["authentication_status"]:
+            logger.debug(f"prije check cookie {st.session_state['name']}")
             self._check_cookie()
+            logger.debug(f"poslije check cookie {st.session_state['name']}")
             if st.session_state["authentication_status"] != True:
                 if location == "main":
                     login_form = st.form("Login")
@@ -198,15 +212,17 @@ class Authenticate:
                 self.username = login_form.text_input("Username").lower()
                 st.session_state["username"] = self.username
                 self.password = login_form.text_input("Password", type="password")
-
+                logger.debug(f"prije check creds {st.session_state['name']}")
                 if login_form.form_submit_button("Login"):
                     self._check_credentials()
-        
-        from loguru import logger
+
         logger.debug(f"## {st.session_state['name']}")
 
-
-        return st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"]
+        return (
+            st.session_state["name"],
+            st.session_state["authentication_status"],
+            st.session_state["username"],
+        )
 
     def logout(self, button_name: str, location: str = "main"):
         """
@@ -295,7 +311,9 @@ class Authenticate:
             else:
                 raise CredentialsError
 
-    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
+    def _register_credentials(
+        self, username: str, name: str, password: str, email: str, preauthorization: bool
+    ):
         """
         Adds to credentials dictionary the new user's information.
 
