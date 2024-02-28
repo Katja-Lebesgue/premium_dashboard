@@ -201,6 +201,10 @@ class Authenticate:
 
                 if login_form.form_submit_button("Login"):
                     self._check_credentials()
+        
+        from loguru import logger
+        logger.debug(f"## {st.session_state['name']}")
+
 
         return st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"]
 
