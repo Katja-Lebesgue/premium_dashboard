@@ -1,5 +1,4 @@
-import os
-from abc import abstractproperty
+from abc import abstractmethod
 from typing import Literal
 import itertools
 
@@ -9,9 +8,8 @@ import streamlit as st
 from plotly.subplots import make_subplots
 from scipy.stats import kruskal
 
-from src.interfaces.descriptive import Descriptive, DescriptiveDF
+from src.interfaces.descriptive import Descriptive
 from src.app.frontend_names import get_frontend_name, list_to_str
-from src.models.enums.facebook import TextFeature
 from src.statistical_tests import perform_test_on_df
 from src.app.utils import filter_df, FilterType
 from src.utils import *
@@ -21,7 +19,7 @@ class DescriptiveTab(Descriptive):
     def available_metrics(self) -> list[str]:
         return []
 
-    @abstractproperty
+    @abstractmethod
     def show(self, **kwargs) -> None:
         ...
 

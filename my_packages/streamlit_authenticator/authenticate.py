@@ -194,14 +194,12 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
-        from loguru import logger
 
         if location not in ["main", "sidebar"]:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state["authentication_status"]:
-            logger.debug(f"prije check cookie {st.session_state['name']}")
             self._check_cookie()
-            logger.debug(f"poslije check cookie {st.session_state['name']}")
+
             if st.session_state["authentication_status"] != True:
                 if location == "main":
                     login_form = st.form("Login")
@@ -212,11 +210,9 @@ class Authenticate:
                 self.username = login_form.text_input("Username").lower()
                 st.session_state["username"] = self.username
                 self.password = login_form.text_input("Password", type="password")
-                logger.debug(f"prije check creds {st.session_state['name']}")
+
                 if login_form.form_submit_button("Login"):
                     self._check_credentials()
-
-        logger.debug(f"## {st.session_state['name']}")
 
         return (
             st.session_state["name"],

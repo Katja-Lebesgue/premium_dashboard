@@ -14,7 +14,9 @@ nltk.download("stopwords")
 from src.app import *
 from src.app.authenticate import authenticate
 
-logger.debug(f"# {os.getcwd()}")
+with open(f'{os.getenv("GLOBAL_PATH_TO_REPO")}/src/utils/Symbola.otf', "rb") as f:
+    a = f.read()
+    logger.success("JUPI!!!")
 
 st.set_page_config(layout="wide")
 

@@ -41,7 +41,6 @@ class S3ReaderWriter:
         failed_shops_df_type = f"{df_type}_failed_shop_ids"
         if all_shops is None:
             all_shops = crud.shop.get_nontest_shops(db=db)
-        logger.info(f"Total of {len(all_shops)} shops.")
 
         all_shop_ids = sorted([shop_.id for shop_ in all_shops if shop_.id not in self.skip_shop_ids])
 

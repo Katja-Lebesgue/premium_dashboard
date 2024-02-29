@@ -1,6 +1,4 @@
 import streamlit as st
-from loguru import logger
-from sqlalchemy.exc import PendingRollbackError
 
 from my_packages import streamlit_authenticator as stauth
 from src.database.session import db
@@ -22,8 +20,6 @@ def authenticate():
             key="cookie_key",
             cookie_expiry_days=30,
         )
-
-        logger.debug(f"# {st.session_state['name']}")
 
         name, authentication_status, username = authenticator.login("Login", "main")
 

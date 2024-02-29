@@ -7,30 +7,6 @@ from src.app.tabs.descriptive_tab import (
     google_campaign_type_shop_descriptive_tab,
 )
 
-google_shop_menu = MyOptionMenu(
-    title="Shop",
-    icon="shop",
-    buttons=(
-        MyButton(
-            name="Campaign type",
-            icon="pie-chart-fill",
-            activation_function=google_campaign_type_shop_descriptive_tab.show,
-        ),
-    ),
-)
-
-google_market_menu = MyOptionMenu(
-    title="Market",
-    icon="globe",
-    buttons=(
-        MyButton(
-            name="Campaign type",
-            icon="pie-chart-fill",
-            activation_function=google_campaign_type_market_descriptive_tab.show,
-        ),
-    ),
-)
-
 
 def shop_button_activation():
     with st.sidebar:
