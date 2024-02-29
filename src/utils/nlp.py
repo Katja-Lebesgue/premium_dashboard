@@ -31,6 +31,9 @@ def get_sentiment(text: str) -> dict:
 
 class EmojiCloud:
     def __init__(self, font_path=f"{os.getenv('GLOBAL_PATH_TO_REPO')}/src/utils/Symbola.otf"):
+        import os
+
+        logger.debug(f'&& {os.getenv("GLOBAL_PATH_TO_REPO")}/src/utils/Symbola.otf')
         self.font_path = font_path
         self.word_cloud = self.initialize_wordcloud()
         self.emoji_probability = None
