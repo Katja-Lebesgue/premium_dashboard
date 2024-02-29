@@ -14,6 +14,8 @@ nltk.download("stopwords")
 from src.app import *
 from src.app.authenticate import authenticate
 
+logger.debug(f"# {os.getcwd()}")
+
 st.set_page_config(layout="wide")
 
 pd.set_option("mode.chained_assignment", None)
