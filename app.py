@@ -14,7 +14,8 @@ nltk.download("stopwords")
 from src.app import *
 from src.app.authenticate import authenticate
 
-with open(f'{os.getenv("GLOBAL_PATH_TO_REPO")}/src/utils/Symbola.otf', "rb") as f:
+with open("a.txt", "rb") as f:
+    # with open(f'{os.getenv("GLOBAL_PATH_TO_REPO")}/src/utils/Symbola.otf', "rb") as f:
     a = f.read()
     logger.success("JUPI!!!")
 
