@@ -10,14 +10,18 @@ class FacebookAdAccountBase(APIModel):
     name: str
     currency: str
     shop_id: int
+    user_id: int
     created_time: datetime.datetime
     time_zone: str
     timezone_offset_hours_utc: int
-    connected: bool
+    internally_connected: bool
+    user_connected: bool
+    platform_user_id: str
 
 
 class FacebookAdAccountCreate(FacebookAdAccountBase):
-    connected: bool = True
+    user_connected: bool = True
+    internally_connected: bool = False
 
 
 class FacebookAdAccountUpdate(FacebookAdAccountBase):

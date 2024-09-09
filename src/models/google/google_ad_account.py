@@ -17,11 +17,13 @@ class GoogleAdAccount(Base):
         autoincrement=True,
     )
     shop_id = Column(BigInteger, ForeignKey("shop.id"), nullable=False)
+    user_id = Column(BigInteger, ForeignKey("user.id"))
     google_id = Column(BigInteger)
     name = Column(String)
     currency = Column(String)
     time_zone = Column(String)
-    connected = Column(Boolean, default=False)
+    user_connected = Column(Boolean, default=False)
+    internally_connected = Column(Boolean, default=False, nullable=False)
     login_customer_id = Column(BigInteger)
 
     shop = relationship("Shop", back_populates="google_ad_accounts")

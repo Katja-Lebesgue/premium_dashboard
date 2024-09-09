@@ -57,6 +57,7 @@ class CreativeType(str, Enum):
     video = "video"
     dynamic = "dynamic"
     carousel = "carousel"
+    catalog = "catalog"
     unknown = "unknown"
 
 

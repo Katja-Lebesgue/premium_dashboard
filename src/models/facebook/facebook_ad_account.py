@@ -17,13 +17,16 @@ class FacebookAdAccount(Base):
         autoincrement=True,
     )
     shop_id = Column(BigInteger, ForeignKey("shop.id"), nullable=False)
+    user_id = Column(BigInteger, ForeignKey("user.id"))
     facebook_id = Column(String)
     name = Column(String)
     currency = Column(String)
     created_time = Column(DateTime)
     time_zone = Column("timezone_name", String)
     timezone_offset_hours_utc = Column(SmallInteger)
-    connected = Column(Boolean, default=False)
+    user_connected = Column(Boolean, default=False)
+    internally_connected = Column(Boolean, default=False, nullable=False)
+    platform_user_id = Column(String)
 
     # synonyms
     channel_account_id = synonym("facebook_id")

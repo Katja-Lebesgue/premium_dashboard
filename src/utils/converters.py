@@ -38,12 +38,12 @@ def big_number_human_format(num, big_decimals: int = 2, small_decimals: int = 0)
     if magnitude:
         num_format = f"%.{big_decimals}f%s" % (
             num,
-            ["", "K", "M", "G", "T", "P"][magnitude],
+            ["", "K", "M", "B", "T", "P"][magnitude],
         )
     else:
         num_format = f"%.{small_decimals}f%s" % (
             num,
-            ["", "K", "M", "G", "T", "P"][magnitude],
+            ["", "K", "M", "B", "T", "P"][magnitude],
         )
 
     return num_format

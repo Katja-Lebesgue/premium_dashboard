@@ -8,7 +8,7 @@ from src.schemas.facebook.facebook_ad_account import (FacebookAdAccountCreate,
 
 class CRUDFacebookAdAccount(CRUDBase[FacebookAdAccount, FacebookAdAccountCreate, FacebookAdAccountUpdate]):
     def disconnect(self, db: Session, account: FacebookAdAccount):
-        self.update(db, db_obj=account, obj_in={"connected": False})
+        self.update(db, db_obj=account, obj_in={"connected": False}) #TODO: fix of remove!
 
     def disconnect_accounts(self, db: Session, accounts: list[FacebookAdAccount]):
         self.update_multi(db, db_objs=accounts, objs_in=[{"connected": False}] * len(accounts))

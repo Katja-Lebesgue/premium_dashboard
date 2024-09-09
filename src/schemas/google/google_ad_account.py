@@ -5,15 +5,18 @@ from src.schemas.api_model import APIModel
 
 class GoogleAdAccountBase(APIModel):
     shop_id: int
+    user_id: int
     google_id: int = Field(..., alias="account_id")
     name: str
     currency: str
     time_zone: str
-    connected: bool
+    user_connected: bool 
+    internally_connected: bool 
 
 
 class GoogleAdAccountCreate(GoogleAdAccountBase):
-    connected: bool = True
+    user_connected: bool = True
+    internally_connected: bool = False
     login_customer_id: int | None = None
 
 

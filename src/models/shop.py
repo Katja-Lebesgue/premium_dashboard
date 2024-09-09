@@ -56,7 +56,6 @@ class Shop(Base):
     closed = Column(Boolean, default=False)
     modules = Column(String, nullable=False)
     app = Column(String, nullable=False)
-    app_store_install = Column(Boolean)
     owner_id = Column(
         BigInteger().with_variant(sqlite.INTEGER, "sqlite"), ForeignKey("user.id"), nullable=True
     )

@@ -17,13 +17,16 @@ class TikTokAdAccount(Base):
         autoincrement=True,
     )
     shop_id = Column(BigInteger, ForeignKey("shop.id"), nullable=False)
+    user_id = Column(BigInteger, ForeignKey("user.id"))
     tiktok_id = Column(String)
     name = Column(String)
     currency = Column(String)
     created_time = Column(DateTime)
     time_zone = Column("timezone_name", String)
     timezone_offset_hours_utc = Column(SmallInteger)
-    connected = Column(Boolean, default=False)
+    user_connected = Column(Boolean, default=False)
+    internally_connected = Column(Boolean, nullable=False, default=False)
+    platform_user_id = Column(String)
 
     shop = relationship("Shop", back_populates="tiktok_ad_accounts")
 
