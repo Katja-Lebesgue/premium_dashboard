@@ -28,7 +28,7 @@ def s3_connect(conn_type: s3ConnectionType = s3ConnectionType.client):
 
 
 def add_global_s3_folder(path):
-    return f"{os.getenv('S3_PATH')}/{path}"
+    return f"dev/{path}"
 
 
 s3_client = s3_connect()
