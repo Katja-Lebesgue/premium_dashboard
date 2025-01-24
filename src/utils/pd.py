@@ -31,4 +31,5 @@ def read_query_into_df(db: Session, query: Query, chunk_size: int = 5000) -> pd.
     for offset in range(0, n_rows + 1, chunk_size):
         new_df = pd.read_sql(query.offset(offset).limit(chunk_size).statement, db.bind)
         df = pd.concat([df, new_df], axis=0)
+    df = df.reset_index(drop=True)
     return df
