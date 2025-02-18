@@ -98,6 +98,7 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 itmp.ipynb
+katja-test.ipynb
 
 # IPython
 profile_default/

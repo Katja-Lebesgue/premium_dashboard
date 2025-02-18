@@ -1,4 +1,3 @@
-import os
 import string
 import sys
 from io import StringIO
@@ -10,11 +9,9 @@ import plotly.express as px
 import seaborn as sns
 import streamlit as st
 from dotenv import load_dotenv
-from loguru import logger
 from matplotlib import pyplot as plt
 from nltk.tokenize.casual import TweetTokenizer
 from wordcloud import WordCloud
-from src.models import Crm
 from src import crud
 from src.models.enums.facebook import TextType
 from src.models.enums import Industry

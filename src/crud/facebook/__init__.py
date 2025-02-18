@@ -7,4 +7,3 @@ from .facebook_adset_insights import fb_adset_insights
 from .facebook_campaign import fb_campaign
 from .facebook_customaudience import fb_customaudience
 from .facebook_daily_performance import fb_daily_performance
-from .ad_creative_features import ad_creative_features

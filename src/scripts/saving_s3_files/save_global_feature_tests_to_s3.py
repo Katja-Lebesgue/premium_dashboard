@@ -1,5 +1,7 @@
 import sys
 
+from models.shop import Shop
+
 sys.path.append("././.")
 
 import warnings
@@ -11,7 +13,6 @@ from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from metadata.globals import *
-from src.models import AdCreativeFeatures
 from src.pingers import ping_facebook_creative_and_performance
 from src.statistical_tests import *
 from src.utils import *
@@ -39,7 +40,8 @@ def save_global_feature_tests_to_s3(
 
     done_shop_ids_path = folder + done_shop_ids_csv_name + ".csv"
 
-    shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    # shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    shop_ids_query = db.query(Shop.id).distinct()
     all_shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"]
 
     idx_cols = [

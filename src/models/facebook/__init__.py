@@ -1,4 +1,3 @@
-from .ad_creative_features import AdCreativeFeatures
 from .facebook_ad import FacebookAd
 from .facebook_ad_account import FacebookAdAccount
 from .facebook_ads_insights import FacebookAdsInsights

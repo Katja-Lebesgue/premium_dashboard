@@ -39,7 +39,8 @@ def save_text_length_trends_to_s3(
     done_shop_ids_path = folder + csv_file_name + "_done_shop_ids" + ".csv"
 
     logger.debug("pinging shops...")
-    shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    # shop_ids_query = db.query(AdCreativeFeatures.shop_id).distinct()
+    shop_ids_query = db.query(Shop.id).distinct()
     all_shop_ids = read_query_into_df(db=db, query=shop_ids_query)["shop_id"]
     logger.debug("done!")
 

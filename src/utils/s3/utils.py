@@ -3,7 +3,6 @@ from enum import Enum
 
 import boto3
 from dotenv import load_dotenv
-from loguru import logger
 
 load_dotenv()
 
@@ -29,6 +28,8 @@ def s3_connect(conn_type: s3ConnectionType = s3ConnectionType.client):
 
 def add_global_s3_folder(path):
     return f"dev/{path}"
+    # bilo je f"{os.getenv('S3_PATH')}/{path}", no jedino ovaj tab cita sa deva i dalje, 
+    # ako ces updateati i spremiti na prod onda vrati kako je bilo 
 
 
 s3_client = s3_connect()
